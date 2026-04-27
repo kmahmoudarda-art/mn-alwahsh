@@ -5,7 +5,7 @@ const TABLE_MAIN = 'Sin-Jim1';
 const TABLE_FLAGS = 'Flags';
 const TABLE_FANAN = 'Fanan';
 const TABLE_FAM = 'Fam';
-const TABLE_FALSAFA = 'Falsafa';
+const TABLE_FALSAFA = 'falsafa';
 
 const BASE_HEADERS = {
   apikey: SUPABASE_ANON_KEY,
