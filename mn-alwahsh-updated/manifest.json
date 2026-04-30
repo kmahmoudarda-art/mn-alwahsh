@@ -1,4 +1,15 @@
-"icons": [
+{
+  "name": "من الوحش",
+  "short_name": "من الوحش",
+  "description": "لعبة من الوحش التعليمية",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "orientation": "portrait",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
@@ -10,3 +21,4 @@
       "type": "image/png"
     }
   ]
+}
