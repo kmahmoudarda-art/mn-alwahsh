@@ -164,7 +164,10 @@
 .animate-score-flash {
   animation: scoreFlash 0.5s ease-in-out;
 }
-
+body {
+  /* This prevents the pull-to-refresh and the "rubber-band" effect */
+  overscroll-behavior-y: contain;
+}
 .animate-correct-pulse {
   animation: correctPulse 0.8s ease-out;
 }
