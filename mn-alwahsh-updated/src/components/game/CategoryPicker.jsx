@@ -18,13 +18,12 @@ const CATEGORY_ICONS = {
   'بنات فقط': '👑', 'مسرحيات عربية': '🎭', 'حيوانات': '🦁',
   'أغاني': '🎼', 'أغاني قديمة': '📻', 'Friends': '☕',
   'League of Legends': '🎮', 'أكل عربي': '🍽️', 'IQ': '🧠',
-  'رياضيات': '➗', 'English Lang': '🔤', 'football logo': '🗿',
-  'Football logo': '🗿',
-  'Football Logo': '🗿',
+  'رياضيات': '➗', 'English Lang': '🔤', 
+  'football logo': '🗿', 'Football logo': '🗿', 'Football Logo': '🗿'
 };
 
 const CATEGORY_GROUPS = {
-  '⚽ رياضة': ['football Logo','رياضة', 'CR7', 'ميسي', 'كأس العرب', 'كأس آسيا', 'Champions League', 'المنتخب الأردني', 'League of Legends', 'Real Madrid', 'Barcelona', 'WildRift', 'ريال مدريد', 'برشلونة', 'برشلونه', 'وايلد ريفت', 'محترف كرة'],
+  '⚽ رياضة': ['football logo', 'رياضة', 'CR7', 'ميسي', 'كأس العرب', 'كأس آسيا', 'Champions League', 'المنتخب الأردني', 'League of Legends', 'Real Madrid', 'Barcelona', 'WildRift', 'ريال مدريد', 'برشلونة', 'برشلونه', 'وايلد ريفت', 'محترف كرة'],
   '🎬 ترفيه': ['أفلام عربية', 'أفلام إنجليزية', 'نتفليكس', 'بريكينج باد', 'بيكي بلايندرز', 'بريزون بريك', 'مسلسلات تركية', 'أفلام رعب', 'Friends', 'Arab Idol', 'Arab Got Talent', 'مسرحيات عربية', 'Game of Thrones', 'باب الحارة'],
   '🎵 موسيقى وفنانون': ['أم كلثوم', 'عبد الحليم', 'حمو بيكا', 'تامر حسني', 'عمرو دياب', 'أغاني', 'أغاني قديمة','مشاهير عرب','فنانون عرب'],
   '🌍 جغرافيا وثقافة': ['جغرافيا', 'الإمارات', 'الأردن', 'دبي', 'تاريخ', 'براندات', 'English Lang', 'English Questions', 'أسئلة إنجليزية'],
@@ -34,16 +33,13 @@ const CATEGORY_GROUPS = {
   '🎲 متفرقات': ['أكل عربي', 'علوم', 'حيوانات', 'Dangerous Animals', 'حيوانات خطرة'],
 };
 
-// Place this right after the CATEGORY_GROUPS object
 const CAT_TO_GROUP = {};
 for (const [group, cats] of Object.entries(CATEGORY_GROUPS)) {
   for (const cat of cats) {
-    // We lowercase and trim here to make the key "clean"
     CAT_TO_GROUP[cat.toLowerCase().trim()] = group;
   }
 }
 
-// Session-level icon cache for unknown categories
 const iconCache = {};
 
 async function getAutoIcon(categoryName) {
@@ -63,28 +59,19 @@ async function getAutoIcon(categoryName) {
 
 function groupCategories(categories) {
   const groups = {};
-  // Initialize known groups in order
   for (const g of Object.keys(CATEGORY_GROUPS)) groups[g] = [];
 
   for (const cat of categories) {
-    // We normalize the incoming category from Supabase to match our clean keys
     const normalizedCat = typeof cat === 'string' ? cat.toLowerCase().trim() : '';
     const g = CAT_TO_GROUP[normalizedCat];
 
     if (g) {
       groups[g].push(cat);
     } else {
-      // If it's not found, it goes to Miscellaneous
       if (!groups['🎲 متفرقات']) groups['🎲 متفرقات'] = [];
       groups['🎲 متفرقات'].push(cat);
     }
   }
-
-  // Remove empty groups
-  return Object.fromEntries(Object.entries(groups).filter(([, cats]) => cats.length > 0));
-}
-
-  // Remove empty groups
   return Object.fromEntries(Object.entries(groups).filter(([, cats]) => cats.length > 0));
 }
 
@@ -106,10 +93,9 @@ export default function CategoryPicker({ selected, onToggle, max }) {
 
   useEffect(() => { load(); }, []);
 
-  // Auto-fetch icons for unknown categories
   useEffect(() => {
     if (!categories.length) return;
-    const unknowns = categories.filter(c => !CATEGORY_ICONS[c] && !loadingIcons.current.has(c));
+    const unknowns = categories.filter(c => !CATEGORY_ICONS[c] && !CATEGORY_ICONS[c.toLowerCase().trim()] && !loadingIcons.current.has(c));
     if (!unknowns.length) return;
     unknowns.forEach(c => loadingIcons.current.add(c));
     Promise.all(
@@ -135,8 +121,6 @@ export default function CategoryPicker({ selected, onToggle, max }) {
     </div>
   );
 
-  if (!categories.length) return <p className="text-center text-muted-foreground font-tajawal text-sm py-4">لا توجد فئات متاحة</p>;
-
   const grouped = groupCategories(categories);
 
   return (
@@ -149,7 +133,6 @@ export default function CategoryPicker({ selected, onToggle, max }) {
       <div className="category-scroll overflow-y-auto overflow-x-hidden" style={{ height: '60vh', scrollBehavior: 'smooth' }}>
         {Object.entries(grouped).map(([groupName, cats]) => (
           <div key={groupName} style={{ marginBottom: 16 }}>
-            {/* Section header */}
             <div style={{
               fontSize: 13, fontWeight: 700,
               color: '#000',
@@ -163,16 +146,18 @@ export default function CategoryPicker({ selected, onToggle, max }) {
               {groupName}
             </div>
 
-            {/* Category grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
               {cats.map((name) => {
                 const isSelected = selected.includes(name);
                 const isDisabled = !isSelected && selected.length >= max;
-// This forces the manual list to take priority over the AI icons
-const emoji = CATEGORY_ICONS[name] || 
-              CATEGORY_ICONS[name.toLowerCase().trim()] || 
-              icons[name] || 
-              '⏳';            return (
+                
+                // Prioritize manual CATEGORY_ICONS list
+                const emoji = CATEGORY_ICONS[name] || 
+                              CATEGORY_ICONS[name.toLowerCase().trim()] || 
+                              icons[name] || 
+                              '⏳';
+
+                return (
                   <motion.button
                     key={name}
                     whileHover={!isDisabled ? { scale: 1.05 } : {}}
