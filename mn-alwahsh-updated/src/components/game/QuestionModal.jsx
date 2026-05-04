@@ -452,242 +452,300 @@ export default function QuestionModal({
         {/* Normal question */}
         {question && !loading && !question.flag_mode && (
           <>
-            {/* Hero photo layout: Fanan (map or image_url) and Fam (image_url) */}
             {(() => {
               const isFanan = question.source_table === 'Fanan';
               const isLogo = question.source_table === 'logo1';
-              
-              console.log('[Hero] source_table:', question.source_table, 'image_url:', question.image_url);
-
-              // Show hero image for ANY question with image_url
-              const resolvedHeroUrl = question.image_url && question.image_url !== ''
-                ? isFanan
-                  ? (singerPhotoUrl || question.image_url)
-                  : question.image_url
+              const hasImage = question.image_url && question.image_url !== '';
+              const resolvedHeroUrl = hasImage
+                ? isFanan ? (singerPhotoUrl || question.image_url) : question.image_url
                 : null;
 
-              if (resolvedHeroUrl) {
-                // Landscape: image centered top, question below
-                if (isLandscape) {
-                  return (
-                    <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{
-                      flexShrink: 0, display: 'flex', flexDirection: 'row',
-                      alignItems: 'center', gap: 12, padding: '6px 12px',
-                    }}>
-                      <img
-                        src={resolvedHeroUrl}
-                        alt=""
-                        style={{
-                          width: isLogo ? 90 : 80,
-                          height: isLogo ? 90 : 80,
-                          flexShrink: 0,
-                          objectFit: isLogo ? 'contain' : 'cover',
-                          objectPosition: 'top',
-                          borderRadius: isLogo ? 8 : '50%',
-                          border: 'none',
-                          boxShadow: 'none',
-                          backgroundColor: 'transparent',
-                        }}
-                        onError={(e) => { e.target.style.display = 'none'; }}
-                        onLoad={() => console.log('Image loaded:', resolvedHeroUrl)}
-                      />
-                      <p style={{
-                        flex: 1, fontFamily: 'var(--font-cairo)', fontWeight: 700,
-                        color: 'hsl(var(--foreground))', fontSize: 13,
-                        lineHeight: 1.5, direction: 'rtl', textAlign: 'right', margin: 0,
-                      }}>
-                        {question.question}
-                      </p>
-                    </div>
-                  );
-                }
-
-                // Portrait: image centered, no frame, larger, question below
+              // ── PORTRAIT WITH IMAGE: split layout ──
+              // RIGHT: image + question | LEFT: answers stacked
+              if (resolvedHeroUrl && !isLandscape) {
+                const optionEntries = Object.entries(question.options);
                 return (
-                  <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{ flexShrink: 0 }}>
-                    {/* Centered image — no border, no shadow, larger */}
-                    <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 4px' }}>
-                      <img
-                        src={resolvedHeroUrl}
-                        alt=""
-                        style={{
-                          width: isLogo ? 160 : 150,
-                          height: isLogo ? 160 : 150,
-                          objectFit: isLogo ? 'contain' : 'cover',
-                          objectPosition: 'top',
-                          borderRadius: isLogo ? 8 : 12,
-                          border: 'none',
-                          boxShadow: 'none',
-                          display: 'block',
-                          backgroundColor: isLogo ? 'transparent' : 'transparent',
-                        }}
-                        onError={(e) => { e.target.style.display = 'none'; }}
-                        onLoad={() => console.log('Image loaded:', resolvedHeroUrl)}
-                      />
-                    </div>
-                    {/* Question text centered below image */}
-                    <div style={{
-                      padding: '4px 12px 2px', textAlign: 'center',
-                      maxHeight: 80, overflow: 'hidden',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  <>
+                    <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{
+                      flexShrink: 0,
+                      display: 'flex', flexDirection: 'row',
+                      gap: 8, padding: '6px 10px 4px',
+                      direction: 'rtl',
+                      alignItems: 'stretch',
                     }}>
-                      <p style={{
-                        fontFamily: 'var(--font-cairo)', fontWeight: 700,
-                        color: 'hsl(var(--foreground))', fontSize: 14,
-                        lineHeight: 1.45, direction: 'rtl', margin: 0,
-                        textAlign: 'center',
+                      {/* LEFT: answers stacked */}
+                      <div style={{
+                        flex: 1, display: 'flex', flexDirection: 'column', gap: 6,
+                        justifyContent: 'center',
                       }}>
-                        {question.question}
-                      </p>
+                        {optionEntries.map(([key, value]) => {
+                          const isEliminated = friendHint === key;
+                          const isDisabled = isEliminated || (twoAnswersMode && firstWrongAnswer === key);
+                          const isCorrectAnswer = question.correct === key;
+                          const isSelected = selectedAnswer === key;
+                          const isFirstWrong = firstWrongAnswer === key;
+                          let bg = 'hsl(var(--secondary))', bdr = '1px solid hsl(var(--border))', color = 'hsl(var(--foreground))';
+                          if (answered) {
+                            bg = 'hsl(var(--secondary)/0.5)'; bdr = '1px solid hsl(var(--border))'; color = 'hsl(var(--muted-foreground))';
+                            if (isCorrectAnswer) { bg='rgba(34,197,94,0.2)'; bdr='2px solid #4ade80'; color='#86efac'; }
+                            else if (isSelected) { bg='rgba(239,68,68,0.2)'; bdr='2px solid #f87171'; color='#fca5a5'; }
+                            else if (isFirstWrong) { bg='rgba(239,68,68,0.08)'; bdr='1px solid rgba(248,113,113,0.3)'; color='rgba(252,165,165,0.5)'; }
+                          }
+                          if (isEliminated) { bg='rgba(255,255,255,0.02)'; bdr='1px solid rgba(255,255,255,0.05)'; color='rgba(255,255,255,0.15)'; }
+                          const Tag = answered ? 'div' : 'button';
+                          return (
+                            <Tag key={key}
+                              onClick={!answered && !isDisabled ? () => onAnswer(key) : undefined}
+                              disabled={!answered ? isDisabled : undefined}
+                              style={{
+                                minHeight: 44, borderRadius: 10, padding: '5px 8px',
+                                fontSize: 12, lineHeight: 1.3, wordBreak: 'break-word',
+                                display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6,
+                                direction: 'rtl', textAlign: 'right',
+                                background: bg, border: bdr, color,
+                                opacity: isEliminated ? 0.3 : 1,
+                                textDecoration: isEliminated ? 'line-through' : 'none',
+                                cursor: (!answered && !isDisabled) ? 'pointer' : 'default',
+                                fontFamily: 'var(--font-cairo)', transition: 'background 0.15s',
+                                width: '100%', boxSizing: 'border-box',
+                              }}>
+                              <span style={{ fontWeight:700, color:GOLD, flexShrink:0 }}>{key}.</span>
+                              {value}
+                            </Tag>
+                          );
+                        })}
+                      </div>
+
+                      {/* RIGHT: image + question */}
+                      <div style={{
+                        width: 130, flexShrink: 0,
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center', gap: 6,
+                      }}>
+                        <img
+                          src={resolvedHeroUrl}
+                          alt=""
+                          style={{
+                            width: 110, height: 110,
+                            objectFit: isLogo ? 'contain' : 'cover',
+                            objectPosition: 'center',
+                            borderRadius: isLogo ? 8 : '50%',
+                            border: 'none',
+                            boxShadow: 'none',
+                            display: 'block',
+                          }}
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                          onLoad={() => console.log('Image loaded:', resolvedHeroUrl)}
+                        />
+                        <p style={{
+                          fontFamily: 'var(--font-cairo)', fontWeight: 700,
+                          color: 'hsl(var(--foreground))', fontSize: 11,
+                          lineHeight: 1.4, direction: 'rtl', textAlign: 'center', margin: 0,
+                          width: '100%',
+                        }}>
+                          {question.question}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+
+                    {/* Status bar */}
+                    <div style={{ flexShrink:0, padding:'0 12px 4px' }}>
+                      {!stealMode && !answered && (
+                        <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
+                          width:'100%', padding:'4px 10px', borderRadius:10, fontSize:11,
+                          background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(251,146,60,0.12)',
+                          border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(251,146,60,0.3)',
+                          color: passToOtherUsed ? 'rgba(255,255,255,0.2)' : '#fdba74',
+                          fontFamily:'var(--font-cairo)', cursor: passToOtherUsed ? 'not-allowed' : 'pointer',
+                          textAlign:'center', opacity: passToOtherUsed ? 0.4 : 1,
+                          textDecoration: passToOtherUsed ? 'line-through' : 'none',
+                        }}>🎯 اسرق يا غالي → أعطها للفريق الثاني (10 ثواني)</button>
+                      )}
+                      {stealMode && !answered && (
+                        <div style={{ background:'rgba(251,146,60,0.12)', border:'1px solid rgba(251,146,60,0.3)', borderRadius:10, padding:'6px 10px', textAlign:'center' }}>
+                          <p style={{ color:'#fdba74', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:12, margin:0 }}>⚡ فرصة السرقة!</p>
+                        </div>
+                      )}
+                      {friendHint && (
+                        <div style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.25)', borderRadius:8, padding:'4px 10px', marginTop:4, textAlign:'center' }}>
+                          <p style={{ color:'#fca5a5', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:11, margin:0 }}>🗑️ تم حذف إجابة خاطئة</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Lifelines */}
+                    {!answered && (
+                      <div className="ll-scroll" style={{ flexShrink:0, display:'flex', flexDirection:'row', overflowX:'auto', gap:8, padding:'0 12px 6px' }}>
+                        {LIFELINES.filter(ll => ll.id !== 'trap').map(ll => {
+                          const isUsed = usedLifelines[ll.id];
+                          const isActive = activeLifeline === ll.id;
+                          return (
+                            <button key={ll.id} onClick={() => !isUsed && onUseLifeline(ll.id)} disabled={isUsed}
+                              style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
+                                background: isUsed ? 'rgba(255,255,255,0.03)' : isActive ? GOLD : GOLD_BG,
+                                color: isUsed ? 'rgba(255,255,255,0.3)' : '#000',
+                                border: `${isActive?'2':'1'}px solid ${isUsed ? 'rgba(255,255,255,0.08)' : GOLD_BORDER}`,
+                                fontFamily:'var(--font-cairo)', opacity: isUsed ? 0.35 : 1,
+                                textDecoration: isUsed ? 'line-through' : 'none',
+                                cursor: isUsed ? 'not-allowed' : 'pointer',
+                              }}>{ll.label}</button>
+                          );
+                        })}
+                        <button onClick={handleSwap} disabled={swapAnimating}
+                          style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
+                            background: GOLD_BG, color: '#000', border: `1px solid ${GOLD_BORDER}`,
+                            fontFamily:'var(--font-cairo)', cursor: 'pointer',
+                          }}>🔄 تغيير سؤال مكرر</button>
+                      </div>
+                    )}
+                  </>
                 );
               }
 
+              // ── LANDSCAPE WITH IMAGE or NO IMAGE: standard layout ──
               return (
-                <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{
-                  flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  padding: '10px 16px', overflow: 'hidden',
-                }}>
-                  {/* image handled above in hero section */}
-                  <p style={{
-                    fontFamily: 'var(--font-cairo)', fontWeight: 700,
-                    color: 'hsl(var(--foreground))', fontSize: qFontSize,
-                    lineHeight: 1.55, textAlign: 'right', direction: 'rtl', margin: 0,
-                  }}>
-                    {question.question}
-                  </p>
-                </div>
+                <>
+                  {resolvedHeroUrl && isLandscape ? (
+                    <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{
+                      flexShrink:0, display:'flex', flexDirection:'row',
+                      alignItems:'center', gap:12, padding:'6px 12px',
+                    }}>
+                      <img src={resolvedHeroUrl} alt=""
+                        style={{
+                          width: isLogo ? 80 : 70, height: isLogo ? 80 : 70, flexShrink:0,
+                          objectFit: isLogo ? 'contain' : 'cover', objectPosition:'top',
+                          borderRadius: isLogo ? 8 : '50%',
+                          border: 'none', boxShadow: 'none',
+                        }}
+                        onError={(e) => e.target.style.display='none'}
+                      />
+                      <p style={{ flex:1, fontFamily:'var(--font-cairo)', fontWeight:700,
+                        color:'hsl(var(--foreground))', fontSize:13,
+                        lineHeight:1.5, direction:'rtl', textAlign:'right', margin:0 }}>
+                        {question.question}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{
+                      flex:1, display:'flex', flexDirection:'column',
+                      alignItems:'center', justifyContent:'center',
+                      padding:'10px 16px', overflow:'hidden',
+                    }}>
+                      <p style={{ fontFamily:'var(--font-cairo)', fontWeight:700,
+                        color:'hsl(var(--foreground))', fontSize:qFontSize,
+                        lineHeight:1.55, textAlign:'right', direction:'rtl', margin:0 }}>
+                        {question.question}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Status bar */}
+                  <div style={{ flexShrink:0, padding:'0 12px 4px' }}>
+                    {!stealMode && !answered && (
+                      <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
+                        width:'100%', padding:'4px 10px', borderRadius:10, fontSize:11,
+                        background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(251,146,60,0.12)',
+                        border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(251,146,60,0.3)',
+                        color: passToOtherUsed ? 'rgba(255,255,255,0.2)' : '#fdba74',
+                        fontFamily:'var(--font-cairo)', cursor: passToOtherUsed ? 'not-allowed' : 'pointer',
+                        textAlign:'center', opacity: passToOtherUsed ? 0.4 : 1,
+                        textDecoration: passToOtherUsed ? 'line-through' : 'none',
+                      }}>🎯 اسرق يا غالي → أعطها للفريق الثاني (10 ثواني)</button>
+                    )}
+                    {stealMode && !answered && (
+                      <div style={{ background:'rgba(251,146,60,0.12)', border:'1px solid rgba(251,146,60,0.3)', borderRadius:10, padding:'6px 10px', textAlign:'center' }}>
+                        <p style={{ color:'#fdba74', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:12, margin:0 }}>⚡ فرصة السرقة!</p>
+                      </div>
+                    )}
+                    {friendHint && (
+                      <div style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.25)', borderRadius:8, padding:'4px 10px', marginTop:4, textAlign:'center' }}>
+                        <p style={{ color:'#fca5a5', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:11, margin:0 }}>🗑️ تم حذف إجابة خاطئة</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Lifelines */}
+                  {!answered && (
+                    <div className="ll-scroll" style={{ flexShrink:0, display:'flex', flexDirection:'row', overflowX:'auto', gap:8, padding:'0 12px 6px' }}>
+                      {LIFELINES.filter(ll => ll.id !== 'trap').map(ll => {
+                        const isUsed = usedLifelines[ll.id];
+                        const isActive = activeLifeline === ll.id;
+                        return (
+                          <button key={ll.id} onClick={() => !isUsed && onUseLifeline(ll.id)} disabled={isUsed}
+                            style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
+                              background: isUsed ? 'rgba(255,255,255,0.03)' : isActive ? GOLD : GOLD_BG,
+                              color: isUsed ? 'rgba(255,255,255,0.3)' : '#000',
+                              border: `${isActive?'2':'1'}px solid ${isUsed ? 'rgba(255,255,255,0.08)' : GOLD_BORDER}`,
+                              fontFamily:'var(--font-cairo)', opacity: isUsed ? 0.35 : 1,
+                              textDecoration: isUsed ? 'line-through' : 'none',
+                              cursor: isUsed ? 'not-allowed' : 'pointer',
+                            }}>{ll.label}</button>
+                        );
+                      })}
+                      <button onClick={handleSwap} disabled={swapAnimating}
+                        style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
+                          background: GOLD_BG, color: '#000', border: `1px solid ${GOLD_BORDER}`,
+                          fontFamily:'var(--font-cairo)', cursor: 'pointer',
+                        }}>🔄 تغيير سؤال مكرر</button>
+                    </div>
+                  )}
+
+                  {/* Options before answer */}
+                  {!answered && (
+                    <div style={{ flexShrink:0, display:'grid', gridTemplateColumns:'1fr 1fr', gap:6, padding:'0 12px 10px' }}>
+                      {Object.entries(question.options).map(([key, value]) => {
+                        const isEliminated = friendHint === key;
+                        const isDisabled = isEliminated || (twoAnswersMode && firstWrongAnswer === key);
+                        return (
+                          <button key={key} onClick={() => !isDisabled && onAnswer(key)} disabled={isDisabled}
+                            style={{ minHeight:48, borderRadius:10, padding:'6px 10px',
+                              fontSize:13, lineHeight:1.3, wordBreak:'break-word',
+                              display:'flex', alignItems:'center', justifyContent:'flex-end', gap:8,
+                              direction:'rtl', textAlign:'right',
+                              background: isEliminated ? 'rgba(255,255,255,0.02)' : 'hsl(var(--secondary))',
+                              border: `1px solid ${isEliminated ? 'rgba(255,255,255,0.05)' : 'hsl(var(--border))'}`,
+                              color: isEliminated ? 'rgba(255,255,255,0.15)' : 'hsl(var(--foreground))',
+                              opacity: isEliminated ? 0.3 : 1,
+                              textDecoration: isEliminated ? 'line-through' : 'none',
+                              cursor: isDisabled ? 'not-allowed' : 'pointer',
+                              fontFamily:'var(--font-cairo)', transition:'background 0.15s',
+                            }}>
+                            <span style={{ fontWeight:700, color:GOLD, flexShrink:0 }}>{key}.</span>
+                            {value}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Options after answer */}
+                  {answered && (
+                    <div style={{ flexShrink:0, display:'grid', gridTemplateColumns:'1fr 1fr', gap:6, padding:'0 12px 8px' }}>
+                      {Object.entries(question.options).map(([key, value]) => {
+                        const isCorrectAnswer = question.correct === key;
+                        const isSelected = selectedAnswer === key;
+                        const isFirstWrong = firstWrongAnswer === key;
+                        let bg = 'hsl(var(--secondary)/0.5)', border = '1px solid hsl(var(--border))', color = 'hsl(var(--muted-foreground))';
+                        if (isCorrectAnswer) { bg='rgba(34,197,94,0.2)'; border='2px solid #4ade80'; color='#86efac'; }
+                        else if (isSelected) { bg='rgba(239,68,68,0.2)'; border='2px solid #f87171'; color='#fca5a5'; }
+                        else if (isFirstWrong) { bg='rgba(239,68,68,0.08)'; border='1px solid rgba(248,113,113,0.3)'; color='rgba(252,165,165,0.5)'; }
+                        return (
+                          <div key={key} style={{ minHeight:48, borderRadius:10, padding:'6px 10px',
+                            fontSize:13, lineHeight:1.3, wordBreak:'break-word',
+                            display:'flex', alignItems:'center', justifyContent:'flex-end', gap:8,
+                            direction:'rtl', textAlign:'right', background:bg, border, color,
+                            fontFamily:'var(--font-cairo)',
+                          }}>
+                            <span style={{ fontWeight:700, color:GOLD, flexShrink:0 }}>{key}.</span>
+                            {value}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
               );
             })()}
-
-            {/* Status bar */}
-            <div style={{ flexShrink:0, padding:'0 12px 4px' }}>
-              {!stealMode && !answered && (
-                <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
-                  width:'100%', padding:'4px 10px', borderRadius:10, fontSize:11,
-                  background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(251,146,60,0.12)',
-                  border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(251,146,60,0.3)',
-                  color: passToOtherUsed ? 'rgba(255,255,255,0.2)' : '#fdba74',
-                  fontFamily:'var(--font-cairo)', cursor: passToOtherUsed ? 'not-allowed' : 'pointer',
-                  textAlign:'center', opacity: passToOtherUsed ? 0.4 : 1,
-                  textDecoration: passToOtherUsed ? 'line-through' : 'none',
-                }}>
-                  🎯 اسرق يا غالي → أعطها للفريق الثاني (10 ثواني)
-                </button>
-              )}
-              {stealMode && !answered && (
-                <div style={{ background:'rgba(251,146,60,0.12)', border:'1px solid rgba(251,146,60,0.3)', borderRadius:10, padding:'6px 10px', textAlign:'center' }}>
-                  <p style={{ color:'#fdba74', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:12, margin:0 }}>
-                    ⚡ فرصة السرقة!
-                  </p>
-                </div>
-              )}
-              {friendHint && (
-                <div style={{ background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.25)', borderRadius:8, padding:'4px 10px', marginTop:4, textAlign:'center' }}>
-                  <p style={{ color:'#fca5a5', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:11, margin:0 }}>🗑️ تم حذف إجابة خاطئة</p>
-                </div>
-              )}
-            </div>
-
-            {/* Lifelines row */}
-            {!answered && (
-              <div className="ll-scroll" style={{
-                flexShrink:0, display:'flex', flexDirection:'row',
-                overflowX:'auto', gap:8, padding:'0 12px 6px',
-              }}>
-                {LIFELINES.filter(ll => ll.id !== 'trap').map(ll => {
-                  const isUsed = usedLifelines[ll.id];
-                  const isActive = activeLifeline === ll.id;
-                  const canUse = !isUsed;
-                  return (
-                    <button key={ll.id} onClick={() => canUse && onUseLifeline(ll.id)} disabled={!canUse}
-                      style={{
-                        whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
-                        background: isUsed ? 'rgba(255,255,255,0.03)' : isActive ? GOLD : GOLD_BG,
-                        color: isUsed ? 'rgba(255,255,255,0.3)' : '#000',
-                        border: `${isActive?'2':'1'}px solid ${isUsed ? 'rgba(255,255,255,0.08)' : GOLD_BORDER}`,
-                        fontFamily:'var(--font-cairo)', opacity: isUsed ? 0.35 : 1,
-                        textDecoration: isUsed ? 'line-through' : 'none',
-                        cursor: canUse ? 'pointer' : 'not-allowed',
-                      }}>{ll.label}</button>
-                  );
-                })}
-                <button onClick={handleSwap} disabled={swapAnimating}
-                  style={{
-                    whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
-                    background: GOLD_BG,
-                    color: '#000',
-                    border: `1px solid ${GOLD_BORDER}`,
-                    fontFamily:'var(--font-cairo)',
-                    cursor: 'pointer',
-                  }}>
-                  🔄 تغيير سؤال مكرر
-                </button>
-              </div>
-            )}
-
-            {/* Options - before answer */}
-            {!answered && (
-              <div style={{
-                flexShrink:0, display:'grid', gridTemplateColumns:'1fr 1fr', gap:6,
-                padding:'0 12px 10px',
-              }}>
-                {Object.entries(question.options).map(([key, value]) => {
-                  const isEliminated = friendHint === key;
-                  const isDisabled = isEliminated || (twoAnswersMode && firstWrongAnswer === key);
-                  return (
-                    <button key={key} onClick={() => !isDisabled && onAnswer(key)} disabled={isDisabled}
-                      style={{
-                        minHeight:48, borderRadius:10, padding:'6px 10px',
-                        fontSize:13, lineHeight:1.3, wordBreak:'break-word',
-                        display:'flex', alignItems:'center', justifyContent:'flex-end', gap:8,
-                        direction:'rtl', textAlign:'right',
-                        background: isEliminated ? 'rgba(255,255,255,0.02)' : 'hsl(var(--secondary))',
-                        border: `1px solid ${isEliminated ? 'rgba(255,255,255,0.05)' : 'hsl(var(--border))'}`,
-                        color: isEliminated ? 'rgba(255,255,255,0.15)' : 'hsl(var(--foreground))',
-                        opacity: isEliminated ? 0.3 : 1,
-                        textDecoration: isEliminated ? 'line-through' : 'none',
-                        cursor: isDisabled ? 'not-allowed' : 'pointer',
-                        fontFamily:'var(--font-cairo)', transition:'background 0.15s',
-                      }}>
-                      <span style={{ fontWeight:700, color:GOLD, flexShrink:0 }}>{key}.</span>
-                      {value}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Options - after answer */}
-            {answered && (
-              <div style={{
-                flexShrink:0, display:'grid', gridTemplateColumns:'1fr 1fr', gap:6,
-                padding:'0 12px 8px',
-              }}>
-                {Object.entries(question.options).map(([key, value]) => {
-                  const isCorrectAnswer = question.correct === key;
-                  const isSelected = selectedAnswer === key;
-                  const isFirstWrong = firstWrongAnswer === key;
-                  let bg = 'hsl(var(--secondary)/0.5)', border = '1px solid hsl(var(--border))', color = 'hsl(var(--muted-foreground))';
-                  if (isCorrectAnswer) { bg='rgba(34,197,94,0.2)'; border='2px solid #4ade80'; color='#86efac'; }
-                  else if (isSelected) { bg='rgba(239,68,68,0.2)'; border='2px solid #f87171'; color='#fca5a5'; }
-                  else if (isFirstWrong) { bg='rgba(239,68,68,0.08)'; border='1px solid rgba(248,113,113,0.3)'; color='rgba(252,165,165,0.5)'; }
-                  return (
-                    <div key={key} style={{
-                      minHeight:48, borderRadius:10, padding:'6px 10px',
-                      fontSize:13, lineHeight:1.3, wordBreak:'break-word',
-                      display:'flex', alignItems:'center', justifyContent:'flex-end', gap:8,
-                      direction:'rtl', textAlign:'right', background:bg, border, color,
-                      fontFamily:'var(--font-cairo)',
-                    }}>
-                      <span style={{ fontWeight:700, color:GOLD, flexShrink:0 }}>{key}.</span>
-                      {value}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
 
             {/* Result banner */}
             {answered && (
