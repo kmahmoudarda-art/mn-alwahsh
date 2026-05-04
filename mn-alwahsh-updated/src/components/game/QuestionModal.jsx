@@ -497,43 +497,73 @@ const resolvedHeroUrl = question.image_url && question.image_url !== ''
                 }
 
                 // Portrait: compact stacked layout
-                return (
-                  <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{ flexShrink: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'center', padding: '6px 0 4px' }}>
-                      <img
-                        src={resolvedHeroUrl}
-                        alt=""
-                        style={{
-                          width: (question.image_url && question.source_table !== 'Fanan' && question.source_table !== 'Fam') ? 220 : imgSize,
-                          height: (question.image_url && question.source_table !== 'Fanan' && question.source_table !== 'Fam') ? 220 : imgSize,
-                          objectFit: (question.image_url && question.source_table !== 'Fanan' && question.source_table !== 'Fam') ? 'contain' : 'cover',
-                          objectPosition: 'center',
-                          borderRadius: 12, border: '3px solid gold',
-                          boxShadow: '0 6px 24px rgba(201,168,76,0.4)',
-                          display: 'block',
-                          backgroundColor: (question.image_url && question.source_table !== 'Fanan' && question.source_table !== 'Fam') ? 'white' : 'transparent',
-                          padding: (question.image_url && question.source_table !== 'Fanan' && question.source_table !== 'Fam') ? '8px' : '0',
-                        }}
-                        onError={(e) => { console.log('Image failed to load:', resolvedHeroUrl); e.target.style.display = 'none'; }}
-                        onLoad={() => console.log('Image loaded successfully:', resolvedHeroUrl)}
-                      />
-                    </div>
-                    <div style={{
-                      padding: '4px 12px 2px', textAlign: 'center',
-                      maxHeight: 80, overflow: 'hidden',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <p style={{
-                        fontFamily: 'var(--font-cairo)', fontWeight: 700,
-                        color: 'hsl(var(--foreground))', fontSize: 14,
-                        lineHeight: 1.45, direction: 'rtl', margin: 0,
-                      }}>
-                        {question.question}
-                      </p>
-                    </div>
-                  </div>
-                );
-              }
+                // Portrait: side-by-side for logo, stacked for singers/flags
+return (
+  <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{ flexShrink: 0 }}>
+    {isLogo ? (
+      // Logo layout: image LEFT, question RIGHT
+      <div style={{
+        display: 'flex', flexDirection: 'row',
+        alignItems: 'center', gap: 12,
+        padding: '8px 12px',
+      }}>
+        <img
+          src={resolvedHeroUrl}
+          alt=""
+          style={{
+            width: 130, height: 130, flexShrink: 0,
+            objectFit: 'contain',
+            borderRadius: 12, border: '3px solid gold',
+            boxShadow: '0 4px 16px rgba(201,168,76,0.4)',
+            backgroundColor: 'white',
+            padding: '6px',
+          }}
+          onError={(e) => { e.target.style.display = 'none'; }}
+          onLoad={() => console.log('Logo loaded:', resolvedHeroUrl)}
+        />
+        <p style={{
+          flex: 1, fontFamily: 'var(--font-cairo)', fontWeight: 700,
+          color: 'hsl(var(--foreground))', fontSize: 15,
+          lineHeight: 1.5, direction: 'rtl', textAlign: 'right', margin: 0,
+        }}>
+          {question.question}
+        </p>
+      </div>
+    ) : (
+      // Singer/other layout: stacked
+      <>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '6px 0 4px' }}>
+          <img
+            src={resolvedHeroUrl}
+            alt=""
+            style={{
+              width: imgSize, height: imgSize,
+              objectFit: 'cover', objectPosition: 'top',
+              borderRadius: 12, border: '3px solid gold',
+              boxShadow: '0 6px 24px rgba(201,168,76,0.4)',
+              display: 'block',
+            }}
+            onError={(e) => { e.target.style.display = 'none'; }}
+            onLoad={() => console.log('Image loaded:', resolvedHeroUrl)}
+          />
+        </div>
+        <div style={{
+          padding: '4px 12px 2px', textAlign: 'center',
+          maxHeight: 80, overflow: 'hidden',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <p style={{
+            fontFamily: 'var(--font-cairo)', fontWeight: 700,
+            color: 'hsl(var(--foreground))', fontSize: 14,
+            lineHeight: 1.45, direction: 'rtl', margin: 0,
+          }}>
+            {question.question}
+          </p>
+        </div>
+      </>
+    )}
+  </div>
+);              }
 
               return (
                 <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{
