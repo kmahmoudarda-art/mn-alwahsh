@@ -467,7 +467,7 @@ export default function QuestionModal({
                 : null;
 
               if (resolvedHeroUrl) {
-                // Landscape: image left, text right
+                // Landscape: image centered top, question below
                 if (isLandscape) {
                   return (
                     <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{
@@ -478,10 +478,15 @@ export default function QuestionModal({
                         src={resolvedHeroUrl}
                         alt=""
                         style={{
-                          width: 80, height: 80, flexShrink: 0,
-                          objectFit: 'cover', objectPosition: 'top',
-                          borderRadius: '50%', border: '3px solid gold',
-                          boxShadow: '0 4px 16px rgba(201,168,76,0.4)',
+                          width: isLogo ? 90 : 80,
+                          height: isLogo ? 90 : 80,
+                          flexShrink: 0,
+                          objectFit: isLogo ? 'contain' : 'cover',
+                          objectPosition: 'top',
+                          borderRadius: isLogo ? 8 : '50%',
+                          border: 'none',
+                          boxShadow: 'none',
+                          backgroundColor: 'transparent',
                         }}
                         onError={(e) => { e.target.style.display = 'none'; }}
                         onLoad={() => console.log('Image loaded:', resolvedHeroUrl)}
