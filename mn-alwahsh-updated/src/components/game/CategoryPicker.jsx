@@ -168,8 +168,11 @@ export default function CategoryPicker({ selected, onToggle, max }) {
               {cats.map((name) => {
                 const isSelected = selected.includes(name);
                 const isDisabled = !isSelected && selected.length >= max;
-const emoji = CATEGORY_ICONS[name] || icons[name] || '⏳';
-            return (
+// This forces the manual list to take priority over the AI icons
+const emoji = CATEGORY_ICONS[name] || 
+              CATEGORY_ICONS[name.toLowerCase().trim()] || 
+              icons[name] || 
+              '⏳';            return (
                   <motion.button
                     key={name}
                     whileHover={!isDisabled ? { scale: 1.05 } : {}}
