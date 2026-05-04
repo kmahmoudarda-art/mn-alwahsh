@@ -166,8 +166,7 @@ export default function CategoryPicker({ selected, onToggle, max }) {
               {cats.map((name) => {
                 const isSelected = selected.includes(name);
                 const isDisabled = !isSelected && selected.length >= max;
-                const emoji = icons[name] || (CATEGORY_ICONS[name] ? CATEGORY_ICONS[name] : '⏳');
-
+const emoji = icons[name] || CATEGORY_ICONS[name] || CATEGORY_ICONS[name.toLowerCase().trim()] || '⏳';
                 return (
                   <motion.button
                     key={name}
