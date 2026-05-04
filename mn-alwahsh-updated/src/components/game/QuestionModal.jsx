@@ -454,15 +454,17 @@ export default function QuestionModal({
           <>
             {/* Hero photo layout: Fanan (map or image_url) and Fam (image_url) */}
             {(() => {
-              const isFanan = question.source_table === 'Fanan';
-              const isFam = question.source_table === 'Fam' && question.image_url && question.image_url !== '';
+          const isFanan = question.source_table === 'Fanan';
+const isFam = question.source_table === 'Fam' && question.image_url && question.image_url !== '';
+const isLogo = question.source_table === 'logo1' && question.image_url && question.image_url !== '';
 
-              const resolvedHeroUrl = isFam
-                ? question.image_url
-                : isFanan
-                  ? (singerPhotoUrl || question.image_url)
-                  : null;
-
+const resolvedHeroUrl = isLogo
+  ? question.image_url
+  : isFam
+    ? question.image_url
+    : isFanan
+      ? (singerPhotoUrl || question.image_url)
+      : null;
               if (resolvedHeroUrl) {
                 // Landscape: image left, text right
                 if (isLandscape) {
