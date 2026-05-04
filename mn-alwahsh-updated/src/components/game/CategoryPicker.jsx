@@ -32,10 +32,13 @@ const CATEGORY_GROUPS = {
   '🎲 متفرقات': ['أكل عربي', 'علوم', 'حيوانات', 'Dangerous Animals', 'حيوانات خطرة'],
 };
 
-// Flat lookup: category name → group label
+// Place this right after the CATEGORY_GROUPS object
 const CAT_TO_GROUP = {};
 for (const [group, cats] of Object.entries(CATEGORY_GROUPS)) {
-  for (const cat of cats) CAT_TO_GROUP[cat] = group;
+  for (const cat of cats) {
+    // We lowercase and trim here to make the key "clean"
+    CAT_TO_GROUP[cat.toLowerCase().trim()] = group;
+  }
 }
 
 // Session-level icon cache for unknown categories
@@ -62,15 +65,22 @@ function groupCategories(categories) {
   for (const g of Object.keys(CATEGORY_GROUPS)) groups[g] = [];
 
   for (const cat of categories) {
-    const g = CAT_TO_GROUP[cat];
+    // We normalize the incoming category from Supabase to match our clean keys
+    const normalizedCat = typeof cat === 'string' ? cat.toLowerCase().trim() : '';
+    const g = CAT_TO_GROUP[normalizedCat];
+
     if (g) {
-      if (!groups[g]) groups[g] = [];
       groups[g].push(cat);
     } else {
+      // If it's not found, it goes to Miscellaneous
       if (!groups['🎲 متفرقات']) groups['🎲 متفرقات'] = [];
       groups['🎲 متفرقات'].push(cat);
     }
   }
+
+  // Remove empty groups
+  return Object.fromEntries(Object.entries(groups).filter(([, cats]) => cats.length > 0));
+}
 
   // Remove empty groups
   return Object.fromEntries(Object.entries(groups).filter(([, cats]) => cats.length > 0));
