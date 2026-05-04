@@ -61,8 +61,8 @@ export async function resetAllQuestions() {
       console.warn(`[Supabase] Reset failed for ${table}:`, res.status, txt);
     }
   };
-  await Promise.all([reset(TABLE_MAIN), reset(TABLE_FLAGS), reset(TABLE_FANAN), reset(TABLE_FAM), reset(TABLE_FALSAFA)] , reset(TABLE_LOGO1)]);
-  console.log('[Supabase] All 5 tables reset successfully');
+  await Promise.all([reset(TABLE_MAIN), reset(TABLE_FLAGS), reset(TABLE_FANAN), reset(TABLE_FAM), reset(TABLE_FALSAFA), reset(TABLE_LOGO1)]);
+  console.log('[Supabase] All 6 tables reset successfully');
 }
 
 // Fetch all rows from a single table with pagination
