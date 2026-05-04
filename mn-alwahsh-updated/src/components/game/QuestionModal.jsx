@@ -474,13 +474,11 @@ export default function QuestionModal({
                       alignItems: 'center', gap: 12, padding: '6px 12px',
                     }}>
                       <img
-                        src={resolvedHeroUrl}
-                        alt=""
                         style={{
-                          width: 80, height: 80, flexShrink: 0,
-                          objectFit: 'cover', objectPosition: 'top',
-                          borderRadius: '50%', border: '3px solid gold',
-                          boxShadow: '0 4px 16px rgba(201,168,76,0.4)',
+  width: 120, height: 120, flexShrink: 0,
+  objectFit: 'contain',
+  borderRadius: 12, border: '3px solid gold',
+  backgroundColor: 'white', padding: '6px',
                         }}
                         onError={(e) => { e.target.style.display = 'none'; }}
                         onLoad={() => console.log('Image loaded:', resolvedHeroUrl)}
@@ -501,13 +499,15 @@ export default function QuestionModal({
                   <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{ flexShrink: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'center', padding: '6px 0 4px' }}>
                       <img
-                        src={resolvedHeroUrl}
-                        alt=""
                         style={{
-                          width: imgSize, height: imgSize,
-                          objectFit: 'cover', objectPosition: 'top',
-                          borderRadius: 12, border: '3px solid gold',
-                          boxShadow: '0 6px 24px rgba(201,168,76,0.4)',
+  width: 220, height: 220,
+  objectFit: 'contain',
+  borderRadius: 12, border: '3px solid gold',
+  boxShadow: '0 6px 24px rgba(201,168,76,0.4)',
+  display: 'block',
+  backgroundColor: 'white',
+  padding: '8px',
+}}
                           display: 'block',
                         }}
                         onError={(e) => { console.log('Image failed to load:', resolvedHeroUrl); e.target.style.display = 'none'; }}
