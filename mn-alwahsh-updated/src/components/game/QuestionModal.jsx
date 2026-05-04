@@ -501,34 +501,37 @@ const resolvedHeroUrl = question.image_url && question.image_url !== ''
 return (
   <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{ flexShrink: 0 }}>
     {isLogo ? (
-      // Logo layout: image LEFT, question RIGHT
-      <div style={{
-        display: 'flex', flexDirection: 'row',
-        alignItems: 'center', gap: 12,
-        padding: '4px 12px',
-      }}>
-        <img
-          src={resolvedHeroUrl}
-          alt=""
-          style={{
-            width: 90, height: 90, flexShrink: 0,
-            objectFit: 'contain',
-            borderRadius: 12, border: '3px solid gold',
-            boxShadow: '0 4px 16px rgba(201,168,76,0.4)',
-            backgroundColor: 'white',
-            padding: '6px',
-          }}
-          onError={(e) => { e.target.style.display = 'none'; }}
-          onLoad={() => console.log('Logo loaded:', resolvedHeroUrl)}
-        />
-        <p style={{
-          flex: 1, fontFamily: 'var(--font-cairo)', fontWeight: 700,
-          color: 'hsl(var(--foreground))', fontSize: 14,
-          lineHeight: 1.5, direction: 'rtl', textAlign: 'right', margin: 0,
-        }}>
-          {question.question}
-        </p>
-      </div>
+  // Logo layout: full width stacked — logo top right, question below
+  <div style={{
+    display: 'flex', flexDirection: 'column',
+    alignItems: 'flex-end',
+    padding: '6px 12px 4px',
+    gap: 6,
+  }}>
+    <img
+      src={resolvedHeroUrl}
+      alt=""
+      style={{
+        width: 100, height: 100,
+        objectFit: 'contain',
+        borderRadius: 12, border: '3px solid gold',
+        boxShadow: '0 4px 16px rgba(201,168,76,0.4)',
+        backgroundColor: 'white',
+        padding: '6px',
+        alignSelf: 'flex-end',
+      }}
+      onError={(e) => { e.target.style.display = 'none'; }}
+      onLoad={() => console.log('Logo loaded:', resolvedHeroUrl)}
+    />
+    <p style={{
+      width: '100%',
+      fontFamily: 'var(--font-cairo)', fontWeight: 700,
+      color: 'hsl(var(--foreground))', fontSize: 16,
+      lineHeight: 1.5, direction: 'rtl', textAlign: 'right', margin: 0,
+    }}>
+      {question.question}
+    </p>
+  </div>
     ) : (
       // Singer/other layout: stacked
       <>
