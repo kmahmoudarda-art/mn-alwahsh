@@ -455,16 +455,15 @@ export default function QuestionModal({
             {/* Hero photo layout: Fanan (map or image_url) and Fam (image_url) */}
             {(() => {
               const isFanan = question.source_table === 'Fanan';
-              const isLogo = question.source_table === 'logo1';
-              
-              console.log('[Hero] source_table:', question.source_table, 'image_url:', question.image_url);
+const isLogo = question.source_table === 'logo1';
 
-              // Show hero image for ANY question with image_url
-              const resolvedHeroUrl = question.image_url && question.image_url !== ''
-                ? isFanan
-                  ? (singerPhotoUrl || question.image_url)
-                  : question.image_url
-                : null;
+console.log('[Hero] source_table:', question.source_table, 'image_url:', question.image_url);
+
+const resolvedHeroUrl = question.image_url && question.image_url !== ''
+  ? isFanan
+    ? (singerPhotoUrl || question.image_url)
+    : question.image_url
+  : null;
 
               if (resolvedHeroUrl) {
                 // Landscape: image left, text right
@@ -478,7 +477,7 @@ export default function QuestionModal({
                         src={resolvedHeroUrl}
                         alt=""
                         style={{
-                          width: 80, height: 80, flexShrink: 0,
+                          width: 200, height: 200, flexShrink: 0,
                           objectFit: 'cover', objectPosition: 'top',
                           borderRadius: '50%', border: '3px solid gold',
                           boxShadow: '0 4px 16px rgba(201,168,76,0.4)',
