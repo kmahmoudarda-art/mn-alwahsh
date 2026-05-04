@@ -470,8 +470,9 @@ const resolvedHeroUrl = question.image_url && question.image_url !== ''
                 if (isLandscape) {
                   return (
                     <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{
-                      flexShrink: 0, display: 'flex', flexDirection: 'row',
-                      alignItems: 'center', gap: 12, padding: '6px 12px',
+                     flexShrink:0, display:'grid', gridTemplateColumns:'1fr 1fr', gap:6,
+padding:'0 12px 10px',
+direction: 'rtl',
                     }}>
                       <img
                         src={resolvedHeroUrl}
