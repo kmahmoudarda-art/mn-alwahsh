@@ -505,13 +505,13 @@ return (
       <div style={{
         display: 'flex', flexDirection: 'row',
         alignItems: 'center', gap: 12,
-        padding: '8px 12px',
+        padding: '4px 12px',
       }}>
         <img
           src={resolvedHeroUrl}
           alt=""
           style={{
-            width: 130, height: 130, flexShrink: 0,
+            width: 90, height: 90, flexShrink: 0,
             objectFit: 'contain',
             borderRadius: 12, border: '3px solid gold',
             boxShadow: '0 4px 16px rgba(201,168,76,0.4)',
@@ -523,7 +523,7 @@ return (
         />
         <p style={{
           flex: 1, fontFamily: 'var(--font-cairo)', fontWeight: 700,
-          color: 'hsl(var(--foreground))', fontSize: 15,
+          color: 'hsl(var(--foreground))', fontSize: 14,
           lineHeight: 1.5, direction: 'rtl', textAlign: 'right', margin: 0,
         }}>
           {question.question}
