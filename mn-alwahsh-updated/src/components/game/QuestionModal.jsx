@@ -497,72 +497,44 @@ export default function QuestionModal({
                   );
                 }
 
-                // Portrait: logo RIGHT + question LEFT side by side, then answers below
+                // Portrait: image centered, no frame, larger, question below
                 return (
                   <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{ flexShrink: 0 }}>
-                    {isLogo ? (
-                      // Logo layout: image on RIGHT, question text on LEFT
-                      <div style={{
-                        display: 'flex', flexDirection: 'row',
-                        alignItems: 'center', gap: 10,
-                        padding: '6px 12px 4px',
-                        direction: 'rtl',
+                    {/* Centered image — no border, no shadow, larger */}
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 4px' }}>
+                      <img
+                        src={resolvedHeroUrl}
+                        alt=""
+                        style={{
+                          width: isLogo ? 160 : 150,
+                          height: isLogo ? 160 : 150,
+                          objectFit: isLogo ? 'contain' : 'cover',
+                          objectPosition: 'top',
+                          borderRadius: isLogo ? 8 : 12,
+                          border: 'none',
+                          boxShadow: 'none',
+                          display: 'block',
+                          backgroundColor: isLogo ? 'transparent' : 'transparent',
+                        }}
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                        onLoad={() => console.log('Image loaded:', resolvedHeroUrl)}
+                      />
+                    </div>
+                    {/* Question text centered below image */}
+                    <div style={{
+                      padding: '4px 12px 2px', textAlign: 'center',
+                      maxHeight: 80, overflow: 'hidden',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <p style={{
+                        fontFamily: 'var(--font-cairo)', fontWeight: 700,
+                        color: 'hsl(var(--foreground))', fontSize: 14,
+                        lineHeight: 1.45, direction: 'rtl', margin: 0,
+                        textAlign: 'center',
                       }}>
-                        <p style={{
-                          flex: 1,
-                          fontFamily: 'var(--font-cairo)', fontWeight: 700,
-                          color: 'hsl(var(--foreground))', fontSize: 15,
-                          lineHeight: 1.5, direction: 'rtl', textAlign: 'right', margin: 0,
-                        }}>
-                          {question.question}
-                        </p>
-                        <img
-                          src={resolvedHeroUrl}
-                          alt=""
-                          style={{
-                            width: 110, height: 110, flexShrink: 0,
-                            objectFit: 'contain',
-                            borderRadius: 12, border: '3px solid gold',
-                            boxShadow: '0 4px 16px rgba(201,168,76,0.4)',
-                            backgroundColor: 'white', padding: '6px',
-                          }}
-                          onError={(e) => { e.target.style.display = 'none'; }}
-                          onLoad={() => console.log('Logo loaded:', resolvedHeroUrl)}
-                        />
-                      </div>
-                    ) : (
-                      // Singer/other: stacked layout
-                      <>
-                        <div style={{ display: 'flex', justifyContent: 'center', padding: '6px 0 4px' }}>
-                          <img
-                            src={resolvedHeroUrl}
-                            alt=""
-                            style={{
-                              width: imgSize, height: imgSize,
-                              objectFit: 'cover', objectPosition: 'top',
-                              borderRadius: 12, border: '3px solid gold',
-                              boxShadow: '0 6px 24px rgba(201,168,76,0.4)',
-                              display: 'block',
-                            }}
-                            onError={(e) => { e.target.style.display = 'none'; }}
-                            onLoad={() => console.log('Image loaded:', resolvedHeroUrl)}
-                          />
-                        </div>
-                        <div style={{
-                          padding: '4px 12px 2px', textAlign: 'center',
-                          maxHeight: 80, overflow: 'hidden',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>
-                          <p style={{
-                            fontFamily: 'var(--font-cairo)', fontWeight: 700,
-                            color: 'hsl(var(--foreground))', fontSize: 14,
-                            lineHeight: 1.45, direction: 'rtl', margin: 0,
-                          }}>
-                            {question.question}
-                          </p>
-                        </div>
-                      </>
-                    )}
+                        {question.question}
+                      </p>
+                    </div>
                   </div>
                 );
               }
