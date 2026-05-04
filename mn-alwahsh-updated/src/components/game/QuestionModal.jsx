@@ -454,17 +454,18 @@ export default function QuestionModal({
           <>
             {/* Hero photo layout: Fanan (map or image_url) and Fam (image_url) */}
             {(() => {
-          const isFanan = question.source_table === 'Fanan';
-          const isFam = question.source_table === 'Fam' && question.image_url && question.image_url !== '';
-          const isLogo = question.source_table === 'logo1' && question.image_url && question.image_url !== '';
+              const isFanan = question.source_table === 'Fanan';
+              const isFam = question.source_table === 'Fam' && question.image_url && question.image_url !== '';
+              const isLogo = question.source_table === 'logo1' && question.image_url && question.image_url !== '';
 
-          const resolvedHeroUrl = isLogo
-              ? question.image_url
-                  : isFam
-              ? question.image_url
+              const resolvedHeroUrl = isLogo
+                ? question.image_url
+                : isFam
+                  ? question.image_url
                   : isFanan
-              ? (singerPhotoUrl || question.image_url)
-                  : null;
+                    ? (singerPhotoUrl || question.image_url)
+                    : null;
+
               if (resolvedHeroUrl) {
                 // Landscape: image left, text right
                 if (isLandscape) {
@@ -474,11 +475,13 @@ export default function QuestionModal({
                       alignItems: 'center', gap: 12, padding: '6px 12px',
                     }}>
                       <img
+                        src={resolvedHeroUrl}
+                        alt=""
                         style={{
-  width: 120, height: 120, flexShrink: 0,
-  objectFit: 'contain',
-  borderRadius: 12, border: '3px solid gold',
-  backgroundColor: 'white', padding: '6px',
+                          width: 80, height: 80, flexShrink: 0,
+                          objectFit: 'cover', objectPosition: 'top',
+                          borderRadius: '50%', border: '3px solid gold',
+                          boxShadow: '0 4px 16px rgba(201,168,76,0.4)',
                         }}
                         onError={(e) => { e.target.style.display = 'none'; }}
                         onLoad={() => console.log('Image loaded:', resolvedHeroUrl)}
@@ -499,16 +502,18 @@ export default function QuestionModal({
                   <div className={swapAnimating ? 'swap-out' : 'swap-in'} style={{ flexShrink: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'center', padding: '6px 0 4px' }}>
                       <img
+                        src={resolvedHeroUrl}
+                        alt=""
                         style={{
-  width: 220, height: 220,
-  objectFit: 'contain',
-  borderRadius: 12, border: '3px solid gold',
-  boxShadow: '0 6px 24px rgba(201,168,76,0.4)',
-  display: 'block',
-  backgroundColor: 'white',
-  padding: '8px',
-}}
+                          width: isLogo ? 200 : imgSize,
+                          height: isLogo ? 200 : imgSize,
+                          objectFit: isLogo ? 'contain' : 'cover',
+                          objectPosition: 'top',
+                          borderRadius: 12, border: '3px solid gold',
+                          boxShadow: '0 6px 24px rgba(201,168,76,0.4)',
                           display: 'block',
+                          backgroundColor: isLogo ? 'white' : 'transparent',
+                          padding: isLogo ? '8px' : '0',
                         }}
                         onError={(e) => { console.log('Image failed to load:', resolvedHeroUrl); e.target.style.display = 'none'; }}
                         onLoad={() => console.log('Image loaded successfully:', resolvedHeroUrl)}
