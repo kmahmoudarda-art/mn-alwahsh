@@ -19,6 +19,8 @@ const CATEGORY_ICONS = {
   'أغاني': '🎼', 'أغاني قديمة': '📻', 'Friends': '☕',
   'League of Legends': '🎮', 'أكل عربي': '🍽️', 'IQ': '🧠',
   'رياضيات': '➗', 'English Lang': '🔤', 'football logo': '🗿',
+  'Football logo': '🗿',
+  'Football Logo': '🗿',
 };
 
 const CATEGORY_GROUPS = {
@@ -166,8 +168,8 @@ export default function CategoryPicker({ selected, onToggle, max }) {
               {cats.map((name) => {
                 const isSelected = selected.includes(name);
                 const isDisabled = !isSelected && selected.length >= max;
-const emoji = icons[name] || CATEGORY_ICONS[name] || CATEGORY_ICONS[name.toLowerCase().trim()] || '⏳';
-                return (
+const emoji = CATEGORY_ICONS[name] || icons[name] || '⏳';
+            return (
                   <motion.button
                     key={name}
                     whileHover={!isDisabled ? { scale: 1.05 } : {}}
