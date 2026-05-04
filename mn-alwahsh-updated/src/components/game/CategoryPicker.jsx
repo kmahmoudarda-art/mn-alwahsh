@@ -18,7 +18,7 @@ const CATEGORY_ICONS = {
   'بنات فقط': '👑', 'مسرحيات عربية': '🎭', 'حيوانات': '🦁',
   'أغاني': '🎼', 'أغاني قديمة': '📻', 'Friends': '☕',
   'League of Legends': '🎮', 'أكل عربي': '🍽️', 'IQ': '🧠',
-  'رياضيات': '➗', 'English Lang': '🔤',
+  'رياضيات': '➗', 'English Lang': '🔤', 'football logo': '🗿',
 };
 
 const CATEGORY_GROUPS = {
