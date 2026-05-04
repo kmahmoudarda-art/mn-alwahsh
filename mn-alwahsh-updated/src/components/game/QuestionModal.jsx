@@ -455,16 +455,16 @@ export default function QuestionModal({
             {/* Hero photo layout: Fanan (map or image_url) and Fam (image_url) */}
             {(() => {
               const isFanan = question.source_table === 'Fanan';
-              const isFam = question.source_table === 'Fam' && question.image_url && question.image_url !== '';
-              const isLogo = question.source_table === 'logo1' && question.image_url && question.image_url !== '';
+              const isLogo = question.source_table === 'logo1';
+              
+              console.log('[Hero] source_table:', question.source_table, 'image_url:', question.image_url);
 
-              const resolvedHeroUrl = isLogo
-                ? question.image_url
-                : isFam
-                  ? question.image_url
-                  : isFanan
-                    ? (singerPhotoUrl || question.image_url)
-                    : null;
+              // Show hero image for ANY question with image_url
+              const resolvedHeroUrl = question.image_url && question.image_url !== ''
+                ? isFanan
+                  ? (singerPhotoUrl || question.image_url)
+                  : question.image_url
+                : null;
 
               if (resolvedHeroUrl) {
                 // Landscape: image left, text right
@@ -505,15 +505,15 @@ export default function QuestionModal({
                         src={resolvedHeroUrl}
                         alt=""
                         style={{
-                          width: isLogo ? 200 : imgSize,
-                          height: isLogo ? 200 : imgSize,
-                          objectFit: isLogo ? 'contain' : 'cover',
-                          objectPosition: 'top',
+                          width: (question.image_url && question.source_table !== 'Fanan' && question.source_table !== 'Fam') ? 220 : imgSize,
+                          height: (question.image_url && question.source_table !== 'Fanan' && question.source_table !== 'Fam') ? 220 : imgSize,
+                          objectFit: (question.image_url && question.source_table !== 'Fanan' && question.source_table !== 'Fam') ? 'contain' : 'cover',
+                          objectPosition: 'center',
                           borderRadius: 12, border: '3px solid gold',
                           boxShadow: '0 6px 24px rgba(201,168,76,0.4)',
                           display: 'block',
-                          backgroundColor: isLogo ? 'white' : 'transparent',
-                          padding: isLogo ? '8px' : '0',
+                          backgroundColor: (question.image_url && question.source_table !== 'Fanan' && question.source_table !== 'Fam') ? 'white' : 'transparent',
+                          padding: (question.image_url && question.source_table !== 'Fanan' && question.source_table !== 'Fam') ? '8px' : '0',
                         }}
                         onError={(e) => { console.log('Image failed to load:', resolvedHeroUrl); e.target.style.display = 'none'; }}
                         onLoad={() => console.log('Image loaded successfully:', resolvedHeroUrl)}
@@ -541,14 +541,7 @@ export default function QuestionModal({
                   flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                   padding: '10px 16px', overflow: 'hidden',
                 }}>
-                  {question.image_url && (
-                    <img
-                      src={question.image_url}
-                      alt=""
-                      style={{ height: 120, objectFit: 'contain', marginBottom: 12, borderRadius: 8 }}
-                      onError={(e) => { e.target.style.display = 'none'; }}
-                    />
-                  )}
+                  {/* image handled above in hero section */}
                   <p style={{
                     fontFamily: 'var(--font-cairo)', fontWeight: 700,
                     color: 'hsl(var(--foreground))', fontSize: qFontSize,
