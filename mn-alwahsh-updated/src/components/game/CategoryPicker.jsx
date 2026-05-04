@@ -19,7 +19,10 @@ const CATEGORY_ICONS = {
   'أغاني': '🎼', 'أغاني قديمة': '📻', 'Friends': '☕',
   'League of Legends': '🎮', 'أكل عربي': '🍽️', 'IQ': '🧠',
   'رياضيات': '➗', 'English Lang': '🔤', 
-  'football logo': '🗿', 'Football logo': '🗿', 'Football Logo': '🗿'
+  'football logo': '🗿',
+  'Football logo': '🗿',
+  'FOOTBALL LOGO': '🗿',
+  'football Logo': '🗿'
 };
 
 const CATEGORY_GROUPS = {
