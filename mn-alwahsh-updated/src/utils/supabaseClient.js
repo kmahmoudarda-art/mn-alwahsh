@@ -8,6 +8,7 @@ const TABLE_FAM = 'Fam';
 const TABLE_FALSAFA = 'falsafa';
 const TABLE_LOGO1 = 'logo1';
 const TABLE_LOGOO = 'logoo';
+const TABLE_KIDS = 'kids';
 
 
 const BASE_HEADERS = {
@@ -35,7 +36,7 @@ try {
     console.log('[Supabase] All 4 tables reset on startup');
 
     // Log row counts for all 4 tables
-    const allTables = [TABLE_MAIN, TABLE_FLAGS, TABLE_FANAN, TABLE_FAM, TABLE_FALSAFA,TABLE_LOGO1,TABLE_LOGOO];
+    const allTables = [TABLE_MAIN, TABLE_FLAGS, TABLE_FANAN, TABLE_FAM, TABLE_FALSAFA, TABLE_LOGO1, TABLE_LOGOO, TABLE_KIDS];
     const counts = await Promise.all(allTables.map(async (table) => {
       const res = await fetch(
         `${SUPABASE_URL}/rest/v1/${table}?select=*&limit=1`,
@@ -68,7 +69,7 @@ export async function resetAllQuestions() {
       console.warn(`[Supabase] Reset failed for ${table}:`, res.status, txt);
     }
   };
-  await Promise.all([reset(TABLE_MAIN), reset(TABLE_FLAGS), reset(TABLE_FANAN), reset(TABLE_FAM), reset(TABLE_FALSAFA), reset(TABLE_LOGO1), reset(TABLE_LOGOO)]);
+  await Promise.all([reset(TABLE_MAIN), reset(TABLE_FLAGS), reset(TABLE_FANAN), reset(TABLE_FAM), reset(TABLE_FALSAFA), reset(TABLE_LOGO1), reset(TABLE_LOGOO), reset(TABLE_KIDS)]);
   console.log('[Supabase] All 7 tables reset successfully');
 }
 
@@ -92,7 +93,7 @@ async function fetchAllRows(table, select = 'category') {
 
 // Fetch distinct categories from ALL 4 tables merged — always fresh, no cache
 export async function fetchCategories() {
-  const [mainRows, flagRows, fananRows, famRows, falsafaRows, logo1Rows , logooRows] = await Promise.all([
+  const [mainRows, flagRows, fananRows, famRows, falsafaRows, logo1Rows, logooRows, kidsRows] = await Promise.all([
     fetchAllRows(TABLE_MAIN, 'category'),
     fetchAllRows(TABLE_FLAGS, 'category'),
     fetchAllRows(TABLE_FANAN, 'category'),
@@ -100,9 +101,9 @@ export async function fetchCategories() {
     fetchAllRows(TABLE_FALSAFA, 'category'),
     fetchAllRows(TABLE_LOGO1, 'category'),
     fetchAllRows(TABLE_LOGOO, 'category'),
-
+    fetchAllRows(TABLE_KIDS, 'category'),
   ]);
-  const allRows = [...mainRows, ...flagRows, ...fananRows, ...famRows, ...falsafaRows, ...logo1Rows, ...logooRows];
+  const allRows = [...mainRows, ...flagRows, ...fananRows, ...famRows, ...falsafaRows, ...logo1Rows, ...logooRows, ...kidsRows];
 const unique = [...new Set(allRows.map(r => r.category).filter(Boolean))].filter(c => !c.startsWith('_hidden_'));
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('Total categories loaded:', unique.length);
