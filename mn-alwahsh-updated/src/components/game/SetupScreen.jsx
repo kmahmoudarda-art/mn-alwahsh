@@ -33,7 +33,22 @@ export default function SetupScreen({ onStartGame }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" dir="rtl" style={{ background: '#0a0000' }}>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" dir="rtl" style={{ background: '#0a0000' }}>
+      {/* Full-screen horror forest background */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        backgroundImage: 'url(/bg-setup.jpeg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        zIndex: 0,
+      }} />
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: 'rgba(0,0,0,0.45)',
+        zIndex: 0,
+      }} />
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: 'radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.6) 100%)',
+        zIndex: 0,
+      }} />
       <style>{`
         @keyframes titleGlow {
           0%, 100% { text-shadow: 0 0 10px rgba(204,0,0,0.8), 0 0 30px rgba(139,0,0,0.5); }
@@ -45,6 +60,7 @@ export default function SetupScreen({ onStartGame }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         className="w-full max-w-3xl"
+        style={{ position: 'relative', zIndex: 1 }}
       >
         <div className="text-center mb-10">
           <motion.h1
