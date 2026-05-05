@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Plus, Minus, Settings, X } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { Trophy, Plus, Minus, X } from 'lucide-react';
 import PayPalDonateButton from './PayPalDonateButton';
 
 const MILESTONES = [1000, 2000, 3000, 4000, 5000, 6000];
@@ -17,13 +16,6 @@ function getBadge(score) {
 }
 
 export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }) {
-  const [showSettings, setShowSettings] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-
-  const handleDeleteAccount = async () => {
-    try { await base44.auth.deleteAccount(); }
-    catch { await base44.auth.logout(); }
-  };
 
   return (
     <>
@@ -80,9 +72,6 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
               <button onClick={onBack} className="w-6 h-6 flex items-center justify-center rounded-full" style={{ background: 'rgba(0,0,0,0.5)', color: '#fff' }}>
                 <X className="w-3.5 h-3.5" />
               </button>
-              <button onClick={() => setShowSettings(true)} className="w-6 h-6 flex items-center justify-center rounded-full" style={{ background: 'rgba(0,0,0,0.5)', color: '#fff' }}>
-                <Settings className="w-3.5 h-3.5" />
-              </button>
             </div>
           </div>
 
@@ -90,25 +79,6 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
         </div>
       </div>
 
-      {showSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.82)' }} dir="rtl">
-          <div className="rounded-2xl p-6 w-80 shadow-2xl" style={{ background: '#fff', border: '3px solid #CC0000' }}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-cairo font-bold text-lg text-gray-900">الإعدادات</h2>
-              <button onClick={() => { setShowSettings(false); setConfirmDelete(false); }}><X className="w-5 h-5 text-gray-500" /></button>
-            </div>
-            {!confirmDelete ? (
-              <button onClick={() => setConfirmDelete(true)} className="w-full rounded-xl px-4 py-3 font-cairo font-bold" style={{ background: '#CC0000', color: '#fff' }}>حذف الحساب</button>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-sm font-tajawal text-center text-gray-700">هل أنت متأكد؟ لا يمكن التراجع.</p>
-                <button onClick={handleDeleteAccount} className="w-full rounded-xl px-4 py-3 font-cairo font-bold" style={{ background: '#CC0000', color: '#fff' }}>نعم، احذف حسابي</button>
-                <button onClick={() => setConfirmDelete(false)} className="w-full rounded-xl px-4 py-3 font-cairo border border-gray-300 text-gray-700">إلغاء</button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </>
   );
 }

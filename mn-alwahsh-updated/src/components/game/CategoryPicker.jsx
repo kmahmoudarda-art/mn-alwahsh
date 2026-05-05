@@ -2,8 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { fetchCategories } from '../../utils/supabaseClient';
-import { base44 } from '@/api/base44Client';
-
 const CATEGORY_ICONS = {
   'رياضة': '⚽', 'تاريخ': '📜', 'جغرافيا': '🌍', 'علوم': '🔬',
   'أفلام عربية': '🎬', 'أفلام إنجليزية': '🎥', 'نتفليكس': '🎞️',
@@ -45,19 +43,11 @@ for (const [group, cats] of Object.entries(CATEGORY_GROUPS)) {
 
 const iconCache = {};
 
-async function getAutoIcon(categoryName) {
+function getAutoIcon(categoryName) {
   if (iconCache[categoryName]) return iconCache[categoryName];
-  try {
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Reply with ONE emoji that best represents this quiz category: ${categoryName}. Reply with the emoji only, nothing else.`,
-    });
-    const emoji = (typeof result === 'string' ? result : result?.text || '🎯').trim().slice(0, 2);
-    iconCache[categoryName] = emoji;
-    return emoji;
-  } catch {
-    iconCache[categoryName] = '🎯';
-    return '🎯';
-  }
+  const icon = CATEGORY_ICONS[categoryName] || CATEGORY_ICONS[categoryName?.trim()] || '🎯';
+  iconCache[categoryName] = icon;
+  return icon;
 }
 
 function groupCategories(categories) {
