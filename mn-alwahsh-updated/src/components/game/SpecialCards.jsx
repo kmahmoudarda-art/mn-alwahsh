@@ -215,7 +215,7 @@ export default function SpecialCards({
         .special-btn:not(:disabled):hover { transform: scale(1.08); }
         .special-btn:not(:disabled):active { transform: scale(0.95); }
       `}</style>
-      <div className="flex items-center justify-center gap-3 px-4 pb-2 flex-wrap" dir="rtl">
+      <div className="flex items-center justify-center gap-3 px-4 pb-2 flex-wrap" dir="rtl" style={{ position: 'relative', zIndex: 25 }}>
         {/* Team 1 cards — red */}
         <div className="flex gap-2">
           <button
