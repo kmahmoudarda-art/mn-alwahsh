@@ -29,21 +29,24 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
 
       <div
         dir="rtl"
-        className="relative flex items-center justify-between gap-3 px-3"
+        className="relative flex items-center justify-between gap-3 px-3 overflow-hidden"
         style={{
           paddingTop: 'max(10px, env(safe-area-inset-top))',
           paddingBottom: 10,
-          background: 'linear-gradient(180deg, #130000 0%, #0a0000 100%)',
+          background: '#0a0000',
           borderBottom: '2px solid #6B0000',
           boxShadow: '0 3px 20px rgba(100,0,0,0.5)',
           zIndex: 20,
         }}
       >
-        {/* Claw marks behind */}
-        <div className="absolute inset-0 pointer-events-none opacity-10" style={{
-          backgroundImage: `url('https://media.base44.com/images/public/69dca0dfc53463f8eae196fc/290f8ce95_image.png')`,
-          backgroundSize: 'cover', backgroundPosition: 'center',
-        }} />
+        {/* Video background */}
+        <video autoPlay loop muted playsInline
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 0 }}>
+          <source src="/bg-scorebar.mp4" type="video/mp4" />
+        </video>
+        {/* Dark tint over video so cards stay readable */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(0,0,0,0.45)', zIndex: 1 }} />
 
         {/* Content */}
         <div className="relative z-10 flex items-center justify-between gap-3 w-full">
@@ -105,7 +108,7 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }
   return (
     <motion.div
       layout
-      className="flex-1 max-w-[165px] rounded-2xl overflow-hidden"
+      className="flex-1 max-w-[330px] rounded-2xl overflow-hidden"
       style={
         isActive
           ? { background: '#ffffff', animation: 'activeCardGlow 1.6s ease-in-out infinite' }
