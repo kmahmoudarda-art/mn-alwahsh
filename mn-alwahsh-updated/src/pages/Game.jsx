@@ -509,24 +509,6 @@ export default function Game() {
   // Zoom state
   const [zoom, setZoom] = useState(0.9);
 
-  // Block pull-to-refresh and overscroll on touch devices.
-  // Must use a non-passive listener — React's synthetic onTouchMove is passive
-  // and cannot call preventDefault() to cancel browser-native PTR gestures.
-  useEffect(() => {
-    let startY = 0;
-    const onTouchStart = (e) => { startY = e.touches[0].clientY; };
-    const onTouchMove = (e) => {
-      const delta = e.touches[0].clientY - startY;
-      // Block downward drag at the top of the page (pull-to-refresh)
-      if (delta > 0 && window.scrollY === 0) e.preventDefault();
-    };
-    document.addEventListener('touchstart', onTouchStart, { passive: true });
-    document.addEventListener('touchmove', onTouchMove, { passive: false });
-    return () => {
-      document.removeEventListener('touchstart', onTouchStart);
-      document.removeEventListener('touchmove', onTouchMove);
-    };
-  }, []);
 
   const handleEnterGameName = useCallback(async (name) => {
     setGameName(name);
