@@ -1,42 +1,90 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 const STORAGE_KEY = 'mn_alwahsh_bgmusic_muted';
 
+const TRACKS = [
+  '/bg-music.mp3',
+  '/track1.mpeg',
+  '/track2.mpeg',
+  '/track3.mpeg',
+  '/track4.mpeg',
+  '/track5.mpeg',
+];
+
+function shuffled(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 export default function BackgroundMusic() {
   const audioRef = useRef(null);
+  const playlistRef = useRef(shuffled(TRACKS));
+  const indexRef = useRef(0);
+  const startedRef = useRef(false);
+
   const [muted, setMuted] = useState(() => {
     try { return localStorage.getItem(STORAGE_KEY) === 'true'; } catch { return false; }
   });
   const [started, setStarted] = useState(false);
 
+  const loadTrack = useCallback((idx) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.src = playlistRef.current[idx];
+    audio.load();
+  }, []);
+
+  const playNext = useCallback(() => {
+    let next = indexRef.current + 1;
+    if (next >= playlistRef.current.length) {
+      playlistRef.current = shuffled(TRACKS);
+      next = 0;
+    }
+    indexRef.current = next;
+    loadTrack(next);
+    audioRef.current.play().catch(() => {});
+  }, [loadTrack]);
+
   // Create audio element once
   useEffect(() => {
-    const audio = new Audio('/bg-music.mp3');
-    audio.loop = true;
+    const audio = new Audio();
     audio.volume = 0.28;
     audio.preload = 'auto';
     audioRef.current = audio;
-    return () => { audio.pause(); audio.src = ''; };
-  }, []);
 
-  // Start on first user interaction (browsers block autoplay without it)
+    loadTrack(0);
+
+    audio.addEventListener('ended', playNext);
+
+    return () => {
+      audio.removeEventListener('ended', playNext);
+      audio.pause();
+      audio.src = '';
+    };
+  }, [loadTrack, playNext]);
+
+  // Start on first user interaction
   useEffect(() => {
     if (started) return;
     const tryPlay = () => {
-      if (!audioRef.current || started) return;
-      audioRef.current.muted = muted;
-      audioRef.current.play().then(() => {
-        setStarted(true);
-      }).catch(() => {});
+      if (startedRef.current) return;
+      startedRef.current = true;
+      const audio = audioRef.current;
+      if (!audio) return;
+      audio.muted = muted;
+      audio.play().then(() => setStarted(true)).catch(() => {});
     };
     const events = ['touchstart', 'mousedown', 'keydown'];
     events.forEach(e => document.addEventListener(e, tryPlay, { once: true, passive: true }));
-    // Also try immediately (works in some PWA contexts)
     tryPlay();
     return () => events.forEach(e => document.removeEventListener(e, tryPlay));
   }, [started, muted]);
 
-  // Sync muted state to audio element + localStorage
+  // Sync muted state
   useEffect(() => {
     if (audioRef.current) audioRef.current.muted = muted;
     try { localStorage.setItem(STORAGE_KEY, muted); } catch {}
