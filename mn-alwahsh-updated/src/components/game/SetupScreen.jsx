@@ -170,6 +170,29 @@ export default function SetupScreen({ onStartGame }) {
           <p className="text-lg font-tajawal" style={{ color: '#FF6666', textShadow: '0 0 6px rgba(204,0,0,0.5)' }}>لعبة المعرفة والتحدي</p>
         </div>
 
+        {/* Start button — TOP */}
+        <motion.div
+          className="flex justify-center mb-6"
+          whileHover={{ scale: isValid ? 1.02 : 1 }}
+          whileTap={{ scale: isValid ? 0.98 : 1 }}
+        >
+          <Button
+            onClick={handleStart}
+            disabled={!isValid}
+            className="text-xl font-cairo font-bold px-12 py-6 rounded-xl gap-3 disabled:opacity-40 transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #8B0000, #4a0000)',
+              color: '#FFE4E4',
+              border: '1px solid #CC0000',
+              boxShadow: isValid ? '0 0 20px rgba(139,0,0,0.6), 0 0 40px rgba(139,0,0,0.3)' : 'none',
+            }}
+            size="lg"
+          >
+            <Play className="w-6 h-6" />
+            ابدأ اللعبة
+          </Button>
+        </motion.div>
+
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           <TeamSetupCard
             teamNumber={1}
@@ -189,6 +212,7 @@ export default function SetupScreen({ onStartGame }) {
           />
         </div>
 
+        {/* Start button — BOTTOM */}
         <motion.div
           className="flex justify-center"
           whileHover={{ scale: isValid ? 1.02 : 1 }}
