@@ -121,7 +121,18 @@ async function fetchRowsFromTable(table, category, points) {
   const usedFilter = table === TABLE_FAM ? '' : '&used=neq.true';
   const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}&limit=1000`;
   const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
-  if (!res.ok) return [];
+
+  // If the query failed (e.g. table has no 'used' column), retry without the used filter
+  if (!res.ok) {
+    if (usedFilter) {
+      const fallbackUrl = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}&limit=1000`;
+      const fallbackRes = await fetch(fallbackUrl, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
+      if (!fallbackRes.ok) return [];
+      return await fallbackRes.json();
+    }
+    return [];
+  }
+
   const allData = await res.json();
 
   // For Fam: also filter out used=true rows client-side (in case encoding slips through)
@@ -167,7 +178,7 @@ async function resetTable(table) {
 async function tableHasCategory(table, category, points) {
   const intPoints = parseInt(points, 10);
   const encodedCategory = encodeURIComponent(category);
-  const url = `${SUPABASE_URL}/rest/v1/${table}?select=id&points=eq.${intPoints}&category=eq.${encodedCategory}&limit=1`;
+  const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}&limit=1`;
   const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
   if (!res.ok) return false;
   const data = await res.json();
