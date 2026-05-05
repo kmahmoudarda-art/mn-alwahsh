@@ -165,7 +165,7 @@ const overlayStyle = {
   width: '100vw',
   height: '100dvh',
   zIndex: 999998,
-  background: 'rgba(0,0,0,0.85)',
+  background: 'rgba(0,0,0,0.75)',
 };
 
 const modalStyle = {
@@ -183,12 +183,27 @@ const modalStyle = {
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
-  background: '#0d0000',
-  backgroundImage: 'radial-gradient(ellipse at top, #2a0000 0%, #0d0000 70%)',
+  background: '#ffffff',
+  backgroundImage: 'radial-gradient(ellipse at top, rgba(204,0,0,0.06) 0%, transparent 60%)',
   zIndex: 999999,
   transform: 'none',
   inset: 0,
 };
+
+/* Light-mode answer button helpers */
+const ANS_DEFAULT_BG  = '#f8f8f8';
+const ANS_DEFAULT_BDR = '1.5px solid #e0e0e0';
+const ANS_DEFAULT_CLR = '#1a1a1a';
+const ANS_KEY_CLR     = '#CC0000';
+const ANS_CORRECT_BG  = 'rgba(34,197,94,0.15)';
+const ANS_CORRECT_BDR = '2px solid #22c55e';
+const ANS_CORRECT_CLR = '#15803d';
+const ANS_WRONG_BG    = 'rgba(239,68,68,0.12)';
+const ANS_WRONG_BDR   = '2px solid #ef4444';
+const ANS_WRONG_CLR   = '#991b1b';
+const ANS_DIM_BG      = 'rgba(0,0,0,0.03)';
+const ANS_DIM_BDR     = '1px solid rgba(0,0,0,0.06)';
+const ANS_DIM_CLR     = 'rgba(0,0,0,0.18)';
 
 function lockViewport() {
   const vp = document.querySelector('meta[name="viewport"]');
@@ -367,26 +382,28 @@ export default function QuestionModal({
 
         {/* Header */}
         <div style={{
-          flexShrink: 0, height: 52,
+          flexShrink: 0, height: 56,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 12px',
-          borderBottom: '1px solid #8B0000',
-          background: 'linear-gradient(180deg, #1a0000, #0d0000)',
-          boxShadow: '0 2px 10px rgba(139,0,0,0.3)',
+          padding: '0 14px',
+          borderBottom: '3px solid #CC0000',
+          background: '#ffffff',
+          boxShadow: '0 2px 12px rgba(204,0,0,0.15)',
+          position: 'relative',
         }}>
           <div>
-            <p style={{ fontFamily: 'var(--font-cairo)', fontWeight: 700, color: GOLD, fontSize: 14, margin: 0 }}>{category}</p>
-            <p style={{ fontFamily: 'var(--font-tajawal)', color: 'hsl(var(--muted-foreground))', fontSize: 11, margin: 0 }}>
+            <p style={{ fontFamily: 'var(--font-cairo)', fontWeight: 800, color: '#CC0000', fontSize: 15, margin: 0 }}>{category}</p>
+            <p style={{ fontFamily: 'var(--font-tajawal)', color: '#666', fontSize: 11, margin: 0, fontWeight: 600 }}>
               {points} نقطة
             </p>
           </div>
 
           {timerSeconds !== null && (
             <div style={{
-              width: 40, height: 40, borderRadius: '50%',
+              width: 42, height: 42, borderRadius: '50%',
               border: `3px solid ${timerColor}`,
+              background: `${timerColor}15`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 16, fontWeight: 700, color: timerColor,
+              fontSize: 17, fontWeight: 800, color: timerColor,
               fontFamily: 'var(--font-cairo)', flexShrink: 0,
               position: 'absolute', left: '50%', transform: 'translateX(-50%)',
             }}>
@@ -396,14 +413,14 @@ export default function QuestionModal({
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ textAlign: 'left' }}>
-              {stealMode && <p style={{ fontFamily:'var(--font-tajawal)', fontSize:10, color:'#fb923c', margin:0 }}>سرقة!</p>}
-              <p style={{ fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:12, color:'hsl(var(--foreground))', margin:0 }}>{activeTeamName}</p>
+              {stealMode && <p style={{ fontFamily:'var(--font-tajawal)', fontSize:10, color:'#ea580c', margin:0, fontWeight:700 }}>⚡ سرقة!</p>}
+              <p style={{ fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:13, color:'#1a1a1a', margin:0 }}>{activeTeamName}</p>
             </div>
             <button onClick={handleCloseClick} disabled={answered} style={{
               width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
-              color: answered ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.7)',
+              background: answered ? '#f5f5f5' : '#fff0f0', border: `1px solid ${answered ? '#e0e0e0' : '#ffcccc'}`,
+              color: answered ? '#bbb' : '#CC0000',
               cursor: answered ? 'not-allowed' : 'pointer',
             }}>
               <X size={14} />
@@ -414,7 +431,7 @@ export default function QuestionModal({
         {/* Before question: lifelines */}
         {showLifelinesBefore && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 16, gap: 12 }}>
-            <p style={{ textAlign: 'center', fontFamily:'var(--font-cairo)', fontSize:15, color:'hsl(var(--foreground))', margin:0 }}>
+            <p style={{ textAlign: 'center', fontFamily:'var(--font-cairo)', fontSize:15, color:'#1a1a1a', margin:0 }}>
               هل تريد استخدام وسيلة مساعدة قبل السؤال؟
             </p>
             <div className="ll-scroll" style={{ display:'flex', flexDirection:'row', overflowX:'auto', gap:8, paddingBottom:4 }}>
@@ -486,14 +503,14 @@ export default function QuestionModal({
                           const isCorrectAnswer = question.correct === key;
                           const isSelected = selectedAnswer === key;
                           const isFirstWrong = firstWrongAnswer === key;
-                          let bg = 'hsl(var(--secondary))', bdr = '1px solid hsl(var(--border))', color = 'hsl(var(--foreground))';
+                          let bg = ANS_DEFAULT_BG, bdr = ANS_DEFAULT_BDR, color = ANS_DEFAULT_CLR;
                           if (answered) {
-                            bg = 'hsl(var(--secondary)/0.5)'; bdr = '1px solid hsl(var(--border))'; color = 'hsl(var(--muted-foreground))';
-                            if (isCorrectAnswer) { bg='rgba(34,197,94,0.2)'; bdr='2px solid #4ade80'; color='#86efac'; }
-                            else if (isSelected) { bg='rgba(239,68,68,0.2)'; bdr='2px solid #f87171'; color='#fca5a5'; }
-                            else if (isFirstWrong) { bg='rgba(239,68,68,0.08)'; bdr='1px solid rgba(248,113,113,0.3)'; color='rgba(252,165,165,0.5)'; }
+                            bg = '#f5f5f5'; bdr = '1px solid #e0e0e0'; color = '#888';
+                            if (isCorrectAnswer) { bg=ANS_CORRECT_BG; bdr=ANS_CORRECT_BDR; color=ANS_CORRECT_CLR; }
+                            else if (isSelected) { bg=ANS_WRONG_BG; bdr=ANS_WRONG_BDR; color=ANS_WRONG_CLR; }
+                            else if (isFirstWrong) { bg='rgba(239,68,68,0.05)'; bdr='1px solid rgba(239,68,68,0.2)'; color='rgba(153,27,27,0.45)'; }
                           }
-                          if (isEliminated) { bg='rgba(255,255,255,0.02)'; bdr='1px solid rgba(255,255,255,0.05)'; color='rgba(255,255,255,0.15)'; }
+                          if (isEliminated) { bg=ANS_DIM_BG; bdr=ANS_DIM_BDR; color=ANS_DIM_CLR; }
                           const Tag = answered ? 'div' : 'button';
                           return (
                             <Tag key={key}
@@ -511,7 +528,7 @@ export default function QuestionModal({
                                 fontFamily: 'var(--font-cairo)', transition: 'background 0.15s',
                                 width: '100%', boxSizing: 'border-box',
                               }}>
-                              <span style={{ fontWeight:700, color:GOLD, flexShrink:0 }}>{key}.</span>
+                              <span style={{ fontWeight:700, color:ANS_KEY_CLR, flexShrink:0 }}>{key}.</span>
                               {value}
                             </Tag>
                           );
@@ -541,7 +558,7 @@ export default function QuestionModal({
                         />
                         <p style={{
                           fontFamily: 'var(--font-cairo)', fontWeight: 700,
-                          color: 'hsl(var(--foreground))', fontSize: 11,
+                          color: '#1a1a1a', fontSize: 11,
                           lineHeight: 1.4, direction: 'rtl', textAlign: 'center', margin: 0,
                           width: '100%',
                         }}>
@@ -627,14 +644,14 @@ export default function QuestionModal({
                           const isCorrectAnswer = question.correct === key;
                           const isSelected = selectedAnswer === key;
                           const isFirstWrong = firstWrongAnswer === key;
-                          let bg = 'hsl(var(--secondary))', bdr = '1px solid hsl(var(--border))', color = 'hsl(var(--foreground))';
+                          let bg = ANS_DEFAULT_BG, bdr = ANS_DEFAULT_BDR, color = ANS_DEFAULT_CLR;
                           if (answered) {
-                            bg = 'hsl(var(--secondary)/0.5)'; bdr = '1px solid hsl(var(--border))'; color = 'hsl(var(--muted-foreground))';
-                            if (isCorrectAnswer) { bg='rgba(34,197,94,0.2)'; bdr='2px solid #4ade80'; color='#86efac'; }
-                            else if (isSelected) { bg='rgba(239,68,68,0.2)'; bdr='2px solid #f87171'; color='#fca5a5'; }
-                            else if (isFirstWrong) { bg='rgba(239,68,68,0.08)'; bdr='1px solid rgba(248,113,113,0.3)'; color='rgba(252,165,165,0.5)'; }
+                            bg = '#f5f5f5'; bdr = '1px solid #e0e0e0'; color = '#888';
+                            if (isCorrectAnswer) { bg=ANS_CORRECT_BG; bdr=ANS_CORRECT_BDR; color=ANS_CORRECT_CLR; }
+                            else if (isSelected) { bg=ANS_WRONG_BG; bdr=ANS_WRONG_BDR; color=ANS_WRONG_CLR; }
+                            else if (isFirstWrong) { bg='rgba(239,68,68,0.05)'; bdr='1px solid rgba(239,68,68,0.2)'; color='rgba(153,27,27,0.45)'; }
                           }
-                          if (isEliminated) { bg='rgba(255,255,255,0.02)'; bdr='1px solid rgba(255,255,255,0.05)'; color='rgba(255,255,255,0.15)'; }
+                          if (isEliminated) { bg=ANS_DIM_BG; bdr=ANS_DIM_BDR; color=ANS_DIM_CLR; }
                           const Tag = answered ? 'div' : 'button';
                           return (
                             <Tag key={key}
@@ -652,7 +669,7 @@ export default function QuestionModal({
                                 fontFamily: 'var(--font-cairo)', transition: 'background 0.15s',
                                 width: '100%', boxSizing: 'border-box',
                               }}>
-                              <span style={{ fontWeight:700, color:GOLD, flexShrink:0 }}>{key}.</span>
+                              <span style={{ fontWeight:700, color:ANS_KEY_CLR, flexShrink:0 }}>{key}.</span>
                               {value}
                             </Tag>
                           );
@@ -680,7 +697,7 @@ export default function QuestionModal({
                         />
                         <p style={{
                           fontFamily: 'var(--font-cairo)', fontWeight: 700,
-                          color: 'hsl(var(--foreground))', fontSize: 12,
+                          color: '#1a1a1a', fontSize: 12,
                           lineHeight: 1.3, direction: 'rtl', textAlign: 'center', margin: 0,
                           width: '100%', padding: '0 4px',
                         }}>
@@ -751,8 +768,8 @@ export default function QuestionModal({
                     padding:'10px 16px', overflow:'hidden',
                   }}>
                     <p style={{ fontFamily:'var(--font-cairo)', fontWeight:700,
-                      color:'hsl(var(--foreground))', fontSize:qFontSize,
-                      lineHeight:1.55, textAlign:'right', direction:'rtl', margin:0 }}>
+                      color:'#1a1a1a', fontSize: qFontSize > 14 ? qFontSize + 2 : qFontSize,
+                      lineHeight:1.6, textAlign:'right', direction:'rtl', margin:0 }}>
                       {question.question}
                     </p>
                   </div>
@@ -820,9 +837,9 @@ export default function QuestionModal({
                               fontSize:13, lineHeight:1.3, wordBreak:'break-word',
                               display:'flex', alignItems:'center', justifyContent:'flex-end', gap:8,
                               direction:'rtl', textAlign:'right',
-                              background: isEliminated ? 'rgba(255,255,255,0.02)' : 'hsl(var(--secondary))',
-                              border: `1px solid ${isEliminated ? 'rgba(255,255,255,0.05)' : 'hsl(var(--border))'}`,
-                              color: isEliminated ? 'rgba(255,255,255,0.15)' : 'hsl(var(--foreground))',
+                              background: isEliminated ? ANS_DIM_BG : ANS_DEFAULT_BG,
+                              border: isEliminated ? ANS_DIM_BDR : ANS_DEFAULT_BDR,
+                              color: isEliminated ? ANS_DIM_CLR : ANS_DEFAULT_CLR,
                               opacity: isEliminated ? 0.3 : 1,
                               textDecoration: isEliminated ? 'line-through' : 'none',
                               cursor: isDisabled ? 'not-allowed' : 'pointer',
@@ -843,10 +860,10 @@ export default function QuestionModal({
                         const isCorrectAnswer = question.correct === key;
                         const isSelected = selectedAnswer === key;
                         const isFirstWrong = firstWrongAnswer === key;
-                        let bg = 'hsl(var(--secondary)/0.5)', border = '1px solid hsl(var(--border))', color = 'hsl(var(--muted-foreground))';
-                        if (isCorrectAnswer) { bg='rgba(34,197,94,0.2)'; border='2px solid #4ade80'; color='#86efac'; }
-                        else if (isSelected) { bg='rgba(239,68,68,0.2)'; border='2px solid #f87171'; color='#fca5a5'; }
-                        else if (isFirstWrong) { bg='rgba(239,68,68,0.08)'; border='1px solid rgba(248,113,113,0.3)'; color='rgba(252,165,165,0.5)'; }
+                        let bg = '#f5f5f5', border = '1px solid #e0e0e0', color = '#888';
+                        if (isCorrectAnswer) { bg=ANS_CORRECT_BG; border=ANS_CORRECT_BDR; color=ANS_CORRECT_CLR; }
+                        else if (isSelected) { bg=ANS_WRONG_BG; border=ANS_WRONG_BDR; color=ANS_WRONG_CLR; }
+                        else if (isFirstWrong) { bg='rgba(239,68,68,0.05)'; border='1px solid rgba(239,68,68,0.2)'; color='rgba(153,27,27,0.4)'; }
                         return (
                           <div key={key} style={{ minHeight:48, borderRadius:10, padding:'6px 10px',
                             fontSize:13, lineHeight:1.3, wordBreak:'break-word',
@@ -854,7 +871,7 @@ export default function QuestionModal({
                             direction:'rtl', textAlign:'right', background:bg, border, color,
                             fontFamily:'var(--font-cairo)',
                           }}>
-                            <span style={{ fontWeight:700, color:GOLD, flexShrink:0 }}>{key}.</span>
+                            <span style={{ fontWeight:700, color:ANS_KEY_CLR, flexShrink:0 }}>{key}.</span>
                             {value}
                           </div>
                         );
@@ -873,11 +890,11 @@ export default function QuestionModal({
                   background: isCorrect ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
                   border: `1px solid ${isCorrect ? 'rgba(74,222,128,0.4)' : 'rgba(248,113,113,0.4)'}`,
                 }}>
-                <p style={{ fontFamily:'var(--font-cairo)', fontWeight:900, fontSize:20, margin:'0 0 4px', color: isCorrect ? '#4ade80' : '#f87171' }}>
+                <p style={{ fontFamily:'var(--font-cairo)', fontWeight:900, fontSize:20, margin:'0 0 4px', color: isCorrect ? '#15803d' : '#CC0000' }}>
                   {isCorrect ? '🎉 إجابة صحيحة!' : '❌ إجابة خاطئة'}
                 </p>
                 {question.explanation && (
-                  <p style={{ fontFamily:'var(--font-tajawal)', fontSize:12, color:'hsl(var(--muted-foreground))', margin:'0 0 8px' }}>{question.explanation}</p>
+                  <p style={{ fontFamily:'var(--font-tajawal)', fontSize:12, color:'#555', margin:'0 0 8px' }}>{question.explanation}</p>
                 )}
                 <Button onClick={onClose} className="font-cairo bg-primary text-primary-foreground hover:bg-primary/90">متابعة</Button>
               </motion.div>

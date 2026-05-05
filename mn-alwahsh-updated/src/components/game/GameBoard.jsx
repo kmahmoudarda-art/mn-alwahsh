@@ -20,113 +20,111 @@ function randomFrom(arr) {
 
 const DISPLAY_VALUES = [200, 200, 400, 400, 600, 600];
 
-/* ── 6 distinct column colour palettes ── */
+/*
+  Per-column palettes: bright header, then 3 point-tier shades.
+  200 = lighter/airier, 400 = richer mid, 600 = deep/dramatic.
+*/
 const COL_PALETTES = [
-  // 0: Blood red
+  // 0: Emerald green
   {
-    header: 'linear-gradient(160deg, #3d0000, #1a0000)',
-    headerBorder: '#8B0000',
-    headerText: '#FF8888',
-    tile200: 'linear-gradient(150deg, rgba(100,0,0,0.7), rgba(55,0,0,0.9))',
-    tile400: 'linear-gradient(150deg, rgba(140,0,0,0.75), rgba(75,0,0,0.92))',
-    tile600: 'linear-gradient(150deg, rgba(200,0,0,0.8), rgba(100,0,0,0.95))',
-    border200: 'rgba(139,0,0,0.6)',
-    border400: 'rgba(180,0,0,0.7)',
-    border600: 'rgba(220,0,0,0.85)',
-    glow: '#CC0000',
-    text: '#FFD8D8',
+    header:       'linear-gradient(150deg, #1a7a3a, #0d5228)',
+    headerBorder: '#22cc66',
+    headerText:   '#ccffdd',
+    headerShadow: 'rgba(34,204,102,0.5)',
+    tile200:  'linear-gradient(150deg, #2e9e52, #1a6b38)',
+    tile400:  'linear-gradient(150deg, #1a6b38, #0d4524)',
+    tile600:  'linear-gradient(150deg, #0d4524, #072d18)',
+    border200: '#3dcc70', border400: '#1e9b52', border600: '#0e5c31',
+    glow200: 'rgba(61,204,112,0.4)', glow400: 'rgba(30,155,82,0.5)', glow600: 'rgba(14,92,49,0.6)',
+    text200: '#d4ffea', text400: '#aaf0cc', text600: '#88e0b0',
   },
-  // 1: Deep purple
+  // 1: Royal blue
   {
-    header: 'linear-gradient(160deg, #1e0040, #0d0020)',
-    headerBorder: '#6600BB',
-    headerText: '#CC88FF',
-    tile200: 'linear-gradient(150deg, rgba(60,0,120,0.7), rgba(30,0,60,0.9))',
-    tile400: 'linear-gradient(150deg, rgba(90,0,160,0.75), rgba(50,0,90,0.92))',
-    tile600: 'linear-gradient(150deg, rgba(130,0,210,0.8), rgba(70,0,130,0.95))',
-    border200: 'rgba(102,0,187,0.55)',
-    border400: 'rgba(130,0,220,0.65)',
-    border600: 'rgba(170,0,255,0.8)',
-    glow: '#9900FF',
-    text: '#EDD8FF',
+    header:       'linear-gradient(150deg, #1a3d9e, #0d2570)',
+    headerBorder: '#4477ff',
+    headerText:   '#ccd9ff',
+    headerShadow: 'rgba(68,119,255,0.5)',
+    tile200:  'linear-gradient(150deg, #2a55cc, #1a3a99)',
+    tile400:  'linear-gradient(150deg, #1a3a99, #0d2266)',
+    tile600:  'linear-gradient(150deg, #0d2266, #081440)',
+    border200: '#5588ff', border400: '#2255dd', border600: '#1133aa',
+    glow200: 'rgba(85,136,255,0.4)', glow400: 'rgba(34,85,221,0.5)', glow600: 'rgba(17,51,170,0.6)',
+    text200: '#d0dcff', text400: '#aabcff', text600: '#8899ee',
   },
-  // 2: Dark teal
+  // 2: Warm amber / gold
   {
-    header: 'linear-gradient(160deg, #003535, #001a1a)',
-    headerBorder: '#008888',
-    headerText: '#66DDDD',
-    tile200: 'linear-gradient(150deg, rgba(0,80,80,0.7), rgba(0,40,40,0.9))',
-    tile400: 'linear-gradient(150deg, rgba(0,110,110,0.75), rgba(0,55,55,0.92))',
-    tile600: 'linear-gradient(150deg, rgba(0,150,150,0.8), rgba(0,80,80,0.95))',
-    border200: 'rgba(0,136,136,0.55)',
-    border400: 'rgba(0,170,170,0.65)',
-    border600: 'rgba(0,210,210,0.8)',
-    glow: '#00BBBB',
-    text: '#D8FFFF',
+    header:       'linear-gradient(150deg, #996600, #664400)',
+    headerBorder: '#ffcc22',
+    headerText:   '#fff3cc',
+    headerShadow: 'rgba(255,204,34,0.5)',
+    tile200:  'linear-gradient(150deg, #cc8800, #996600)',
+    tile400:  'linear-gradient(150deg, #996600, #664400)',
+    tile600:  'linear-gradient(150deg, #664400, #3d2800)',
+    border200: '#ffbb33', border400: '#cc8800', border600: '#885500',
+    glow200: 'rgba(255,187,51,0.4)', glow400: 'rgba(204,136,0,0.5)', glow600: 'rgba(136,85,0,0.6)',
+    text200: '#fff4cc', text400: '#ffe0aa', text600: '#ffcc88',
   },
-  // 3: Dark amber / gold
+  // 3: Teal / cyan
   {
-    header: 'linear-gradient(160deg, #3a2000, #1a0e00)',
-    headerBorder: '#AA6600',
-    headerText: '#FFBB55',
-    tile200: 'linear-gradient(150deg, rgba(100,55,0,0.7), rgba(55,25,0,0.9))',
-    tile400: 'linear-gradient(150deg, rgba(140,75,0,0.75), rgba(75,35,0,0.92))',
-    tile600: 'linear-gradient(150deg, rgba(190,100,0,0.8), rgba(100,50,0,0.95))',
-    border200: 'rgba(170,102,0,0.55)',
-    border400: 'rgba(200,130,0,0.65)',
-    border600: 'rgba(240,160,0,0.8)',
-    glow: '#DD9900',
-    text: '#FFF0D0',
+    header:       'linear-gradient(150deg, #007777, #004d4d)',
+    headerBorder: '#00ddcc',
+    headerText:   '#ccfffa',
+    headerShadow: 'rgba(0,221,204,0.5)',
+    tile200:  'linear-gradient(150deg, #009999, #006666)',
+    tile400:  'linear-gradient(150deg, #006666, #004444)',
+    tile600:  'linear-gradient(150deg, #004444, #002828)',
+    border200: '#00ccbb', border400: '#009988', border600: '#006655',
+    glow200: 'rgba(0,204,187,0.4)', glow400: 'rgba(0,153,136,0.5)', glow600: 'rgba(0,102,85,0.6)',
+    text200: '#ccfff8', text400: '#aaffee', text600: '#88eedd',
   },
-  // 4: Deep navy / indigo
+  // 4: Violet / purple
   {
-    header: 'linear-gradient(160deg, #000d40, #000820)',
-    headerBorder: '#1133BB',
-    headerText: '#7799FF',
-    tile200: 'linear-gradient(150deg, rgba(0,20,100,0.7), rgba(0,10,55,0.9))',
-    tile400: 'linear-gradient(150deg, rgba(0,30,140,0.75), rgba(0,15,80,0.92))',
-    tile600: 'linear-gradient(150deg, rgba(0,45,190,0.8), rgba(0,22,110,0.95))',
-    border200: 'rgba(17,51,187,0.55)',
-    border400: 'rgba(30,80,220,0.65)',
-    border600: 'rgba(50,110,255,0.8)',
-    glow: '#2255FF',
-    text: '#D0DDFF',
+    header:       'linear-gradient(150deg, #550099, #360066)',
+    headerBorder: '#bb55ff',
+    headerText:   '#f0ccff',
+    headerShadow: 'rgba(187,85,255,0.5)',
+    tile200:  'linear-gradient(150deg, #7722cc, #550099)',
+    tile400:  'linear-gradient(150deg, #550099, #380066)',
+    tile600:  'linear-gradient(150deg, #380066, #200040)',
+    border200: '#aa44ff', border400: '#7722cc', border600: '#550099',
+    glow200: 'rgba(170,68,255,0.4)', glow400: 'rgba(119,34,204,0.5)', glow600: 'rgba(85,0,153,0.6)',
+    text200: '#f2deff', text400: '#e0bbff', text600: '#cc99ff',
   },
-  // 5: Dark forest green
+  // 5: Crimson red
   {
-    header: 'linear-gradient(160deg, #0a2200, #041200)',
-    headerBorder: '#226600',
-    headerText: '#66DD44',
-    tile200: 'linear-gradient(150deg, rgba(20,70,0,0.7), rgba(10,35,0,0.9))',
-    tile400: 'linear-gradient(150deg, rgba(30,100,0,0.75), rgba(15,55,0,0.92))',
-    tile600: 'linear-gradient(150deg, rgba(40,140,0,0.8), rgba(20,80,0,0.95))',
-    border200: 'rgba(34,102,0,0.55)',
-    border400: 'rgba(50,140,0,0.65)',
-    border600: 'rgba(70,180,0,0.8)',
-    glow: '#33BB00',
-    text: '#D8FFD0',
+    header:       'linear-gradient(150deg, #990000, #660000)',
+    headerBorder: '#ff4444',
+    headerText:   '#ffcccc',
+    headerShadow: 'rgba(255,68,68,0.5)',
+    tile200:  'linear-gradient(150deg, #cc2222, #991111)',
+    tile400:  'linear-gradient(150deg, #991111, #660000)',
+    tile600:  'linear-gradient(150deg, #660000, #3d0000)',
+    border200: '#ff5555', border400: '#cc2222', border600: '#991111',
+    glow200: 'rgba(255,85,85,0.4)', glow400: 'rgba(204,34,34,0.5)', glow600: 'rgba(153,17,17,0.6)',
+    text200: '#ffdddd', text400: '#ffbbbb', text600: '#ff9999',
   },
 ];
 
 function getColStyle(colIndex, points) {
   const p = COL_PALETTES[colIndex % COL_PALETTES.length];
-  const bg = points === 600 ? p.tile600 : points === 400 ? p.tile400 : p.tile200;
-  const border = points === 600 ? p.border600 : points === 400 ? p.border400 : p.border200;
+  const isHigh = points === 600, isMid = points === 400;
+  const bg     = isHigh ? p.tile600     : isMid ? p.tile400     : p.tile200;
+  const border = isHigh ? p.border600   : isMid ? p.border400   : p.border200;
+  const glow   = isHigh ? p.glow600     : isMid ? p.glow400     : p.glow200;
+  const color  = isHigh ? p.text600     : isMid ? p.text400     : p.text200;
   return {
-    borderRadius: '14px',
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
+    borderRadius: '16px',
     position: 'relative',
     overflow: 'hidden',
-    transition: 'all 0.22s ease',
+    transition: 'all 0.2s ease',
     cursor: 'pointer',
-    fontSize: '22px',
-    fontWeight: 700,
-    letterSpacing: '0.02em',
+    fontSize: points === 600 ? '24px' : points === 400 ? '22px' : '20px',
+    fontWeight: 800,
+    letterSpacing: '0.01em',
     background: bg,
-    border: `1.5px solid ${border}`,
-    color: p.text,
-    boxShadow: `0 4px 14px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07)`,
+    border: `2px solid ${border}`,
+    color,
+    boxShadow: `0 4px 16px ${glow}, inset 0 1px 0 rgba(255,255,255,0.12)`,
   };
 }
 
@@ -300,10 +298,10 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
                 transition={{ delay: i * 0.08 }}
                 style={{
                   background: p.header,
-                  border: `1.5px solid ${p.headerBorder}`,
-                  boxShadow: `0 0 10px rgba(0,0,0,0.4), 0 0 8px ${p.glow}33`,
-                  borderRadius: '10px',
-                  padding: '8px 4px',
+                  border: `2px solid ${p.headerBorder}`,
+                  boxShadow: `0 3px 12px rgba(0,0,0,0.45), 0 0 10px ${p.headerShadow}`,
+                  borderRadius: '12px',
+                  padding: '9px 4px',
                   textAlign: 'center',
                 }}
               >
