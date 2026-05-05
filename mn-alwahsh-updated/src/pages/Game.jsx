@@ -547,6 +547,7 @@ export default function Game() {
     setGameName(name);
     const existing = await loadSession(name);
     if (existing?.gamePhase) {
+      // Resume saved game
       setGamePhase(existing.gamePhase);
       if (existing.categories) setCategories(existing.categories);
       if (existing.teams) setTeams(existing.teams);
@@ -558,6 +559,16 @@ export default function Game() {
       if (existing.gamePhase === 'playing' && existing.categories?.length > 0) {
         startPregeneration(existing.categories);
       }
+    } else {
+      // New game — reset all state to defaults
+      setGamePhase('setup');
+      setCategories([]);
+      setTeams({ 1: { name: '', score: 0, scoreKey: 0 }, 2: { name: '', score: 0, scoreKey: 0 } });
+      setCurrentTeam(1);
+      setAnsweredTiles(new Set());
+      setTeamLifelines({ 1: {}, 2: {} });
+      setUsedLucky({ 1: false, 2: false });
+      setUsedQuickTimer({ 1: false, 2: false });
     }
   }, [startPregeneration]);
 
