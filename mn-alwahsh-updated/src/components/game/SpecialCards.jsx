@@ -178,11 +178,15 @@ export default function SpecialCards({
     }, 800);
   };
 
-  const btnActive = (color, glow) => ({
-    border: `2px solid ${color}`,
+  const btnActive = (isRed) => ({
+    border: isRed ? '2px solid #FF4444' : '2px solid #4499ff',
     color: '#ffffff',
-    background: `linear-gradient(135deg, ${color}cc, ${color}88)`,
-    boxShadow: `0 0 10px ${glow}, 0 2px 8px rgba(0,0,0,0.5)`,
+    background: isRed
+      ? 'linear-gradient(135deg, rgba(180,0,0,0.95), rgba(120,0,0,0.95))'
+      : 'linear-gradient(135deg, rgba(20,80,220,0.95), rgba(10,50,160,0.95))',
+    boxShadow: isRed
+      ? '0 0 12px rgba(220,0,0,0.7), 0 2px 8px rgba(0,0,0,0.6)'
+      : '0 0 12px rgba(30,100,255,0.7), 0 2px 8px rgba(0,0,0,0.6)',
     cursor: 'pointer',
     fontWeight: 700,
     fontSize: 13,
@@ -219,7 +223,7 @@ export default function SpecialCards({
             onClick={() => handleLucky(1)}
             disabled={team1UsedLucky || spinning}
             className="special-btn font-cairo px-3 py-1.5 rounded-xl"
-            style={team1UsedLucky ? btnUsed : btnActive('#CC0000', 'rgba(204,0,0,0.6)')}
+            style={team1UsedLucky ? btnUsed : btnActive(true)}
             title="بطاقة الحظ - تسرق نقاط أو تخسر"
           >
             🃏 حظ
@@ -228,7 +232,7 @@ export default function SpecialCards({
             onClick={() => onQuickTimer(1)}
             disabled={team1UsedQuick}
             className="special-btn font-cairo px-3 py-1.5 rounded-xl"
-            style={team1UsedQuick ? btnUsed : btnActive('#CC0000', 'rgba(204,0,0,0.6)')}
+            style={team1UsedQuick ? btnUsed : btnActive(true)}
             title="ضغط الوقت - يجعل السؤال 15 ثانية"
           >
             ⏱️ 15ث
@@ -243,7 +247,7 @@ export default function SpecialCards({
             onClick={() => handleLucky(2)}
             disabled={team2UsedLucky || spinning}
             className="special-btn font-cairo px-3 py-1.5 rounded-xl"
-            style={team2UsedLucky ? btnUsed : btnActive('#1a6fff', 'rgba(30,100,255,0.6)')}
+            style={team2UsedLucky ? btnUsed : btnActive(false)}
             title="بطاقة الحظ - تسرق نقاط أو تخسر"
           >
             🃏 حظ
@@ -252,7 +256,7 @@ export default function SpecialCards({
             onClick={() => onQuickTimer(2)}
             disabled={team2UsedQuick}
             className="special-btn font-cairo px-3 py-1.5 rounded-xl"
-            style={team2UsedQuick ? btnUsed : btnActive('#1a6fff', 'rgba(30,100,255,0.6)')}
+            style={team2UsedQuick ? btnUsed : btnActive(false)}
             title="ضغط الوقت - يجعل السؤال 15 ثانية"
           >
             ⏱️ 15ث
