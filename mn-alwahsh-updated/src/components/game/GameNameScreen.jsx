@@ -60,40 +60,40 @@ export default function GameNameScreen({ onEnter }) {
 
       <AnimatePresence>{showManual && <InstructionManual onClose={() => setShowManual(false)} />}</AnimatePresence>
 
-      {/* Deep red sky pulse */}
+      {/* ── Static fallback background (shows while video loads) ── */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(ellipse 100% 55% at 50% 0%, rgba(180,0,0,0.6) 0%, transparent 70%)',
-        animation: 'skyPulse 3s ease-in-out infinite',
+        background: 'radial-gradient(ellipse 110% 70% at 50% 30%, #2a0000 0%, #0d0000 60%, #050000 100%)',
+        zIndex: 0,
       }} />
-
-      {/* Monster paw background */}
       <div className="absolute inset-0 pointer-events-none" style={{
         backgroundImage: `url('https://media.base44.com/images/public/69dca0dfc53463f8eae196fc/30ca55b32_image.png')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center 30%',
-        opacity: 0.18,
-        filter: 'sepia(1) saturate(4) hue-rotate(320deg) contrast(1.3)',
+        backgroundSize: 'cover', backgroundPosition: 'center 30%',
+        opacity: 0.22, filter: 'sepia(1) saturate(4) hue-rotate(320deg) contrast(1.3)',
+        zIndex: 0,
+      }} />
+
+      {/* ── Looping video background ── */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 1 }}
+      >
+        <source src="/bg-video.mp4" type="video/mp4" />
+      </video>
+
+      {/* Subtle dark overlay so text stays readable over the video */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: 'rgba(0,0,0,0.32)',
+        zIndex: 2,
       }} />
 
       {/* Edge vignette */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.78) 100%)',
-      }} />
-
-      {/* Claw marks - top-left corner */}
-      <div className="absolute top-0 left-0 pointer-events-none" style={{
-        backgroundImage: `url('https://media.base44.com/images/public/69dca0dfc53463f8eae196fc/290f8ce95_image.png')`,
-        backgroundSize: '200px', backgroundRepeat: 'no-repeat',
-        width: 200, height: 200, opacity: 0.22,
-        filter: 'sepia(1) saturate(5) hue-rotate(320deg)',
-        transform: 'rotate(180deg)',
-      }} />
-      {/* Claw marks - bottom-right corner */}
-      <div className="absolute bottom-0 right-0 pointer-events-none" style={{
-        backgroundImage: `url('https://media.base44.com/images/public/69dca0dfc53463f8eae196fc/290f8ce95_image.png')`,
-        backgroundSize: '180px', backgroundRepeat: 'no-repeat',
-        width: 180, height: 180, opacity: 0.18,
-        filter: 'sepia(1) saturate(5) hue-rotate(320deg)',
+        background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%)',
+        zIndex: 2,
       }} />
 
       {/* Floating skulls */}
@@ -104,7 +104,7 @@ export default function GameNameScreen({ onEnter }) {
         { style: { right: '6%', bottom: '20%', fontSize: 44, animDur: '4s',   animDel: '0.5s' } },
       ].map((s, i) => (
         <div key={i} className="absolute pointer-events-none select-none"
-          style={{ ...s.style, animation: `skullHover ${s.style.animDur} ease-in-out infinite ${s.style.animDel}` }}>
+          style={{ ...s.style, zIndex: 3, animation: `skullHover ${s.style.animDur} ease-in-out infinite ${s.style.animDel}` }}>
           💀
         </div>
       ))}
@@ -112,8 +112,9 @@ export default function GameNameScreen({ onEnter }) {
       {/* Bottom fog glow */}
       <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{
         height: '28vh',
-        background: 'linear-gradient(to top, rgba(90,0,0,0.3) 0%, transparent 100%)',
+        background: 'linear-gradient(to top, rgba(90,0,0,0.35) 0%, transparent 100%)',
         animation: 'fogBase 4s ease-in-out infinite',
+        zIndex: 2,
       }} />
 
       {/* ── Content ── */}
