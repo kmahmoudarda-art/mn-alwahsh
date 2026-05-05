@@ -4,6 +4,7 @@ import { Gamepad2, BookOpen, Download, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import InstructionManual from './InstructionManual';
+import ScreenMirrorButton from './ScreenMirrorButton';
 
 function InstallBanner({ prompt, onDismiss }) {
   return (
@@ -96,6 +97,7 @@ export default function GameNameScreen({ onEnter }) {
       `}</style>
 
       <AnimatePresence>{showManual && <InstructionManual onClose={() => setShowManual(false)} />}</AnimatePresence>
+      <ScreenMirrorButton />
 
       <AnimatePresence>
         {showInstall && installPrompt && (

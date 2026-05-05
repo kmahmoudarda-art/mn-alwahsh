@@ -20,6 +20,22 @@
         });
       }
     </script>
+    <!-- Google Cast SDK -->
+    <script>
+      window['__onGCastApiAvailable'] = function(isAvailable) {
+        if (isAvailable && window.cast && window.chrome && window.chrome.cast) {
+          try {
+            cast.framework.CastContext.getInstance().setOptions({
+              receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+              autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,
+            });
+            window.__castReady = true;
+            window.dispatchEvent(new Event('castready'));
+          } catch(e) {}
+        }
+      };
+    </script>
+    <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1" async></script>
   </head>
   <body>
     <div id="root"></div>
