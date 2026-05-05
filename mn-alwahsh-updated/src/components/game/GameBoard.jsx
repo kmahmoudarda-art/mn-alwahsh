@@ -244,7 +244,6 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
             categories.map((cat, colIndex) => {
               const tileKey = `${colIndex}-${rowIndex}`;
               const isAnswered = answeredTiles.has(tileKey);
-              const p = COL_PALETTES[colIndex % COL_PALETTES.length];
 
               return (
                 <motion.button
