@@ -505,7 +505,7 @@ export default function Game() {
 
 
   // Zoom state
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(0.9);
 
   // Pull-to-refresh
   const pullStartY = useRef(null);
