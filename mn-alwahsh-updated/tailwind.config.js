@@ -9,6 +9,7 @@ module.exports = {
                         tajawal: ['var(--font-tajawal)'],
                         rakkas: ['var(--font-rakkas)'],
                         mirza: ['var(--font-mirza)'],
+                        helpme: ['var(--font-helpme)'],
                 },
                 borderRadius: {
                         lg: 'var(--radius)',
