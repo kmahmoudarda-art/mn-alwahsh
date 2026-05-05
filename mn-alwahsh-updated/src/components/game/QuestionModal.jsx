@@ -590,12 +590,13 @@ export default function QuestionModal({
                       {!stealMode && !answered && (
                         <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
                           width:'100%', padding:'4px 10px', borderRadius:10, fontSize:11,
-                          background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(251,146,60,0.12)',
-                          border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(251,146,60,0.3)',
-                          color: passToOtherUsed ? 'rgba(255,255,255,0.2)' : '#fdba74',
+                          background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(200,30,30,0.18)',
+                          border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(200,30,30,0.35)',
+                          color: passToOtherUsed ? 'rgba(255,255,255,0.2)' : '#fff',
                           fontFamily:'var(--font-cairo)', cursor: passToOtherUsed ? 'not-allowed' : 'pointer',
                           textAlign:'center', opacity: passToOtherUsed ? 0.4 : 1,
                           textDecoration: passToOtherUsed ? 'line-through' : 'none',
+                          fontWeight: 700,
                         }}>🎯 اسرق يا غالي → أعطها للفريق الثاني (10 ثواني)</button>
                       )}
                       {stealMode && !answered && (
@@ -729,12 +730,13 @@ export default function QuestionModal({
                       {!stealMode && !answered && (
                         <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
                           width:'100%', padding:'3px 10px', borderRadius:10, fontSize:10,
-                          background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(251,146,60,0.12)',
-                          border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(251,146,60,0.3)',
-                          color: passToOtherUsed ? 'rgba(255,255,255,0.2)' : '#fdba74',
+                          background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(200,30,30,0.18)',
+                          border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(200,30,30,0.35)',
+                          color: passToOtherUsed ? 'rgba(255,255,255,0.2)' : '#fff',
                           fontFamily:'var(--font-cairo)', cursor: passToOtherUsed ? 'not-allowed' : 'pointer',
                           textAlign:'center', opacity: passToOtherUsed ? 0.4 : 1,
                           textDecoration: passToOtherUsed ? 'line-through' : 'none',
+                          fontWeight: 700,
                         }}>🎯 اسرق يا غالي → أعطها للفريق الثاني (10 ثواني)</button>
                       )}
                       {stealMode && !answered && (
@@ -797,12 +799,13 @@ export default function QuestionModal({
                     {!stealMode && !answered && (
                       <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
                         width:'100%', padding:'4px 10px', borderRadius:10, fontSize:11,
-                        background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(251,146,60,0.12)',
-                        border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(251,146,60,0.3)',
-                        color: passToOtherUsed ? 'rgba(255,255,255,0.2)' : '#fdba74',
+                        background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(200,30,30,0.18)',
+                        border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(200,30,30,0.35)',
+                        color: passToOtherUsed ? 'rgba(255,255,255,0.2)' : '#fff',
                         fontFamily:'var(--font-cairo)', cursor: passToOtherUsed ? 'not-allowed' : 'pointer',
                         textAlign:'center', opacity: passToOtherUsed ? 0.4 : 1,
                         textDecoration: passToOtherUsed ? 'line-through' : 'none',
+                        fontWeight: 700,
                       }}>🎯 اسرق يا غالي → أعطها للفريق الثاني (10 ثواني)</button>
                     )}
                     {stealMode && !answered && (
