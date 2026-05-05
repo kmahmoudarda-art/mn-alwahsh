@@ -163,21 +163,38 @@ async function resetTable(table) {
   else console.log(`[Supabase] ${table} reset (exhausted — recycling)`);
 }
 
+// Check if a table has ANY rows for this category (used or not) — used to detect exhaustion vs absence
+async function tableHasCategory(table, category, points) {
+  const intPoints = parseInt(points, 10);
+  const encodedCategory = encodeURIComponent(category);
+  const url = `${SUPABASE_URL}/rest/v1/${table}?select=id&points=eq.${intPoints}&category=eq.${encodedCategory}&limit=1`;
+  const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
+  if (!res.ok) return false;
+  const data = await res.json();
+  return Array.isArray(data) && data.length > 0;
+}
+
 // Fetch question — tries all tables in order, returns first match
-// If a table is exhausted, resets it and retries once
+// Only resets a table when it actually owns the category but is exhausted
 export async function fetchQuestion(category, points) {
-  const tables = [TABLE_MAIN, TABLE_FLAGS, TABLE_FANAN, TABLE_FAM, TABLE_FALSAFA,TABLE_LOGO1,TABLE_LOGOO];
+  const tables = [TABLE_MAIN, TABLE_FLAGS, TABLE_FANAN, TABLE_FAM, TABLE_FALSAFA, TABLE_LOGO1, TABLE_LOGOO, TABLE_KIDS];
 
   for (const table of tables) {
     console.log(`[fetchQuestion] Trying ${table} for "${category}" ${parseInt(points, 10)}pts`);
     let rows = await fetchRowsFromTable(table, category, points);
     console.log(`[fetchQuestion] ${table} → ${rows.length} rows`);
 
-    // If no unused rows found, reset this table and retry once
     if (rows.length === 0) {
-      await resetTable(table);
-      rows = await fetchRowsFromTable(table, category, points);
-      console.log(`[fetchQuestion] ${table} after reset → ${rows.length} rows`);
+      // Only reset if this table actually has the category (i.e. it's exhausted, not absent)
+      const hasIt = await tableHasCategory(table, category, points);
+      if (hasIt) {
+        await resetTable(table);
+        rows = await fetchRowsFromTable(table, category, points);
+        console.log(`[fetchQuestion] ${table} after reset → ${rows.length} rows`);
+      } else {
+        console.log(`[fetchQuestion] ${table} doesn't own "${category}" — skipping`);
+        continue;
+      }
     }
 
     if (rows.length > 0) {
