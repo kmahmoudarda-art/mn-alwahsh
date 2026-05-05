@@ -156,13 +156,13 @@ export default function GameNameScreen({ onEnter }) {
             initial={{ scale: 0.85, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.15, type: 'spring', stiffness: 110 }}
-            className="font-cairo font-black"
+            className="font-rakkas"
             style={{
               fontSize: 'clamp(72px, 18vw, 200px)',
               color: '#CC0000',
               animation: 'titleFlicker 4s ease-in-out infinite',
               lineHeight: 0.92,
-              letterSpacing: '-0.01em',
+              letterSpacing: '0.02em',
               textAlign: 'center',
             }}
           >
