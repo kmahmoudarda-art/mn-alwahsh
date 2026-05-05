@@ -60,24 +60,23 @@ export default function GameNameScreen({ onEnter }) {
 
       <AnimatePresence>{showManual && <InstructionManual onClose={() => setShowManual(false)} />}</AnimatePresence>
 
-      {/* ── Full-screen background image ── */}
+      {/* ── Background: dark red gradient + looping video ── */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: 'url(/bg-image.jpeg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        background: 'radial-gradient(ellipse 110% 70% at 50% 30%, #2a0000 0%, #0d0000 60%, #050000 100%)',
         zIndex: 0,
       }} />
-
-      {/* Dark overlay so text stays readable */}
+      <video autoPlay loop muted playsInline
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 1 }}>
+        <source src="/bg-video.mp4" type="video/mp4" />
+      </video>
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'rgba(0,0,0,0.45)',
-        zIndex: 1,
+        background: 'rgba(0,0,0,0.32)',
+        zIndex: 2,
       }} />
-
-      {/* Edge vignette */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.65) 100%)',
-        zIndex: 1,
+        background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%)',
+        zIndex: 2,
       }} />
 
       {/* Floating skulls */}
