@@ -143,13 +143,13 @@ export default function GameNameScreen({ onEnter }) {
         style={{ zIndex: 10 }}
       >
         {/* Title */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-2">
           <motion.h1
             initial={{ scale: 0.75, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2, type: 'spring', stiffness: 120 }}
             className="font-cairo font-black tracking-tight"
-            style={{ fontSize: 'clamp(42px, 10vw, 80px)', color: '#CC0000', animation: 'titleFlicker 4s ease-in-out infinite', lineHeight: 1.1 }}
+            style={{ fontSize: 'clamp(64px, 15vw, 110px)', color: '#CC0000', animation: 'titleFlicker 4s ease-in-out infinite', lineHeight: 1.05 }}
           >
             من الوحش
           </motion.h1>
