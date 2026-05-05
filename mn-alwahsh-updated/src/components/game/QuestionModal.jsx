@@ -536,7 +536,7 @@ export default function QuestionModal({
                               disabled={!answered ? isDisabled : undefined}
                               style={{
                                 minHeight: 44, borderRadius: 10, padding: '5px 8px',
-                                fontSize: 12, lineHeight: 1.3, wordBreak: 'break-word',
+                                fontSize: 15, fontWeight: 700, lineHeight: 1.3, wordBreak: 'break-word',
                                 display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6,
                                 direction: 'rtl', textAlign: 'right',
                                 background: bg, border: bdr, color,
@@ -575,8 +575,8 @@ export default function QuestionModal({
                           onLoad={() => console.log('Image loaded:', resolvedHeroUrl)}
                         />
                         <p style={{
-                          fontFamily: 'var(--font-cairo)', fontWeight: 700,
-                          color: '#1a1a1a', fontSize: 11,
+                          fontFamily: 'var(--font-cairo)', fontWeight: 800,
+                          color: '#1a1a1a', fontSize: 16,
                           lineHeight: 1.4, direction: 'rtl', textAlign: 'center', margin: 0,
                           width: '100%',
                         }}>
@@ -599,8 +599,8 @@ export default function QuestionModal({
                         }}>🎯 اسرق يا غالي → أعطها للفريق الثاني (10 ثواني)</button>
                       )}
                       {stealMode && !answered && (
-                        <div style={{ background:'rgba(251,146,60,0.12)', border:'1px solid rgba(251,146,60,0.3)', borderRadius:10, padding:'6px 10px', textAlign:'center' }}>
-                          <p style={{ color:'#fdba74', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:12, margin:0 }}>⚡ فرصة السرقة!</p>
+                        <div style={{ background:'#ffffff', border:'1px solid rgba(251,146,60,0.5)', borderRadius:10, padding:'6px 10px', textAlign:'center' }}>
+                          <p style={{ color:'#d97706', fontFamily:'var(--font-cairo)', fontWeight:800, fontSize:14, margin:0 }}>⚡ فرصة السرقة!</p>
                         </div>
                       )}
                       {friendHint && (
@@ -677,7 +677,7 @@ export default function QuestionModal({
                               disabled={!answered ? isDisabled : undefined}
                               style={{
                                 flex: 1, borderRadius: 8, padding: '4px 8px',
-                                fontSize: 12, lineHeight: 1.2, wordBreak: 'break-word',
+                                fontSize: 15, fontWeight: 700, lineHeight: 1.2, wordBreak: 'break-word',
                                 display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6,
                                 direction: 'rtl', textAlign: 'right',
                                 background: bg, border: bdr, color,
@@ -714,8 +714,8 @@ export default function QuestionModal({
                           onError={(e) => { e.target.style.display = 'none'; }}
                         />
                         <p style={{
-                          fontFamily: 'var(--font-cairo)', fontWeight: 700,
-                          color: '#1a1a1a', fontSize: 12,
+                          fontFamily: 'var(--font-cairo)', fontWeight: 800,
+                          color: '#1a1a1a', fontSize: 16,
                           lineHeight: 1.3, direction: 'rtl', textAlign: 'center', margin: 0,
                           width: '100%', padding: '0 4px',
                         }}>
@@ -738,8 +738,8 @@ export default function QuestionModal({
                         }}>🎯 اسرق يا غالي → أعطها للفريق الثاني (10 ثواني)</button>
                       )}
                       {stealMode && !answered && (
-                        <div style={{ background:'rgba(251,146,60,0.12)', border:'1px solid rgba(251,146,60,0.3)', borderRadius:10, padding:'4px 10px', textAlign:'center' }}>
-                          <p style={{ color:'#fdba74', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:11, margin:0 }}>⚡ فرصة السرقة!</p>
+                        <div style={{ background:'#ffffff', border:'1px solid rgba(251,146,60,0.5)', borderRadius:10, padding:'4px 10px', textAlign:'center' }}>
+                          <p style={{ color:'#d97706', fontFamily:'var(--font-cairo)', fontWeight:800, fontSize:14, margin:0 }}>⚡ فرصة السرقة!</p>
                         </div>
                       )}
                       {friendHint && (
@@ -785,8 +785,8 @@ export default function QuestionModal({
                     alignItems:'center', justifyContent:'center',
                     padding:'10px 16px', overflow:'hidden',
                   }}>
-                    <p style={{ fontFamily:'var(--font-cairo)', fontWeight:700,
-                      color:'#1a1a1a', fontSize: qFontSize > 14 ? qFontSize + 2 : qFontSize,
+                    <p style={{ fontFamily:'var(--font-cairo)', fontWeight:800,
+                      color:'#1a1a1a', fontSize: qFontSize > 14 ? qFontSize + 4 : qFontSize + 4,
                       lineHeight:1.6, textAlign:'right', direction:'rtl', margin:0 }}>
                       {question.question}
                     </p>
@@ -806,8 +806,8 @@ export default function QuestionModal({
                       }}>🎯 اسرق يا غالي → أعطها للفريق الثاني (10 ثواني)</button>
                     )}
                     {stealMode && !answered && (
-                      <div style={{ background:'rgba(251,146,60,0.12)', border:'1px solid rgba(251,146,60,0.3)', borderRadius:10, padding:'6px 10px', textAlign:'center' }}>
-                        <p style={{ color:'#fdba74', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:12, margin:0 }}>⚡ فرصة السرقة!</p>
+                      <div style={{ background:'#ffffff', border:'1px solid rgba(251,146,60,0.5)', borderRadius:10, padding:'6px 10px', textAlign:'center' }}>
+                        <p style={{ color:'#d97706', fontFamily:'var(--font-cairo)', fontWeight:800, fontSize:14, margin:0 }}>⚡ فرصة السرقة!</p>
                       </div>
                     )}
                     {friendHint && (
@@ -852,7 +852,7 @@ export default function QuestionModal({
                         return (
                           <button key={key} onClick={() => !isDisabled && onAnswer(key)} disabled={isDisabled}
                             style={{ minHeight:48, borderRadius:10, padding:'6px 10px',
-                              fontSize:13, lineHeight:1.3, wordBreak:'break-word',
+                              fontSize:16, fontWeight:700, lineHeight:1.3, wordBreak:'break-word',
                               display:'flex', alignItems:'center', justifyContent:'flex-end', gap:8,
                               direction:'rtl', textAlign:'right',
                               background: isEliminated ? ANS_DIM_BG : ANS_DEFAULT_BG,
@@ -884,7 +884,7 @@ export default function QuestionModal({
                         else if (isFirstWrong) { bg='rgba(239,68,68,0.05)'; border='1px solid rgba(239,68,68,0.2)'; color='rgba(153,27,27,0.4)'; }
                         return (
                           <div key={key} style={{ minHeight:48, borderRadius:10, padding:'6px 10px',
-                            fontSize:13, lineHeight:1.3, wordBreak:'break-word',
+                            fontSize:16, fontWeight:700, lineHeight:1.3, wordBreak:'break-word',
                             display:'flex', alignItems:'center', justifyContent:'flex-end', gap:8,
                             direction:'rtl', textAlign:'right', background:bg, border, color,
                             fontFamily:'var(--font-cairo)',
