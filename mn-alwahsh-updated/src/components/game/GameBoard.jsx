@@ -239,11 +239,20 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
                           style={{
                             ...HEADER_STYLE,
                             borderRadius: '10px',
-                            padding: '7px 3px',
+                            padding: '10px 4px',
                           }}
                         >
-                          <p className="gb-cat-text text-[10px] sm:text-xs font-cairo font-bold leading-tight truncate"
-                            style={{ color: '#fff' }}>
+                          <p className="gb-cat-text font-cairo leading-tight"
+                            style={{
+                              color: '#1a0a00',
+                              fontWeight: 900,
+                              fontSize: '15px',
+                              textShadow: 'none',
+                              letterSpacing: '0.01em',
+                              wordBreak: 'break-word',
+                              whiteSpace: 'normal',
+                              lineHeight: 1.25,
+                            }}>
                             {cat}
                           </p>
                         </motion.div>

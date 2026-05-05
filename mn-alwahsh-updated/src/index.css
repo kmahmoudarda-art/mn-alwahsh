@@ -255,8 +255,8 @@ body {
   .gb-team-section > .grid { gap: 2px !important; }
   .gb-cat-col { gap: 1px !important; }
 
-  .gb-cat-cell { padding: 2px 1px !important; border-radius: 4px !important; }
-  .gb-cat-text { font-size: 7px !important; }
+  .gb-cat-cell { padding: 3px 2px !important; border-radius: 4px !important; }
+  .gb-cat-text { font-size: 9px !important; font-weight: 900 !important; white-space: normal !important; }
 
   /* Tier pairs: no extra gap between same-value rows, tiny gap between tiers */
   .gb-tier-pair { gap: 1px !important; margin-top: 2px !important; }
