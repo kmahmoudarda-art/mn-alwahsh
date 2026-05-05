@@ -657,17 +657,18 @@ export default function QuestionModal({
                         })}
                       </div>
 
-                      {/* RIGHT: image + question */}
+                      {/* RIGHT: image + question — 50% width */}
                       <div style={{
-                        width: 120, flexShrink: 0,
+                        flex: 1, flexShrink: 0,
                         display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', justifyContent: 'center', gap: 4,
+                        alignItems: 'center', justifyContent: 'center', gap: 6,
                       }}>
                         <img
                           src={resolvedHeroUrl}
                           alt=""
                           style={{
-                            width: 80, height: 80,
+                            width: '100%', maxWidth: 160,
+                            height: 'auto', maxHeight: 140,
                             objectFit: isLogo ? 'contain' : 'cover',
                             objectPosition: 'center',
                             borderRadius: isLogo ? 8 : '50%',
@@ -677,9 +678,9 @@ export default function QuestionModal({
                         />
                         <p style={{
                           fontFamily: 'var(--font-cairo)', fontWeight: 700,
-                          color: 'hsl(var(--foreground))', fontSize: 10,
+                          color: 'hsl(var(--foreground))', fontSize: 12,
                           lineHeight: 1.3, direction: 'rtl', textAlign: 'center', margin: 0,
-                          width: '100%',
+                          width: '100%', padding: '0 4px',
                         }}>
                           {question.question}
                         </p>
