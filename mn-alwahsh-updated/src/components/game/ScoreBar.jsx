@@ -122,8 +122,8 @@ function TeamScore({ teamNum, name, score, isActive, scoreKey, reverse, onAdjust
 
     setShaking(true);
     setBlastScore(blastScoreVal);
-    // Apply shake to body instead of html to avoid breaking fixed-position children
-    document.body.classList.add('screen-shake');
+    // Note: no CSS class shake on body/html — transforms break fixed-position portals.
+    // The card itself shakes via Framer Motion below.
 
     setTimeout(() => {
       setBlastScore(null);
@@ -132,13 +132,12 @@ function TeamScore({ teamNum, name, score, isActive, scoreKey, reverse, onAdjust
 
     setTimeout(() => {
       setBlastBadge(null);
-      document.body.classList.remove('screen-shake');
       setShaking(false);
     }, 2800);
   }, [modalOpen]);
 
-  // Score blast: appears on the team's side of the screen, not centered
-  // team 1 (isRed) is on the right; team 2 is on the left
+  // Score blast: full-screen overlay (avoids fixed+transform issue), number aligned to team's side
+  // team 1 (isRed) → number pushed to the right; team 2 → pushed to the left
   const scoreBlastPortal = blastScore !== null ? createPortal(
     <AnimatePresence>
       <motion.div
@@ -148,17 +147,16 @@ function TeamScore({ teamNum, name, score, isActive, scoreKey, reverse, onAdjust
         exit={{ opacity: 0, transition: { duration: 0.25 } }}
         style={{
           position: 'fixed',
-          top: 0, bottom: 0,
-          ...(isRed
-            ? { right: 0, left: '30%' }
-            : { left: 0, right: '30%' }),
+          top: 0, left: 0, right: 0, bottom: 0,
           zIndex: 9999,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: isRed ? 'flex-end' : 'flex-start',
+          paddingLeft: isRed ? 0 : '8vw',
+          paddingRight: isRed ? '8vw' : 0,
           background: isRed
-            ? 'radial-gradient(ellipse at center, rgba(139,0,0,0.55) 0%, transparent 70%)'
-            : 'radial-gradient(ellipse at center, rgba(17,85,204,0.55) 0%, transparent 70%)',
+            ? 'radial-gradient(ellipse 60% 80% at 85% 50%, rgba(139,0,0,0.5) 0%, transparent 70%)'
+            : 'radial-gradient(ellipse 60% 80% at 15% 50%, rgba(17,85,204,0.5) 0%, transparent 70%)',
           pointerEvents: 'none',
         }}
       >
@@ -169,7 +167,7 @@ function TeamScore({ teamNum, name, score, isActive, scoreKey, reverse, onAdjust
           transition={{ duration: 0.65, times: [0, 0.5, 1] }}
           style={{
             fontFamily: 'var(--font-cairo)', fontWeight: 900,
-            fontSize: 'clamp(72px, 18vw, 200px)',
+            fontSize: 'clamp(60px, 14vw, 180px)',
             color: '#ffffff',
             textShadow: `0 0 30px ${C.primary}, 0 0 80px ${C.bright}, 0 0 120px ${C.primary}`,
             lineHeight: 1,
