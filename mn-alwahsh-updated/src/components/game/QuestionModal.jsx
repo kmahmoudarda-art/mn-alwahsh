@@ -183,7 +183,8 @@ const modalStyle = {
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
-  background: 'hsl(var(--card))',
+  background: '#0d0000',
+  backgroundImage: 'radial-gradient(ellipse at top, #2a0000 0%, #0d0000 70%)',
   zIndex: 999999,
   transform: 'none',
   inset: 0,
@@ -369,8 +370,9 @@ export default function QuestionModal({
           flexShrink: 0, height: 52,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 12px',
-          borderBottom: '1px solid hsl(var(--border))',
-          background: 'hsl(var(--primary)/0.08)',
+          borderBottom: '1px solid #8B0000',
+          background: 'linear-gradient(180deg, #1a0000, #0d0000)',
+          boxShadow: '0 2px 10px rgba(139,0,0,0.3)',
         }}>
           <div>
             <p style={{ fontFamily: 'var(--font-cairo)', fontWeight: 700, color: GOLD, fontSize: 14, margin: 0 }}>{category}</p>

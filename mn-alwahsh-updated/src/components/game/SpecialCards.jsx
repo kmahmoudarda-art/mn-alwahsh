@@ -40,30 +40,14 @@ function spawnStarBurst(originX, originY) {
 
     star.animate(
       [
-        {
-          transform: 'translate(-50%, -50%) scale(0.3) rotate(0deg)',
-          opacity: '0',
-        },
-        {
-          transform: `translate(calc(-50% + ${tx * 0.3}px), calc(-50% + ${ty * 0.3}px)) scale(1.2) rotate(${rotation * 0.3}deg)`,
-          opacity: '1',
-          offset: 0.2,
-        },
-        {
-          transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0.5) rotate(${rotation}deg)`,
-          opacity: '0',
-        },
+        { transform: 'translate(-50%, -50%) scale(0.3) rotate(0deg)', opacity: '0' },
+        { transform: `translate(calc(-50% + ${tx * 0.3}px), calc(-50% + ${ty * 0.3}px)) scale(1.2) rotate(${rotation * 0.3}deg)`, opacity: '1', offset: 0.2 },
+        { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0.5) rotate(${rotation}deg)`, opacity: '0' },
       ],
-      {
-        duration: duration * 1000,
-        delay: delay * 1000,
-        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-        fill: 'forwards',
-      }
+      { duration: duration * 1000, delay: delay * 1000, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', fill: 'forwards' }
     ).onfinish = () => star.remove();
   }
 
-  // Trailing stream
   setTimeout(() => {
     const streamStars = ['✨', '💫', '⭐'];
     for (let i = 0; i < 20; i++) {
@@ -88,21 +72,10 @@ function spawnStarBurst(originX, originY) {
 
       star.animate(
         [
-          {
-            transform: 'translate(-50%, -50%) scale(0)',
-            opacity: '0',
-          },
-          {
-            transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(1)`,
-            opacity: '0',
-          },
+          { transform: 'translate(-50%, -50%) scale(0)', opacity: '0' },
+          { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(1)`, opacity: '0' },
         ],
-        {
-          duration: duration * 1000,
-          delay: delay * 1000,
-          easing: 'ease-out',
-          fill: 'forwards',
-        }
+        { duration: duration * 1000, delay: delay * 1000, easing: 'ease-out', fill: 'forwards' }
       ).onfinish = () => star.remove();
     }
   }, 150);
@@ -130,42 +103,28 @@ export default function SpecialCards({
 
   const handleLucky = (teamNum) => {
     const luckRoll = Math.random() * 100;
-    
+
     if (luckRoll < 10) {
-      // 10% chance — DOUBLE LUCK
       const btn = doubleLuckBtnRef.current;
       if (btn) {
         const rect = btn.getBoundingClientRect();
         const originX = rect.left + rect.width / 2;
         const originY = rect.top + rect.height / 2;
 
-        // Button animation
         btn.style.animation = 'doublePop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        btn.style.boxShadow = '0 0 0 0 rgba(201,168,76,0.8)';
         btn.animate(
           [
-            {
-              boxShadow: '0 0 0 0 rgba(201,168,76,0.8)',
-              opacity: '1',
-            },
-            {
-              boxShadow: '0 0 0 30px rgba(201,168,76,0)',
-              opacity: '0',
-            },
+            { boxShadow: '0 0 0 0 rgba(204,0,0,0.8)', opacity: '1' },
+            { boxShadow: '0 0 0 30px rgba(204,0,0,0)', opacity: '0' },
           ],
-          {
-            duration: 500,
-            easing: 'ease-out',
-            fill: 'forwards',
-          }
+          { duration: 500, easing: 'ease-out', fill: 'forwards' }
         );
 
-        // Screen flash
         const flash = document.createElement('div');
         flash.style.cssText = `
           position: fixed;
           inset: 0;
-          background: rgba(201,168,76,0.12);
+          background: rgba(139,0,0,0.18);
           pointer-events: none;
           z-index: 99998;
         `;
@@ -175,19 +134,17 @@ export default function SpecialCards({
           { duration: 400, easing: 'ease-out', fill: 'forwards' }
         ).onfinish = () => flash.remove();
 
-        // Star burst
         spawnStarBurst(originX, originY);
       }
 
       setIsDoubleLuck(true);
       setShowDoubleLuckPopup(true);
 
-      // Confetti burst
       confetti({
         particleCount: 20,
         spread: 100,
         origin: { y: 0.5, x: 0.5 },
-        colors: ['#c9a84c', '#e8c97a', '#d4af37'],
+        colors: ['#CC0000', '#FF0000', '#8B0000'],
       });
 
       setTimeout(() => {
@@ -203,21 +160,20 @@ export default function SpecialCards({
     setSpinning(true);
     setTimeout(() => {
       let outcome = LUCKY_OUTCOMES[Math.floor(Math.random() * 4)];
-      
+
       if (doubleLuck) {
-        // Apply double luck: gains are doubled, losses are halved
         if (outcome.delta > 0) {
           outcome = { ...outcome, delta: outcome.delta * 2, label: outcome.label + ' (×2)' };
         } else {
           outcome = { ...outcome, delta: outcome.delta / 2, label: outcome.label + ' (÷2)' };
         }
       }
-      
+
       setLuckyResult({ teamNum, ...outcome });
       onLuckyResult(teamNum, outcome.delta);
       setSpinning(false);
       setIsDoubleLuck(false);
-      
+
       setTimeout(() => setLuckyResult(null), 2500);
     }, 800);
   };
@@ -239,151 +195,156 @@ export default function SpecialCards({
             ref={doubleLuckBtnRef}
             onClick={() => handleLucky(1)}
             disabled={team1UsedLucky || spinning}
-            className={`text-xs font-cairo px-2 py-1 rounded-lg border transition-all ${
+            className="text-xs font-cairo px-2 py-1 rounded-lg border transition-all"
+            style={
               team1UsedLucky
-                ? 'opacity-30 line-through border-border text-muted-foreground cursor-not-allowed'
-                : 'border-yellow-400 text-yellow-400 bg-yellow-400/10 hover:bg-yellow-400/20 cursor-pointer'
-            }`}
+                ? { opacity: 0.3, textDecoration: 'line-through', border: '1px solid #4a0000', color: '#880000', cursor: 'not-allowed' }
+                : { border: '1px solid #CC0000', color: '#FF6666', background: 'rgba(139,0,0,0.15)', cursor: 'pointer' }
+            }
             title="بطاقة الحظ - تسرق نقاط أو تخسر"
           >
             🃏 حظ
           </button>
-        <button
-          onClick={() => onQuickTimer(1)}
-          disabled={team1UsedQuick}
-          className={`text-xs font-cairo px-2 py-1 rounded-lg border transition-all ${
-            team1UsedQuick
-              ? 'opacity-30 line-through border-border text-muted-foreground cursor-not-allowed'
-              : 'border-red-400 text-red-400 bg-red-400/10 hover:bg-red-400/20 cursor-pointer'
-          }`}
-          title="ضغط الوقت - يجعل السؤال 15 ثانية"
-        >
-          ⏱️ 15ث
-        </button>
-      </div>
+          <button
+            onClick={() => onQuickTimer(1)}
+            disabled={team1UsedQuick}
+            className="text-xs font-cairo px-2 py-1 rounded-lg border transition-all"
+            style={
+              team1UsedQuick
+                ? { opacity: 0.3, textDecoration: 'line-through', border: '1px solid #4a0000', color: '#880000', cursor: 'not-allowed' }
+                : { border: '1px solid #CC0000', color: '#FF6666', background: 'rgba(139,0,0,0.15)', cursor: 'pointer' }
+            }
+            title="ضغط الوقت - يجعل السؤال 15 ثانية"
+          >
+            ⏱️ 15ث
+          </button>
+        </div>
 
-      <span className="text-muted-foreground text-xs font-tajawal">vs</span>
+        <span className="text-xs font-tajawal" style={{ color: '#CC0000' }}>vs</span>
 
         {/* Team 2 cards */}
         <div className="flex gap-1">
           <button
             onClick={() => handleLucky(2)}
             disabled={team2UsedLucky || spinning}
-            className={`text-xs font-cairo px-2 py-1 rounded-lg border transition-all ${
+            className="text-xs font-cairo px-2 py-1 rounded-lg border transition-all"
+            style={
               team2UsedLucky
-                ? 'opacity-30 line-through border-border text-muted-foreground cursor-not-allowed'
-                : 'border-yellow-400 text-yellow-400 bg-yellow-400/10 hover:bg-yellow-400/20 cursor-pointer'
-            }`}
+                ? { opacity: 0.3, textDecoration: 'line-through', border: '1px solid #4a0000', color: '#880000', cursor: 'not-allowed' }
+                : { border: '1px solid #CC0000', color: '#FF6666', background: 'rgba(139,0,0,0.15)', cursor: 'pointer' }
+            }
             title="بطاقة الحظ - تسرق نقاط أو تخسر"
           >
             🃏 حظ
           </button>
-        <button
-          onClick={() => onQuickTimer(2)}
-          disabled={team2UsedQuick}
-          className={`text-xs font-cairo px-2 py-1 rounded-lg border transition-all ${
-            team2UsedQuick
-              ? 'opacity-30 line-through border-border text-muted-foreground cursor-not-allowed'
-              : 'border-red-400 text-red-400 bg-red-400/10 hover:bg-red-400/20 cursor-pointer'
-          }`}
-          title="ضغط الوقت - يجعل السؤال 15 ثانية"
-        >
-          ⏱️ 15ث
-        </button>
-      </div>
-
-      {/* Double Luck Popup */}
-      <AnimatePresence>
-        {showDoubleLuckPopup && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            className="fixed inset-0 z-[70] flex items-center justify-center backdrop-blur-sm"
-            style={{ background: 'rgba(0, 0, 0, 0.75)' }}
+          <button
+            onClick={() => onQuickTimer(2)}
+            disabled={team2UsedQuick}
+            className="text-xs font-cairo px-2 py-1 rounded-lg border transition-all"
+            style={
+              team2UsedQuick
+                ? { opacity: 0.3, textDecoration: 'line-through', border: '1px solid #4a0000', color: '#880000', cursor: 'not-allowed' }
+                : { border: '1px solid #CC0000', color: '#FF6666', background: 'rgba(139,0,0,0.15)', cursor: 'pointer' }
+            }
+            title="ضغط الوقت - يجعل السؤال 15 ثانية"
           >
-            <style>{`
-              @keyframes spinCoin {
-                0%   { transform: rotateY(0deg) scale(1); }
-                50%  { transform: rotateY(180deg) scale(1.3); }
-                100% { transform: rotateY(360deg) scale(1); }
-              }
-              @keyframes goldShimmer {
-                0%   { box-shadow: 0 0 10px #c9a84c, 0 0 20px rgba(201,168,76,0.3); }
-                50%  { box-shadow: 0 0 25px #c9a84c, 0 0 60px rgba(201,168,76,0.5), 0 0 100px rgba(201,168,76,0.2); }
-                100% { box-shadow: 0 0 10px #c9a84c, 0 0 20px rgba(201,168,76,0.3); }
-              }
-            `}</style>
-            
+            ⏱️ 15ث
+          </button>
+        </div>
+
+        {/* Double Luck Popup */}
+        <AnimatePresence>
+          {showDoubleLuckPopup && (
             <motion.div
-              initial={{ scale: 0.5, rotate: -10, opacity: 0 }}
-              animate={{ scale: 1, rotate: 0, opacity: 1 }}
-              exit={{ scale: 0.5, rotate: -10, opacity: 0 }}
-              transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-              style={{
-                background: 'linear-gradient(135deg, #1a1200, #2d1f00)',
-                border: '2px solid #c9a84c',
-                borderRadius: '24px',
-                padding: '50px 60px',
-                textAlign: 'center',
-                maxWidth: '400px',
-                animation: 'goldShimmer 1s ease infinite',
-              }}
+              initial={{ opacity: 0, scale: 0.5, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.5 }}
+              className="fixed inset-0 z-[70] flex items-center justify-center backdrop-blur-sm"
+              style={{ background: 'rgba(0, 0, 0, 0.85)' }}
             >
-              <div style={{ fontSize: '48px', lineHeight: 1, marginBottom: '16px', animation: 'spinCoin 0.8s ease infinite' }}>
-                🪙
-              </div>
-              <div
+              <style>{`
+                @keyframes spinCoin {
+                  0%   { transform: rotateY(0deg) scale(1); }
+                  50%  { transform: rotateY(180deg) scale(1.3); }
+                  100% { transform: rotateY(360deg) scale(1); }
+                }
+                @keyframes redShimmer {
+                  0%   { box-shadow: 0 0 10px #8B0000, 0 0 20px rgba(139,0,0,0.4); }
+                  50%  { box-shadow: 0 0 30px #CC0000, 0 0 70px rgba(204,0,0,0.6); }
+                  100% { box-shadow: 0 0 10px #8B0000, 0 0 20px rgba(139,0,0,0.4); }
+                }
+              `}</style>
+
+              <motion.div
+                initial={{ scale: 0.5, rotate: -10, opacity: 0 }}
+                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                exit={{ scale: 0.5, rotate: -10, opacity: 0 }}
+                transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
                 style={{
-                  fontSize: '34px',
-                  fontWeight: 'bold',
-                  fontFamily: 'var(--font-tajawal)',
-                  marginBottom: '12px',
-                  background: 'linear-gradient(135deg, #c9a84c, #e8c97a, #c9a84c)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
+                  background: 'linear-gradient(135deg, #1a0000, #0d0000)',
+                  border: '2px solid #CC0000',
+                  borderRadius: '24px',
+                  padding: '50px 60px',
+                  textAlign: 'center',
+                  maxWidth: '400px',
+                  animation: 'redShimmer 1s ease infinite',
                 }}
               >
-                حظ مضاعف!
-              </div>
-              <div style={{ fontSize: '18px', color: '#e8c97a', fontFamily: 'var(--font-tajawal)', marginBottom: '12px', fontWeight: 'bold' }}>
-                ×2 النقاط مضاعفة!
-              </div>
-              <div style={{ fontSize: '13px', color: 'rgba(255,200,100,0.6)', fontFamily: 'var(--font-tajawal)' }}>
-                تحذير: الخسارة = نصف النقاط ⚠️
+                <div style={{ fontSize: '48px', lineHeight: 1, marginBottom: '16px', animation: 'spinCoin 0.8s ease infinite' }}>
+                  💀
+                </div>
+                <div
+                  style={{
+                    fontSize: '34px',
+                    fontWeight: 'bold',
+                    fontFamily: 'var(--font-tajawal)',
+                    marginBottom: '12px',
+                    color: '#FF0000',
+                    textShadow: '0 0 20px rgba(255,0,0,0.9)',
+                  }}
+                >
+                  حظ مضاعف!
+                </div>
+                <div style={{ fontSize: '18px', color: '#FF6666', fontFamily: 'var(--font-tajawal)', marginBottom: '12px', fontWeight: 'bold' }}>
+                  ×2 النقاط مضاعفة!
+                </div>
+                <div style={{ fontSize: '13px', color: 'rgba(255,100,100,0.6)', fontFamily: 'var(--font-tajawal)' }}>
+                  تحذير: الخسارة = نصف النقاط ⚠️
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Result popup */}
+        <AnimatePresence>
+          {(spinning || luckyResult) && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.7, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.7 }}
+              className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none"
+            >
+              <div
+                className="rounded-2xl px-8 py-6 shadow-2xl text-center"
+                style={{ background: '#1a0000', border: '2px solid #CC0000', boxShadow: '0 0 30px rgba(204,0,0,0.5)' }}
+              >
+                {spinning ? (
+                  <p className="text-2xl font-cairo font-black animate-pulse" style={{ color: '#CC0000', textShadow: '0 0 10px rgba(255,0,0,0.8)' }}>🎲 يتم السحب...</p>
+                ) : luckyResult ? (
+                  <>
+                    <p className={`text-3xl font-cairo font-black mb-2 ${luckyResult.delta > 0 ? 'text-green-400' : ''}`} style={luckyResult.delta <= 0 ? { color: '#FF0000', textShadow: '0 0 10px rgba(255,0,0,0.8)' } : {}}>
+                      {luckyResult.label}
+                    </p>
+                    <p className="text-sm font-tajawal" style={{ color: '#FF6666' }}>
+                      الفريق {luckyResult.teamNum}
+                    </p>
+                  </>
+                ) : null}
               </div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Result popup */}
-      <AnimatePresence>
-        {(spinning || luckyResult) && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.7, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.7 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none"
-          >
-            <div className="bg-card border-2 border-primary rounded-2xl px-8 py-6 shadow-2xl text-center">
-              {spinning ? (
-                <p className="text-2xl font-cairo font-black text-primary animate-pulse">🎲 يتم السحب...</p>
-              ) : luckyResult ? (
-                <>
-                  <p className={`text-3xl font-cairo font-black mb-2 ${luckyResult.delta > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {luckyResult.label}
-                  </p>
-                  <p className="text-sm font-tajawal text-muted-foreground">
-                    الفريق {luckyResult.teamNum}
-                  </p>
-                </>
-              ) : null}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
       </div>
     </>
   );

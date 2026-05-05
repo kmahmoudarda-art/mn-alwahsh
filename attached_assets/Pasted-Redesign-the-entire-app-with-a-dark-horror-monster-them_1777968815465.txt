@@ -1,0 +1,104 @@
+Redesign the entire app with a dark horror monster theme.
+The game is an Arabic Jeopardy-style quiz called سين جيم.
+
+OVERALL THEME:
+- Dark horror, blood red, black, scary atmosphere
+- Inspired by haunted dungeons and monster lairs
+- Arabic RTL layout must be preserved
+
+COLORS:
+- Background: #0a0000 (near black with red tint)
+- Primary accent: #8B0000 (dark blood red)
+- Secondary accent: #CC0000 (bright blood red)
+- Glow color: #FF0000 (neon red glow)
+- Text primary: #FFE4E4 (off-white with red tint)
+- Text secondary: #FF6666 (light red)
+- Gold (keep for correct answers): #C9A84C
+- Card background: #1a0000 (very dark red-black)
+- Border: #4a0000 (dark red border)
+
+BACKGROUND:
+- Main background: deep black #0a0000
+- Add cracked blood red texture effect using CSS:
+  background-image: 
+    radial-gradient(ellipse at top, #3a0000 0%, #0a0000 70%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(139,0,0,0.03) 10px,
+      rgba(139,0,0,0.03) 11px
+    );
+- Add subtle red vignette around edges
+
+BUTTONS AND CARDS (glowing neon monster style):
+- All buttons: background #1a0000, border 1px solid #8B0000
+- On hover: box-shadow: 0 0 15px #CC0000, 0 0 30px #8B0000
+- Category cards on game board:
+  background: linear-gradient(135deg, #1a0000, #2d0000)
+  border: 1px solid #8B0000
+  box-shadow: 0 0 10px rgba(139,0,0,0.3)
+  On hover: box-shadow: 0 0 20px #CC0000, inset 0 0 10px rgba(139,0,0,0.2)
+- Point value buttons (200, 400, 600):
+  background: linear-gradient(135deg, #8B0000, #4a0000)
+  color: #FFE4E4
+  box-shadow: 0 0 8px rgba(204,0,0,0.5)
+  On hover: box-shadow: 0 0 20px #FF0000
+
+HEADER:
+- Background: linear-gradient(180deg, #1a0000, #0a0000)
+- Bottom border: 1px solid #8B0000 with red glow
+- Team names in blood red #CC0000
+- Score in glowing red
+
+QUESTION MODAL:
+- Background: #0d0000
+- Header: dark red gradient
+- Question text: #FFE4E4 (off-white)
+- Answer buttons: 
+  background: #1a0000
+  border: 1px solid #4a0000
+  On hover: border-color #CC0000, box-shadow 0 0 12px #8B0000
+- Correct answer: green glow kept #4ade80
+- Wrong answer: intense red #FF0000 with glow
+
+TYPOGRAPHY:
+- Keep Cairo and Tajawal fonts
+- Add text-shadow: 0 0 10px rgba(204,0,0,0.5) to headings
+- Category names: color #FF6666 with subtle red glow
+
+CATEGORY PICKER:
+- Background: #0a0000
+- Category cards: dark red with red neon border glow
+- Group headers: blood red with glow effect
+- Selected categories: intense red glow border
+
+SCORE BOARD:
+- Team score boxes: dark red gradient background
+- Scores in glowing red-white
+- Winning team: intense pulsing red glow animation
+
+SPECIAL EFFECTS:
+- Add CSS animation for a subtle red pulse on category hover:
+  @keyframes monsterPulse {
+    0%, 100% { box-shadow: 0 0 10px #8B0000; }
+    50% { box-shadow: 0 0 25px #CC0000, 0 0 50px #8B0000; }
+  }
+- Add dripping blood effect on page title using CSS
+- Timer circle: blood red color when time is running out
+
+GAME BOARD:
+- Board background: #0d0000
+- Category headers: blood red gradient
+- Point cells: dark with red glow on hover
+- Used/answered cells: dark grey #1a1a1a with no glow
+- Selected cell: intense red pulse animation
+
+DANGER POPUP:
+- Make it extra scary with red skull emoji
+- Background: #1a0000 with red glow border
+- Text: blood red with white glow
+
+Keep all existing functionality exactly the same.
+Only change visual styling — colors, shadows, borders, backgrounds.
+Do not break any game logic or Arabic text rendering.

@@ -33,7 +33,13 @@ export default function SetupScreen({ onStartGame }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" dir="rtl">
+    <div className="min-h-screen flex items-center justify-center p-4" dir="rtl" style={{ background: '#0a0000' }}>
+      <style>{`
+        @keyframes titleGlow {
+          0%, 100% { text-shadow: 0 0 10px rgba(204,0,0,0.8), 0 0 30px rgba(139,0,0,0.5); }
+          50%       { text-shadow: 0 0 20px rgba(255,0,0,1), 0 0 60px rgba(204,0,0,0.8); }
+        }
+      `}</style>
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -45,11 +51,12 @@ export default function SetupScreen({ onStartGame }) {
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-6xl md:text-8xl font-cairo font-black text-primary mb-2 tracking-tight"
+            className="text-6xl md:text-8xl font-cairo font-black mb-2 tracking-tight"
+            style={{ color: '#CC0000', animation: 'titleGlow 2.5s ease-in-out infinite' }}
           >
             من الوحش
           </motion.h1>
-          <p className="text-muted-foreground text-lg font-tajawal">لعبة المعرفة والتحدي</p>
+          <p className="text-lg font-tajawal" style={{ color: '#FF6666', textShadow: '0 0 6px rgba(204,0,0,0.5)' }}>لعبة المعرفة والتحدي</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 mb-8">
@@ -59,8 +66,6 @@ export default function SetupScreen({ onStartGame }) {
             onNameChange={setTeam1Name}
             categories={team1Categories}
             onToggle={(name) => toggleCategory(1, name)}
-            color="from-blue-600/20 to-blue-900/20"
-            borderColor="border-blue-500/30"
           />
           <TeamSetupCard
             teamNumber={2}
@@ -68,8 +73,6 @@ export default function SetupScreen({ onStartGame }) {
             onNameChange={setTeam2Name}
             categories={team2Categories}
             onToggle={(name) => toggleCategory(2, name)}
-            color="from-red-600/20 to-red-900/20"
-            borderColor="border-red-500/30"
           />
         </div>
 
@@ -81,7 +84,13 @@ export default function SetupScreen({ onStartGame }) {
           <Button
             onClick={handleStart}
             disabled={!isValid}
-            className="text-xl font-cairo font-bold px-12 py-6 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl gap-3 disabled:opacity-40"
+            className="text-xl font-cairo font-bold px-12 py-6 rounded-xl gap-3 disabled:opacity-40 transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #8B0000, #4a0000)',
+              color: '#FFE4E4',
+              border: '1px solid #CC0000',
+              boxShadow: isValid ? '0 0 20px rgba(139,0,0,0.6), 0 0 40px rgba(139,0,0,0.3)' : 'none',
+            }}
             size="lg"
           >
             <Play className="w-6 h-6" />
@@ -93,27 +102,37 @@ export default function SetupScreen({ onStartGame }) {
   );
 }
 
-function TeamSetupCard({ teamNumber, teamName, onNameChange, categories, onToggle, color, borderColor }) {
+function TeamSetupCard({ teamNumber, teamName, onNameChange, categories, onToggle }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: teamNumber === 1 ? 30 : -30 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 0.3 + teamNumber * 0.1 }}
-      className={`bg-gradient-to-b ${color} border ${borderColor} rounded-2xl p-4 backdrop-blur-sm`}
+      className="rounded-2xl p-4"
+      style={{
+        background: 'linear-gradient(135deg, rgba(139,0,0,0.15), rgba(74,0,0,0.25))',
+        border: '1px solid #8B0000',
+        boxShadow: '0 0 15px rgba(139,0,0,0.2)',
+      }}
     >
       <div className="flex items-center gap-2 mb-3">
-        <Users className="w-5 h-5 text-primary" />
-        <h2 className="text-lg font-cairo font-bold text-foreground">الفريق {teamNumber}</h2>
+        <Users className="w-5 h-5" style={{ color: '#CC0000' }} />
+        <h2 className="text-lg font-cairo font-bold" style={{ color: '#FFE4E4' }}>الفريق {teamNumber}</h2>
       </div>
 
       <Input
         placeholder={`اسم الفريق ${teamNumber}`}
         value={teamName}
         onChange={(e) => onNameChange(e.target.value)}
-        className="mb-3 bg-background/50 border-border text-foreground font-cairo text-base h-12 placeholder:text-muted-foreground"
+        className="mb-3 font-cairo text-base h-12"
+        style={{
+          background: 'rgba(13,0,0,0.8)',
+          border: '1px solid #4a0000',
+          color: '#FFE4E4',
+        }}
       />
 
-      <p className="text-xs font-tajawal text-muted-foreground mb-2">
+      <p className="text-xs font-tajawal mb-2" style={{ color: '#FF6666' }}>
         اختر ٣ فئات ({categories.length}/3)
       </p>
       <CategoryPicker selected={categories} onToggle={onToggle} max={3} />

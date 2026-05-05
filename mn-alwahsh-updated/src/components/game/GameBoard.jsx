@@ -37,27 +37,24 @@ function getGlassStyle(points) {
   const styles = {
     200: {
       ...baseStyle,
-      background: 'linear-gradient(135deg, rgba(220,255,230,0.55), rgba(180,240,200,0.35))',
-      border: '1px solid rgba(150,220,170,0.5)',
-      color: '#2d7a4a',
-      boxShadow: '0 4px 16px rgba(100,200,130,0.2), 0 1px 0 rgba(255,255,255,0.6) inset, 0 -1px 0 rgba(100,180,120,0.2) inset',
-      '--hover-shadow': '0 8px 28px rgba(100,200,130,0.35), 0 1px 0 rgba(255,255,255,0.7) inset',
+      background: 'linear-gradient(135deg, rgba(139,0,0,0.35), rgba(74,0,0,0.55))',
+      border: '1px solid rgba(139,0,0,0.6)',
+      color: '#FFE4E4',
+      boxShadow: '0 4px 16px rgba(139,0,0,0.25), 0 0 8px rgba(204,0,0,0.2)',
     },
     400: {
       ...baseStyle,
-      background: 'linear-gradient(135deg, rgba(220,240,255,0.55), rgba(180,215,245,0.35))',
-      border: '1px solid rgba(140,195,235,0.5)',
-      color: '#2a5f8a',
-      boxShadow: '0 4px 16px rgba(100,160,220,0.2), 0 1px 0 rgba(255,255,255,0.6) inset, 0 -1px 0 rgba(100,150,200,0.2) inset',
-      '--hover-shadow': '0 8px 28px rgba(100,160,220,0.35), 0 1px 0 rgba(255,255,255,0.7) inset',
+      background: 'linear-gradient(135deg, rgba(160,0,0,0.45), rgba(90,0,0,0.65))',
+      border: '1px solid rgba(180,0,0,0.65)',
+      color: '#FFE4E4',
+      boxShadow: '0 4px 16px rgba(180,0,0,0.3), 0 0 10px rgba(204,0,0,0.3)',
     },
     600: {
       ...baseStyle,
-      background: 'linear-gradient(135deg, rgba(240,225,255,0.55), rgba(215,195,245,0.35))',
-      border: '1px solid rgba(185,155,225,0.5)',
-      color: '#5a2d8a',
-      boxShadow: '0 4px 16px rgba(160,110,220,0.2), 0 1px 0 rgba(255,255,255,0.6) inset, 0 -1px 0 rgba(140,100,190,0.2) inset',
-      '--hover-shadow': '0 8px 28px rgba(160,110,220,0.35), 0 1px 0 rgba(255,255,255,0.7) inset',
+      background: 'linear-gradient(135deg, rgba(204,0,0,0.55), rgba(120,0,0,0.75))',
+      border: '1px solid rgba(220,0,0,0.7)',
+      color: '#FFE4E4',
+      boxShadow: '0 4px 16px rgba(204,0,0,0.4), 0 0 14px rgba(255,0,0,0.35)',
     },
   };
 
@@ -79,17 +76,17 @@ function DangerOverlay() {
           100% { transform: translateX(0); }
         }
         @keyframes dangerPulse {
-          0%   { box-shadow: 0 0 10px red; }
-          50%  { box-shadow: 0 0 40px red, 0 0 80px rgba(255,0,0,0.4); }
-          100% { box-shadow: 0 0 10px red; }
+          0%   { box-shadow: 0 0 10px #8B0000, 0 0 30px rgba(139,0,0,0.4); }
+          50%  { box-shadow: 0 0 40px #FF0000, 0 0 80px rgba(255,0,0,0.5); }
+          100% { box-shadow: 0 0 10px #8B0000, 0 0 30px rgba(139,0,0,0.4); }
         }
         @keyframes flashRed {
           0%, 100% { opacity: 0; }
-          25%, 75% { opacity: 1; }
+          25%, 75%  { opacity: 1; }
         }
         @keyframes pulseSub {
           0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.6; transform: scale(1.08); }
+          50%       { opacity: 0.6; transform: scale(1.08); }
         }
         .shine-overlay {
           position: absolute;
@@ -97,7 +94,7 @@ function DangerOverlay() {
           left: -60%;
           width: 40%;
           height: 200%;
-          background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.4) 50%, transparent 80%);
+          background: linear-gradient(105deg, transparent 20%, rgba(255,100,100,0.15) 50%, transparent 80%);
           transform: rotate(10deg);
           transition: left 0.5s ease;
           pointer-events: none;
@@ -106,7 +103,7 @@ function DangerOverlay() {
           left: 130%;
         }
         .shine-reflection {
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+          background: linear-gradient(90deg, transparent, rgba(255,100,100,0.2), transparent);
           pointer-events: none;
         }
       `}</style>
@@ -115,7 +112,7 @@ function DangerOverlay() {
       <div
         className="fixed inset-0 z-40 pointer-events-none"
         style={{
-          background: 'rgba(255, 0, 0, 0.18)',
+          background: 'rgba(255, 0, 0, 0.22)',
           animation: 'flashRed 0.45s ease 3',
         }}
       />
@@ -127,22 +124,23 @@ function DangerOverlay() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 400, damping: 18 }}
           style={{
-            background: '#0a0a0a',
-            border: '3px solid red',
+            background: 'linear-gradient(135deg, #1a0000, #0d0000)',
+            border: '3px solid #CC0000',
             borderRadius: '20px',
             padding: '40px 60px',
             textAlign: 'center',
             animation: 'dangerPulse 0.5s ease infinite',
           }}
         >
-          <div style={{ fontSize: '64px', lineHeight: 1, marginBottom: '12px' }}>⚠️</div>
+          <div style={{ fontSize: '64px', lineHeight: 1, marginBottom: '12px' }}>💀</div>
           <div
             style={{
               fontSize: '28px',
               fontWeight: 'bold',
-              color: 'red',
+              color: '#FF0000',
               fontFamily: 'var(--font-cairo)',
               marginBottom: '8px',
+              textShadow: '0 0 15px rgba(255,0,0,0.8)',
             }}
           >
             سؤال خطر!
@@ -150,7 +148,7 @@ function DangerOverlay() {
           <div
             style={{
               fontSize: '22px',
-              color: 'white',
+              color: '#FFE4E4',
               fontFamily: 'var(--font-cairo)',
               fontWeight: 'bold',
               animation: 'pulseSub 0.6s ease infinite',
@@ -182,14 +180,13 @@ function EscapeOverlay() {
         }
       `}</style>
 
-      {/* Escape popup */}
       <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
         <motion.div
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 400, damping: 18 }}
           style={{
-            background: '#000000',
+            background: 'linear-gradient(135deg, #1a0500, #0d0000)',
             border: '3px solid orange',
             borderRadius: '20px',
             padding: '40px 60px',
@@ -212,7 +209,7 @@ function EscapeOverlay() {
           <div
             style={{
               fontSize: '18px',
-              color: 'white',
+              color: '#FFE4E4',
               fontFamily: 'var(--font-cairo)',
               fontWeight: 'bold',
             }}
@@ -231,12 +228,12 @@ function EasyPopup({ message }) {
       <style>{`
         @keyframes bounce {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-12px); }
+          50%       { transform: translateY(-12px); }
         }
-        @keyframes greenPulse {
-          0%   { box-shadow: 0 0 8px rgba(100,200,130,0.3); }
-          50%  { box-shadow: 0 0 24px rgba(100,200,130,0.6); }
-          100% { box-shadow: 0 0 8px rgba(100,200,130,0.3); }
+        @keyframes easyPulse {
+          0%   { box-shadow: 0 0 8px rgba(139,0,0,0.4); }
+          50%  { box-shadow: 0 0 24px rgba(204,0,0,0.7); }
+          100% { box-shadow: 0 0 8px rgba(139,0,0,0.4); }
         }
       `}</style>
 
@@ -247,22 +244,22 @@ function EasyPopup({ message }) {
           exit={{ scale: 0.8, opacity: 0 }}
           transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
           style={{
-            background: 'linear-gradient(135deg, rgba(245,250,240,0.95), rgba(240,248,235,0.95))',
-            border: '2px solid rgba(100,200,130,0.6)',
+            background: 'linear-gradient(135deg, #1a0000, #0d0000)',
+            border: '2px solid rgba(139,0,0,0.8)',
             borderRadius: '20px',
             padding: '40px 60px',
             textAlign: 'center',
             maxWidth: '380px',
-            animation: 'greenPulse 1s ease infinite',
+            animation: 'easyPulse 1s ease infinite',
           }}
         >
           <div style={{ fontSize: '48px', lineHeight: 1, marginBottom: '12px', animation: 'bounce 0.5s ease infinite' }}>
             {message.emoji}
           </div>
-          <div style={{ fontSize: '26px', fontWeight: 'bold', color: '#2d7a4a', fontFamily: 'var(--font-tajawal)', marginBottom: '8px' }}>
+          <div style={{ fontSize: '26px', fontWeight: 'bold', color: '#FF6666', fontFamily: 'var(--font-tajawal)', marginBottom: '8px', textShadow: '0 0 10px rgba(204,0,0,0.7)' }}>
             {message.main}
           </div>
-          <div style={{ fontSize: '16px', color: 'rgba(45,122,74,0.7)', fontFamily: 'var(--font-tajawal)' }}>
+          <div style={{ fontSize: '16px', color: 'rgba(255,180,180,0.8)', fontFamily: 'var(--font-tajawal)' }}>
             {message.sub}
           </div>
         </motion.div>
@@ -277,13 +274,13 @@ function MediumPopup({ message }) {
       <style>{`
         @keyframes flex {
           0%, 100% { transform: scale(1) rotate(0deg); }
-          25% { transform: scale(1.2) rotate(-5deg); }
-          75% { transform: scale(1.2) rotate(5deg); }
+          25%       { transform: scale(1.2) rotate(-5deg); }
+          75%       { transform: scale(1.2) rotate(5deg); }
         }
-        @keyframes bluePulse {
-          0%   { box-shadow: 0 0 8px rgba(100,160,220,0.3); }
-          50%  { box-shadow: 0 0 24px rgba(100,160,220,0.6); }
-          100% { box-shadow: 0 0 8px rgba(100,160,220,0.3); }
+        @keyframes medPulse {
+          0%   { box-shadow: 0 0 8px rgba(180,0,0,0.4); }
+          50%  { box-shadow: 0 0 30px rgba(220,0,0,0.8); }
+          100% { box-shadow: 0 0 8px rgba(180,0,0,0.4); }
         }
       `}</style>
 
@@ -294,22 +291,22 @@ function MediumPopup({ message }) {
           exit={{ scale: 0.8, opacity: 0 }}
           transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
           style={{
-            background: 'linear-gradient(135deg, rgba(240,248,255,0.95), rgba(230,240,250,0.95))',
-            border: '2px solid rgba(100,160,220,0.6)',
+            background: 'linear-gradient(135deg, #200000, #0d0000)',
+            border: '2px solid rgba(180,0,0,0.8)',
             borderRadius: '20px',
             padding: '40px 60px',
             textAlign: 'center',
             maxWidth: '380px',
-            animation: 'bluePulse 1s ease infinite',
+            animation: 'medPulse 1s ease infinite',
           }}
         >
           <div style={{ fontSize: '48px', lineHeight: 1, marginBottom: '12px', animation: 'flex 0.6s ease infinite' }}>
             {message.emoji}
           </div>
-          <div style={{ fontSize: '26px', fontWeight: 'bold', color: '#2a5f8a', fontFamily: 'var(--font-tajawal)', marginBottom: '8px' }}>
+          <div style={{ fontSize: '26px', fontWeight: 'bold', color: '#CC0000', fontFamily: 'var(--font-tajawal)', marginBottom: '8px', textShadow: '0 0 12px rgba(255,0,0,0.7)' }}>
             {message.main}
           </div>
-          <div style={{ fontSize: '16px', color: 'rgba(42,95,138,0.7)', fontFamily: 'var(--font-tajawal)' }}>
+          <div style={{ fontSize: '16px', color: 'rgba(255,150,150,0.7)', fontFamily: 'var(--font-tajawal)' }}>
             {message.sub}
           </div>
         </motion.div>
@@ -319,7 +316,7 @@ function MediumPopup({ message }) {
 }
 
 export default function GameBoard({ categories, answeredTiles, onTileClick, teamNames, readyTiles = new Set() }) {
-  const [popupType, setPopupType] = useState(null); // 'danger', 'escape', 'easy', 'medium', or null
+  const [popupType, setPopupType] = useState(null);
   const [popupMessage, setPopupMessage] = useState(null);
   const [pendingTile, setPendingTile] = useState(null);
 
@@ -391,13 +388,31 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
             90%  { transform: translateX(4px); }
             100% { transform: translateX(0); }
           }
+          @keyframes monsterPulse {
+            0%, 100% { box-shadow: 0 0 10px #8B0000; }
+            50%       { box-shadow: 0 0 25px #CC0000, 0 0 50px #8B0000; }
+          }
+          .tile-hover:hover {
+            box-shadow: 0 0 20px #CC0000, inset 0 0 10px rgba(139,0,0,0.2) !important;
+            border-color: #CC0000 !important;
+          }
         `}</style>
 
         <div>
           {/* Team Labels */}
           <div className="grid grid-cols-2 gap-1 md:gap-2 mb-1">
-            <div className="text-center text-sm font-cairo font-bold text-blue-400 bg-blue-900/20 rounded-lg py-1">{teamNames?.[0] || 'الفريق الأول'}</div>
-            <div className="text-center text-sm font-cairo font-bold text-red-400 bg-red-900/20 rounded-lg py-1">{teamNames?.[1] || 'الفريق الثاني'}</div>
+            <div
+              className="text-center text-sm font-cairo font-bold rounded-lg py-1"
+              style={{ color: '#FF6666', background: 'rgba(139,0,0,0.2)', textShadow: '0 0 8px rgba(204,0,0,0.5)' }}
+            >
+              {teamNames?.[0] || 'الفريق الأول'}
+            </div>
+            <div
+              className="text-center text-sm font-cairo font-bold rounded-lg py-1"
+              style={{ color: '#FF6666', background: 'rgba(139,0,0,0.2)', textShadow: '0 0 8px rgba(204,0,0,0.5)' }}
+            >
+              {teamNames?.[1] || 'الفريق الثاني'}
+            </div>
           </div>
 
           {/* Category Headers */}
@@ -408,9 +423,19 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08 }}
-                className="bg-primary/90 rounded-lg px-1 py-2 md:py-3 text-center"
+                style={{
+                  background: 'linear-gradient(135deg, #1a0000, #2d0000)',
+                  border: '1px solid #8B0000',
+                  boxShadow: '0 0 10px rgba(139,0,0,0.3)',
+                  borderRadius: '8px',
+                  padding: '8px 4px',
+                  textAlign: 'center',
+                }}
               >
-                <p className="text-[10px] sm:text-xs md:text-base font-cairo font-bold text-primary-foreground leading-tight truncate">
+                <p
+                  className="text-[10px] sm:text-xs md:text-base font-cairo font-bold leading-tight truncate"
+                  style={{ color: '#FF6666', textShadow: '0 0 8px rgba(204,0,0,0.5)' }}
+                >
                   {cat}
                 </p>
               </motion.div>
@@ -438,27 +463,25 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
                     whileTap={!isAnswered ? { scale: 0.98, y: 1 } : {}}
                     onClick={() => !isAnswered && handleTileClick(colIndex, rowIndex, cat, points)}
                     disabled={isAnswered || popupType}
-                    className="relative min-h-[44px] py-3 sm:py-4 md:py-5 text-center font-cairo font-bold overflow-hidden"
+                    className={`relative min-h-[44px] py-3 sm:py-4 md:py-5 text-center font-cairo font-bold overflow-hidden${!isAnswered ? ' tile-hover' : ''}`}
                     style={
                       isAnswered
                         ? {
-                            background: 'rgba(100,100,100,0.15)',
-                            color: 'rgba(150,150,150,0.4)',
+                            background: '#1a1a1a',
+                            color: 'rgba(150,100,100,0.4)',
                             borderRadius: '16px',
                             border: '1px solid transparent',
                             fontSize: '18px',
                             cursor: 'not-allowed',
                             transition: 'all 0.3s ease',
                             opacity: 0.4,
-                            filter: 'grayscale(30%)',
-                            backdropFilter: 'blur(12px)',
                           }
                         : getGlassStyle(points)
                     }
                   >
                     {isAnswered ? '✓' : points}
                     {isPending && !isAnswered && (
-                      <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
+                      <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: 'rgba(255,100,100,0.5)' }} />
                     )}
                     {!isAnswered && <div className="absolute inset-0 shine-overlay" />}
                     {!isAnswered && <div className="absolute top-0 left-[10%] w-[80%] h-px shine-reflection" />}

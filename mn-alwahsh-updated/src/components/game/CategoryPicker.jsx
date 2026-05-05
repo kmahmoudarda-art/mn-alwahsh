@@ -115,12 +115,12 @@ export default function CategoryPicker({ selected, onToggle, max }) {
     });
   }, [categories]);
 
-  if (loading) return <p className="text-center text-muted-foreground font-tajawal text-sm py-4">جاري تحميل الفئات...</p>;
+  if (loading) return <p className="text-center font-tajawal text-sm py-4" style={{ color: '#FF6666' }}>جاري تحميل الفئات...</p>;
 
   if (error) return (
     <div className="text-center py-4 space-y-2">
-      <p className="text-red-400 font-tajawal text-xs break-all">{error}</p>
-      <button onClick={load} className="text-xs text-primary underline font-cairo">إعادة المحاولة</button>
+      <p className="font-tajawal text-xs break-all" style={{ color: '#FF6666' }}>{error}</p>
+      <button onClick={load} className="text-xs underline font-cairo" style={{ color: '#CC0000' }}>إعادة المحاولة</button>
     </div>
   );
 
@@ -131,17 +131,22 @@ export default function CategoryPicker({ selected, onToggle, max }) {
       <style>{`
         .category-scroll::-webkit-scrollbar { width: 6px; }
         .category-scroll::-webkit-scrollbar-track { background: transparent; }
-        .category-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
+        .category-scroll::-webkit-scrollbar-thumb { background: rgba(139,0,0,0.5); border-radius: 10px; }
+        .cat-btn:hover {
+          box-shadow: 0 0 12px rgba(204,0,0,0.6), inset 0 0 8px rgba(139,0,0,0.2) !important;
+          border-color: #CC0000 !important;
+        }
       `}</style>
       <div className="category-scroll overflow-y-auto overflow-x-hidden" style={{ height: '60vh', scrollBehavior: 'smooth' }}>
         {Object.entries(grouped).map(([groupName, cats]) => (
           <div key={groupName} style={{ marginBottom: 16 }}>
             <div style={{
               fontSize: 13, fontWeight: 700,
-              color: '#000',
+              color: '#CC0000',
+              textShadow: '0 0 8px rgba(204,0,0,0.5)',
               letterSpacing: '0.1em',
               padding: '12px 8px 6px 8px',
-              borderBottom: '1px solid rgba(255,255,255,0.08)',
+              borderBottom: '1px solid rgba(139,0,0,0.3)',
               marginBottom: 8,
               display: 'flex', alignItems: 'center', gap: 8,
               fontFamily: 'var(--font-cairo)',
@@ -153,11 +158,10 @@ export default function CategoryPicker({ selected, onToggle, max }) {
               {cats.map((name) => {
                 const isSelected = selected.includes(name);
                 const isDisabled = !isSelected && selected.length >= max;
-                
-                // Prioritize manual CATEGORY_ICONS list
-                const emoji = CATEGORY_ICONS[name] || 
-                              CATEGORY_ICONS[name.toLowerCase().trim()] || 
-                              icons[name] || 
+
+                const emoji = CATEGORY_ICONS[name] ||
+                              CATEGORY_ICONS[name.toLowerCase().trim()] ||
+                              icons[name] ||
                               '⏳';
 
                 return (
@@ -168,25 +172,36 @@ export default function CategoryPicker({ selected, onToggle, max }) {
                     onClick={() => !isDisabled && onToggle(name)}
                     disabled={isDisabled}
                     dir="rtl"
-                    className={`relative rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-1
-                      ${isSelected
-                        ? 'border-primary bg-primary/20 shadow-lg shadow-primary/40'
+                    className="cat-btn relative rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-1"
+                    style={{
+                      height: 85,
+                      background: isSelected
+                        ? 'linear-gradient(135deg, rgba(139,0,0,0.5), rgba(74,0,0,0.7))'
                         : isDisabled
-                        ? 'border-border bg-muted/30 opacity-40'
-                        : 'border-border bg-card/60 hover:border-primary/60 hover:bg-card/90'}
-                    `}
-                    style={{ height: 85 }}
+                        ? 'rgba(26,0,0,0.3)'
+                        : 'rgba(26,0,0,0.6)',
+                      border: isSelected
+                        ? '2px solid #CC0000'
+                        : isDisabled
+                        ? '2px solid #2a0000'
+                        : '2px solid #4a0000',
+                      boxShadow: isSelected ? '0 0 15px rgba(204,0,0,0.5), inset 0 0 8px rgba(139,0,0,0.3)' : 'none',
+                      opacity: isDisabled ? 0.4 : 1,
+                    }}
                   >
                     <span style={{ fontSize: 32, lineHeight: 1 }}>{emoji}</span>
                     <span
                       className="font-tajawal text-center leading-tight px-1"
-                      style={{ fontSize: 12, color: '#000', fontWeight: 600, textShadow: '-1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff' }}
+                      style={{ fontSize: 12, color: '#FFE4E4', fontWeight: 600 }}
                     >
                       {name}
                     </span>
                     {isSelected && (
-                      <div className="absolute top-1 right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center shadow">
-                        <Check className="w-2.5 h-2.5 text-primary-foreground" />
+                      <div
+                        className="absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center shadow"
+                        style={{ background: '#CC0000' }}
+                      >
+                        <Check className="w-2.5 h-2.5" style={{ color: '#FFE4E4' }} />
                       </div>
                     )}
                   </motion.button>
