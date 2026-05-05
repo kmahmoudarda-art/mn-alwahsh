@@ -213,7 +213,7 @@ export default function GameNameScreen({ onEnter }) {
             border: '1.5px solid rgba(139,0,0,0.4)', padding: 20,
             backdropFilter: 'blur(10px)',
           }}>
-            <p style={{ textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#FFE4E4', fontFamily: 'var(--font-cairo)', marginBottom: 14 }}>
+            <p style={{ textAlign: 'center', fontSize: 14, fontWeight: 400, color: 'rgba(255,228,228,0.75)', fontFamily: 'var(--font-cairo)', marginBottom: 14 }}>
               أدخل اسم اللعبة
             </p>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
