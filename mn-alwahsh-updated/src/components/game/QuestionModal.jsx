@@ -183,8 +183,7 @@ const modalStyle = {
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
-  background: '#ffffff',
-  backgroundImage: 'radial-gradient(ellipse at top, rgba(204,0,0,0.06) 0%, transparent 60%)',
+  background: 'transparent',
   zIndex: 999999,
   transform: 'none',
   inset: 0,
@@ -379,6 +378,23 @@ export default function QuestionModal({
       <div style={overlayStyle} />
 
       <div style={modalStyle} dir="rtl">
+
+        {/* ── Looping video background ── */}
+        <video autoPlay loop muted playsInline
+          style={{
+            position: 'absolute', top: 0, left: 0,
+            width: '100%', height: '100%',
+            objectFit: 'cover', objectPosition: 'center',
+            zIndex: 0, pointerEvents: 'none',
+          }}>
+          <source src="/bg-question.mp4" type="video/mp4" />
+        </video>
+        {/* Bright overlay so text stays readable */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'rgba(255,255,255,0.55)',
+          zIndex: 1, pointerEvents: 'none',
+        }} />
 
         {/* Header */}
         <div style={{
