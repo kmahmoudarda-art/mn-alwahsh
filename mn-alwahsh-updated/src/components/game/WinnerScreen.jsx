@@ -34,9 +34,9 @@ export default function WinnerScreen({ team1, team2, onPlayAgain }) {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4"
+      className="min-h-screen flex items-center justify-center p-4 relative"
       dir="rtl"
-      style={{ background: '#0a0000' }}
+      style={{ background: '#0a0000', backgroundImage: 'url(/bg-winner.jpeg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
     >
       <style>{`
         @keyframes winnerPulse {
