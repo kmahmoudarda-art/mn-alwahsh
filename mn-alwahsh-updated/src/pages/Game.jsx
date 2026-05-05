@@ -134,6 +134,41 @@ export default function Game() {
     console.log('[LuckyDouble] Assigned lucky cell:', cell);
   }, [answeredTiles.size, gamePhase]);
 
+  // Early game-end: impossible to win for the losing team
+  useEffect(() => {
+    if (gamePhase !== 'playing' || categories.length === 0) return;
+    const s1 = teams[1].score, s2 = teams[2].score;
+    if (s1 === s2) return; // tied — no early end
+    const leaderTeam = s1 > s2 ? 1 : 2;
+    const loserTeam  = leaderTeam === 1 ? 2 : 1;
+    const deficit    = teams[leaderTeam].score - teams[loserTeam].score;
+
+    // Sum all remaining tile points (row determines value: 0-1→200, 2-3→400, 4-5→600)
+    let remainingPoints = 0;
+    for (let col = 0; col < categories.length; col++) {
+      for (let row = 0; row < 6; row++) {
+        if (!answeredTiles.has(`${col}-${row}`)) {
+          remainingPoints += POINT_VALUES[Math.floor(row / 2)];
+        }
+      }
+    }
+    if (remainingPoints === 0) return; // board done — normal handler finishes it
+
+    // Max luck-card bonus for loser (positive doubleLuck max = 400)
+    const maxLuckCardBonus = usedLucky[loserTeam] ? 0 : 400;
+
+    // Max lucky-double bonus: doubles one tile (max extra = 600)
+    const maxLuckyDoubleBonus = luckyUsed ? 0
+      : luckyCell !== null ? (luckyCell.losingTeam === loserTeam ? 600 : 0)
+      : 600; // not yet assigned — could still go to loserTeam
+
+    const maxPossible = remainingPoints + maxLuckCardBonus + maxLuckyDoubleBonus;
+
+    if (maxPossible < deficit) {
+      setGamePhase('finished');
+    }
+  }, [teams, answeredTiles, usedLucky, luckyCell, luckyUsed, gamePhase, categories]);
+
   // Persist game state on meaningful changes
   useEffect(() => {
     if (!gameName || gamePhase !== 'playing') return;

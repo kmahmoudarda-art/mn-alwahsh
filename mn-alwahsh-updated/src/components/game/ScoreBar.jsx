@@ -136,12 +136,12 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }
         if (newBadge) setBlastBadge(newBadge);
       }, 800);
 
-      // After 1600ms: hide badge, end shake
+      // After 2800ms: hide badge (badge dances for 2 full seconds)
       setTimeout(() => {
         setBlastBadge(null);
         document.documentElement.classList.remove('screen-shake');
         setShaking(false);
-      }, 1600);
+      }, 2800);
     }
     prevScoreRef.current = score;
   }, [score]);
@@ -181,7 +181,7 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }
         )}
       </AnimatePresence>
 
-      {/* Badge text blast */}
+      {/* Badge text blast — dances for 2 seconds */}
       <AnimatePresence>
         {blastBadge !== null && (
           <motion.div
@@ -192,21 +192,27 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }
             style={{
               position: 'fixed', inset: 0, zIndex: 9999,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'rgba(0,0,0,0.8)', pointerEvents: 'none',
+              background: 'rgba(0,0,0,0.85)', pointerEvents: 'none',
             }}
           >
             <motion.span
-              initial={{ scale: 0.2, opacity: 0, rotate: -15 }}
-              animate={{ scale: [0.2, 1.35, 1.05], opacity: [0, 1, 1], rotate: [-15, 5, 0] }}
-              exit={{ scale: 1.8, opacity: 0 }}
-              transition={{ duration: 0.6, times: [0, 0.5, 1] }}
+              initial={{ scale: 0.1, opacity: 0, rotate: -20 }}
+              animate={{
+                scale:  [0.1, 1.5, 1.1, 1.25, 0.95, 1.15, 1.0, 1.1, 1.0],
+                opacity:[0,   1,   1,   1,    1,    1,    1,   1,   1  ],
+                rotate: [-20, 8,   -5,  6,    -4,   5,    -3,  3,   0  ],
+                y:      [0,   0,  -25,  0,   -18,   0,   -12,  0,   0  ],
+              }}
+              exit={{ scale: 2.2, opacity: 0, transition: { duration: 0.35 } }}
+              transition={{ duration: 2, times: [0, 0.12, 0.28, 0.42, 0.56, 0.68, 0.80, 0.90, 1.0], ease: 'easeInOut' }}
               style={{
                 fontFamily: 'var(--font-cairo)', fontWeight: 900,
                 fontSize: 'clamp(64px, 16vw, 160px)',
                 color: blastBadge.color,
-                textShadow: `0 0 40px ${blastBadge.glow}, 0 0 80px ${blastBadge.glow}88`,
+                textShadow: `0 0 40px ${blastBadge.glow}, 0 0 80px ${blastBadge.glow}88, 0 0 120px ${blastBadge.glow}44`,
                 lineHeight: 1,
                 whiteSpace: 'nowrap',
+                display: 'inline-block',
               }}
             >
               {blastBadge.text}
