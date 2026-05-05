@@ -27,7 +27,7 @@ function getIcon(name) {
   return CATEGORY_ICONS[name] || CATEGORY_ICONS[name?.trim()] || '🎯';
 }
 
-function SelectedCategoryColumn({ categories, teamName, side }) {
+function SelectedCategoryColumn({ categories, teamName, side, onRemove }) {
   const isRed = side === 'right';
   const color = isRed ? '#CC0000' : '#1155CC';
   const glow = isRed ? 'rgba(204,0,0,0.5)' : 'rgba(17,85,204,0.5)';
@@ -49,7 +49,7 @@ function SelectedCategoryColumn({ categories, teamName, side }) {
       gap: 10,
       padding: '10px 6px',
       background: `linear-gradient(to ${side === 'right' ? 'left' : 'right'}, ${bg}, transparent)`,
-      pointerEvents: 'none',
+      pointerEvents: 'auto',
     }}>
       <div style={{
         fontSize: 9, fontWeight: 700, color, textAlign: 'center',
@@ -62,12 +62,16 @@ function SelectedCategoryColumn({ categories, teamName, side }) {
       {[0, 1, 2].map(i => (
         <AnimatePresence key={i} mode="wait">
           {categories[i] ? (
-            <motion.div
+            <motion.button
               key={categories[i]}
               initial={{ opacity: 0, scale: 0.6, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.6 }}
+              whileHover={{ scale: 1.08, boxShadow: `0 0 18px ${glow}` }}
+              whileTap={{ scale: 0.9 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+              onClick={() => onRemove(categories[i])}
+              title="اضغط لإزالة الفئة"
               style={{
                 width: 68, minHeight: 68,
                 borderRadius: 12,
@@ -77,6 +81,7 @@ function SelectedCategoryColumn({ categories, teamName, side }) {
                 display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center',
                 gap: 3, padding: '6px 4px', textAlign: 'center',
+                cursor: 'pointer', position: 'relative',
               }}
             >
               <span style={{ fontSize: 22 }}>{getIcon(categories[i])}</span>
@@ -86,7 +91,11 @@ function SelectedCategoryColumn({ categories, teamName, side }) {
               }}>
                 {categories[i]}
               </span>
-            </motion.div>
+              <span style={{
+                position: 'absolute', top: 3, left: 3,
+                fontSize: 10, lineHeight: 1, opacity: 0.6, color: '#FFE4E4',
+              }}>✕</span>
+            </motion.button>
           ) : (
             <motion.div
               key={`empty-${i}`}
@@ -153,11 +162,13 @@ export default function SetupScreen({ onStartGame }) {
         categories={team1Categories}
         teamName={team1Name.trim() || 'Monster Red'}
         side="right"
+        onRemove={(name) => toggleCategory(1, name)}
       />
       <SelectedCategoryColumn
         categories={team2Categories}
         teamName={team2Name.trim() || 'Monster Blue'}
         side="left"
+        onRemove={(name) => toggleCategory(2, name)}
       />
 
       <motion.div
