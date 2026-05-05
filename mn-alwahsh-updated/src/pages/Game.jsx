@@ -550,15 +550,16 @@ export default function Game() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* ── Full-screen video background ── */}
+      {/* ── Full-screen horror image background ── */}
       <div className="fixed inset-0 pointer-events-none" style={{ background: '#050000', zIndex: 0 }} />
-      <video autoPlay loop muted playsInline
-        className="fixed inset-0 w-full h-full pointer-events-none"
-        style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 0 }}>
-        <source src="/bg-scorebar.mp4" type="video/mp4" />
-      </video>
       <div className="fixed inset-0 pointer-events-none" style={{
-        background: 'rgba(0,0,0,0.5)',
+        backgroundImage: 'url(/bg-game-horror.jpeg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        zIndex: 0,
+      }} />
+      <div className="fixed inset-0 pointer-events-none" style={{
+        background: 'rgba(0,0,0,0.45)',
         zIndex: 0,
       }} />
 
