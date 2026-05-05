@@ -397,7 +397,7 @@ export default function QuestionModal({
         }} />
 
         {/* Content sits above the video */}
-        <div style={{ position: 'relative', zIndex: 2, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+        <div style={{ position: 'relative', zIndex: 2, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden', background: '#ffffff' }}>
         {/* Header */}
         <div style={{
           flexShrink: 0, height: 56,
