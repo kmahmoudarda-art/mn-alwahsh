@@ -610,6 +610,10 @@ export default function Game() {
           0%,100% { opacity: 0.12; }
           50%      { opacity: 0.22; }
         }
+        @keyframes teamGlowPulse {
+          0%,100% { opacity: 0.75; }
+          50%      { opacity: 1; }
+        }
       `}</style>
 
       {/* ── Fixed side score columns ── */}
@@ -681,6 +685,24 @@ export default function Game() {
       {showLuckyPopup && <LuckyDoublePopup teamName={luckyCell ? teams[luckyCell.losingTeam]?.name : ''} />}
 
       <ScoreBar team1={teams[1]} team2={teams[2]} currentTeam={currentTeam} onAdjust={handleAdjustScore} onBack={handleExit} modalOpen={modalOpen} />
+
+      {/* ── Active-team glow beam under score bar ── */}
+      <div
+        key={currentTeam}
+        className="fixed pointer-events-none"
+        style={{
+          top: 0,
+          right: currentTeam === 1 ? 0 : 'auto',
+          left: currentTeam === 2 ? 0 : 'auto',
+          width: '52%',
+          height: 320,
+          zIndex: 4,
+          animation: 'teamGlowPulse 2s ease-in-out infinite',
+          background: currentTeam === 1
+            ? 'radial-gradient(ellipse 80% 100% at 90% 0%, rgba(204,0,0,0.55) 0%, rgba(180,0,0,0.25) 40%, transparent 75%)'
+            : 'radial-gradient(ellipse 80% 100% at 10% 0%, rgba(30,80,220,0.55) 0%, rgba(20,60,200,0.25) 40%, transparent 75%)',
+        }}
+      />
 
       <SpecialCards
         team1={teams[1]}
