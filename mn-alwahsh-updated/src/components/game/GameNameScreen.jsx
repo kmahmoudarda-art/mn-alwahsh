@@ -75,7 +75,7 @@ export default function GameNameScreen({ onEnter }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" dir="rtl" style={{ background: '#050000' }}>
+    <div className="min-h-screen relative overflow-hidden" dir="rtl" style={{ background: '#050000' }}>
       <style>{`
         @keyframes titleFlicker {
           0%,100% { text-shadow: 0 0 12px #FF0000, 0 0 40px #CC0000, 0 0 80px #8B0000; }
@@ -134,58 +134,59 @@ export default function GameNameScreen({ onEnter }) {
         animation: 'fogBase 4s ease-in-out infinite', zIndex: 2,
       }} />
 
-      {/* Content */}
+      {/* Full-width title */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, padding: '5vh 4vw 0', textAlign: 'right' }}
+      >
+        <motion.h1
+          initial={{ scale: 0.85, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.15, type: 'spring', stiffness: 110 }}
+          className="font-cairo font-black"
+          style={{
+            fontSize: 'clamp(100px, 22vw, 240px)',
+            color: '#CC0000',
+            animation: 'titleFlicker 4s ease-in-out infinite',
+            lineHeight: 0.92,
+            letterSpacing: '-0.01em',
+          }}
+        >
+          من الوحش
+        </motion.h1>
+      </motion.div>
+
+      {/* Bottom form area */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-        className="w-full max-w-md relative"
-        style={{ zIndex: 10 }}
+        transition={{ duration: 0.7, delay: 0.3 }}
+        className="w-full max-w-md"
+        style={{ zIndex: 10, position: 'absolute', bottom: '5vh', left: '50%', transform: 'translateX(-50%)' }}
       >
-        {/* Title */}
-        <div className="text-center mb-6">
-          <motion.h1
-            initial={{ scale: 0.75, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2, type: 'spring', stiffness: 120 }}
-            className="font-cairo font-black tracking-tight"
-            style={{ fontSize: 'clamp(64px, 15vw, 110px)', color: '#CC0000', animation: 'titleFlicker 4s ease-in-out infinite', lineHeight: 1.05 }}
+        {/* How to play + Install row */}
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <button onClick={() => setShowManual(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl font-cairo font-bold text-sm transition-all"
+            style={{ background: 'rgba(10,0,0,0.7)', border: '1px solid rgba(139,0,0,0.7)', color: '#FFE4E4', backdropFilter: 'blur(8px)' }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,0,0,0.3)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(10,0,0,0.7)'; }}
           >
-            من الوحش
-          </motion.h1>
-          <p className="text-base font-tajawal font-bold mb-3"
-            style={{ color: '#FF6666', textShadow: '0 0 10px rgba(204,0,0,0.6)', letterSpacing: '0.05em' }}>
-            لعبة المعرفة والتحدي
-          </p>
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div style={{ flex: 1, height: 1, background: 'linear-gradient(to left, #CC0000, transparent)' }} />
-            <span style={{ fontSize: 16 }}>⚔️</span>
-            <div style={{ flex: 1, height: 1, background: 'linear-gradient(to right, #CC0000, transparent)' }} />
-          </div>
-
-          {/* How to play + Install row */}
-          <div className="flex items-center justify-center gap-3">
-            <button onClick={() => setShowManual(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl font-cairo font-bold text-sm transition-all"
-              style={{ background: 'rgba(10,0,0,0.7)', border: '1px solid rgba(139,0,0,0.7)', color: '#FFE4E4', backdropFilter: 'blur(8px)' }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,0,0,0.3)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(10,0,0,0.7)'; }}
-            >
-              <BookOpen className="w-4 h-4" style={{ color: '#CC0000' }} />
-              كيف تلعب؟
-            </button>
-
-            <button
-              onClick={() => installPrompt ? (installPrompt.prompt(), setShowInstall(false)) : setShowInstall(v => !v)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl font-cairo font-bold text-sm transition-all"
-              style={{ background: 'rgba(10,0,0,0.7)', border: '1px solid rgba(139,0,0,0.7)', color: '#FFE4E4', backdropFilter: 'blur(8px)' }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,0,0,0.3)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(10,0,0,0.7)'; }}
-            >
-              <Download className="w-4 h-4" style={{ color: '#CC0000' }} />
-              تثبيت
-            </button>
-          </div>
+            <BookOpen className="w-4 h-4" style={{ color: '#CC0000' }} />
+            كيف تلعب؟
+          </button>
+          <button
+            onClick={() => installPrompt ? (installPrompt.prompt(), setShowInstall(false)) : setShowInstall(v => !v)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl font-cairo font-bold text-sm transition-all"
+            style={{ background: 'rgba(10,0,0,0.7)', border: '1px solid rgba(139,0,0,0.7)', color: '#FFE4E4', backdropFilter: 'blur(8px)' }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,0,0,0.3)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(10,0,0,0.7)'; }}
+          >
+            <Download className="w-4 h-4" style={{ color: '#CC0000' }} />
+            تثبيت
+          </button>
         </div>
 
         {/* Game name form */}
