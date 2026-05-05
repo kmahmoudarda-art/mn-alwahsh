@@ -39,14 +39,8 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
           zIndex: 20,
         }}
       >
-        {/* Video background */}
-        <video autoPlay loop muted playsInline
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 0 }}>
-          <source src="/bg-scorebar.mp4" type="video/mp4" />
-        </video>
-        {/* Dark tint over video so cards stay readable */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(0,0,0,0.45)', zIndex: 1 }} />
+        {/* Semi-transparent dark band so cards stay readable */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(0,0,0,0.35)', zIndex: 1 }} />
 
         {/* Content */}
         <div className="relative z-10 flex items-center justify-between gap-3 w-full">

@@ -550,15 +550,15 @@ export default function Game() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* ── Full-screen background image ── */}
+      {/* ── Full-screen video background ── */}
+      <div className="fixed inset-0 pointer-events-none" style={{ background: '#050000', zIndex: 0 }} />
+      <video autoPlay loop muted playsInline
+        className="fixed inset-0 w-full h-full pointer-events-none"
+        style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 0 }}>
+        <source src="/bg-scorebar.mp4" type="video/mp4" />
+      </video>
       <div className="fixed inset-0 pointer-events-none" style={{
-        backgroundImage: 'url(/bg-image.jpeg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        zIndex: 0,
-      }} />
-      <div className="fixed inset-0 pointer-events-none" style={{
-        background: 'rgba(0,0,0,0.55)',
+        background: 'rgba(0,0,0,0.5)',
         zIndex: 0,
       }} />
 
