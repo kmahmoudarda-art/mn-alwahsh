@@ -90,6 +90,7 @@ const CATEGORY_ICONS = {
   'Kids Guess':        '🧒',
   'Kids guess':        '🧒',
   'KIDS GUESS':        '🧒',
+  'Kids Guess ':       '🧒',
   'أطفال':             '🧒',
   'عالم الأطفال':      '🧒',
   'رسوم متحركة':       '🎠',

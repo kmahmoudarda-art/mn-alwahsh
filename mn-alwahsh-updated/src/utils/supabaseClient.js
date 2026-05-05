@@ -145,8 +145,8 @@ async function fetchRowsFromTable(table, category, points) {
 // Mark a question as used in the correct table
 async function markQuestionUsed(row, table) {
   let filter;
-  if (table === TABLE_FAM) {
-    // Fam has no id column — use composite key
+  if (table === TABLE_FAM || table === TABLE_KIDS) {
+    // These tables use slot as key instead of id
     filter = `category=eq.${encodeURIComponent(row.category)}&points=eq.${row.points}&slot=eq.${encodeURIComponent(row.slot)}`;
   } else {
     const id = row.id ?? row.question_id ?? row.ID ?? row.rowid;
@@ -271,7 +271,7 @@ function normalizeRow(row, sourceTable) {
   return {
     id: rowId,
     source_table: sourceTable || TABLE_MAIN,
-    question: row.question,
+    question: row.question || row.questions || '',
     options: shuffledOptions,
     correct: keys[correctPos],
     explanation: row.explanation || '',
