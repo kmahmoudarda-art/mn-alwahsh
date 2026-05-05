@@ -1,13 +1,113 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import CategoryPicker from './CategoryPicker';
 
+const CATEGORY_ICONS = {
+  'رياضة': '⚽', 'تاريخ': '📜', 'جغرافيا': '🌍', 'علوم': '🔬',
+  'أفلام عربية': '🎬', 'أفلام إنجليزية': '🎥', 'نتفليكس': '🎞️',
+  'بريكينج باد': '🧪', 'بيكي بلايندرز': '🎩', 'بريزون بريك': '🔓',
+  'مسلسلات تركية': '🌙', 'أفلام رعب': '👻', 'CR7': '🥇', 'ميسي': '🐐',
+  'أم كلثوم': '🎤', 'عبد الحليم': '🎵', 'حمو بيكا': '🎧',
+  'تامر حسني': '🎶', 'عمرو دياب': '🌟', 'Arab Idol': '🏆',
+  'Arab Got Talent': '🎭', 'الإمارات': '🇦🇪', 'الأردن': '🇯🇴',
+  'دبي': '🏙️', 'كأس العرب': '🏆', 'كأس آسيا': '🥈',
+  'Champions League': '⭐', 'المنتخب الأردني': '⚽', 'هواتف ذكية': '📱',
+  'تكنولوجيا': '💻', 'سيارات': '🚗', 'براندات': '👜', 'سبيستون': '🚀',
+  'بنات فقط': '👑', 'مسرحيات عربية': '🎭', 'حيوانات': '🦁',
+  'أغاني': '🎼', 'أغاني قديمة': '📻', 'Friends': '☕',
+  'League of Legends': '🎮', 'أكل عربي': '🍽️', 'IQ': '🧠',
+  'رياضيات': '➗', 'English Lang': '🔤', 'Logos': '🖼️',
+  'football logo': '🗿', 'Football logo': '🗿', 'FOOTBALL LOGO': '🗿', 'football Logo': '🗿',
+};
+
+function getIcon(name) {
+  return CATEGORY_ICONS[name] || CATEGORY_ICONS[name?.trim()] || '🎯';
+}
+
+function SelectedCategoryColumn({ categories, teamName, side }) {
+  const isRed = side === 'right';
+  const color = isRed ? '#CC0000' : '#1155CC';
+  const glow = isRed ? 'rgba(204,0,0,0.5)' : 'rgba(17,85,204,0.5)';
+  const bg = isRed ? 'rgba(80,0,0,0.85)' : 'rgba(0,20,80,0.85)';
+  const border = isRed ? 'rgba(204,0,0,0.5)' : 'rgba(17,85,204,0.5)';
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      [side]: 0,
+      width: 80,
+      height: '100vh',
+      zIndex: 50,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 10,
+      padding: '10px 6px',
+      background: `linear-gradient(to ${side === 'right' ? 'left' : 'right'}, ${bg}, transparent)`,
+      pointerEvents: 'none',
+    }}>
+      <div style={{
+        fontSize: 9, fontWeight: 700, color, textAlign: 'center',
+        fontFamily: 'var(--font-cairo)', letterSpacing: '0.05em',
+        textShadow: `0 0 6px ${glow}`, marginBottom: 4, lineHeight: 1.2,
+        maxWidth: 72, wordBreak: 'break-word',
+      }}>
+        {teamName}
+      </div>
+      {[0, 1, 2].map(i => (
+        <AnimatePresence key={i} mode="wait">
+          {categories[i] ? (
+            <motion.div
+              key={categories[i]}
+              initial={{ opacity: 0, scale: 0.6, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.6 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+              style={{
+                width: 68, minHeight: 68,
+                borderRadius: 12,
+                background: bg,
+                border: `1.5px solid ${border}`,
+                boxShadow: `0 0 10px ${glow}`,
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                gap: 3, padding: '6px 4px', textAlign: 'center',
+              }}
+            >
+              <span style={{ fontSize: 22 }}>{getIcon(categories[i])}</span>
+              <span style={{
+                fontSize: 9, color: '#FFE4E4', fontFamily: 'var(--font-cairo)',
+                fontWeight: 600, lineHeight: 1.2, wordBreak: 'break-word',
+              }}>
+                {categories[i]}
+              </span>
+            </motion.div>
+          ) : (
+            <motion.div
+              key={`empty-${i}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              style={{
+                width: 68, height: 68, borderRadius: 12,
+                border: `1.5px dashed ${border}`,
+                opacity: 0.25,
+              }}
+            />
+          )}
+        </AnimatePresence>
+      ))}
+    </div>
+  );
+}
+
 export default function SetupScreen({ onStartGame }) {
-  const [team1Name, setTeam1Name] = useState('');
-  const [team2Name, setTeam2Name] = useState('');
+  const [team1Name, setTeam1Name] = useState('Monster Red');
+  const [team2Name, setTeam2Name] = useState('Monster Blue');
   const [team1Categories, setTeam1Categories] = useState([]);
   const [team2Categories, setTeam2Categories] = useState([]);
 
@@ -21,33 +121,25 @@ export default function SetupScreen({ onStartGame }) {
     }
   };
 
-  const isValid = team1Name.trim() && team2Name.trim() &&
-    team1Categories.length === 3 && team2Categories.length === 3;
+  const isValid = team1Categories.length === 3 && team2Categories.length === 3;
 
   const handleStart = () => {
     if (!isValid) return;
     onStartGame({
-      team1: { name: team1Name.trim(), categories: team1Categories },
-      team2: { name: team2Name.trim(), categories: team2Categories },
+      team1: { name: team1Name.trim() || 'Monster Red', categories: team1Categories },
+      team2: { name: team2Name.trim() || 'Monster Blue', categories: team2Categories },
     });
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" dir="rtl" style={{ background: '#0a0000' }}>
-      {/* Full-screen horror forest background */}
       <div className="absolute inset-0 pointer-events-none" style={{
         backgroundImage: 'url(/bg-setup.jpeg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        zIndex: 0,
+        backgroundSize: 'cover', backgroundPosition: 'center', zIndex: 0,
       }} />
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(0,0,0,0.45)', zIndex: 0 }} />
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'rgba(0,0,0,0.45)',
-        zIndex: 0,
-      }} />
-      <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.6) 100%)',
-        zIndex: 0,
+        background: 'radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.6) 100%)', zIndex: 0,
       }} />
       <style>{`
         @keyframes titleGlow {
@@ -55,6 +147,19 @@ export default function SetupScreen({ onStartGame }) {
           50%       { text-shadow: 0 0 20px rgba(255,0,0,1), 0 0 60px rgba(204,0,0,0.8); }
         }
       `}</style>
+
+      {/* Side columns — only on setup page */}
+      <SelectedCategoryColumn
+        categories={team1Categories}
+        teamName={team1Name.trim() || 'Monster Red'}
+        side="right"
+      />
+      <SelectedCategoryColumn
+        categories={team2Categories}
+        teamName={team2Name.trim() || 'Monster Blue'}
+        side="left"
+      />
+
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -139,15 +244,11 @@ function TeamSetupCard({ teamNumber, teamName, onNameChange, categories, onToggl
       </div>
 
       <Input
-        placeholder={`اسم الفريق ${teamNumber}`}
+        placeholder={teamNumber === 1 ? 'Monster Red' : 'Monster Blue'}
         value={teamName}
         onChange={(e) => onNameChange(e.target.value)}
         className="mb-3 font-cairo text-base h-12"
-        style={{
-          background: 'rgba(13,0,0,0.8)',
-          border: '1px solid #4a0000',
-          color: '#FFE4E4',
-        }}
+        style={{ background: 'rgba(13,0,0,0.8)', border: '1px solid #4a0000', color: '#FFE4E4' }}
       />
 
       <p className="text-xs font-tajawal mb-2" style={{ color: '#FF6666' }}>
