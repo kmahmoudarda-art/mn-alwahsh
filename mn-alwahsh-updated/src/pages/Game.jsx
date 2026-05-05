@@ -450,34 +450,24 @@ export default function Game() {
   }, [stopTimer, startTimer, currentTeam]);
 
   const handleCloseModal = useCallback(() => {
-    if (modalPhase === 'lifeline-before') {
-      loadQuestion();
-      return;
-    }
-
-    if (!answered && modalPhase === 'question') {
-      // Close button pressed before answering - reset tile and return question
-      stopTimer();
-      setModalOpen(false);
-      setStealMode(false);
-      setModalPhase('lifeline-before');
-      return;
-    }
-
     stopTimer();
-    if (currentTile) {
-      const tileKey = `${currentTile.colIndex}-${currentTile.rowIndex}`;
-      setAnsweredTiles(prev => new Set([...prev, tileKey]));
-    }
 
-    setCurrentTeam(prev => (prev === 1 ? 2 : 1));
+    if (answered && currentTile) {
+      // Question was answered — mark tile as used and switch teams
+      const tileKey = `${currentTile.colIndex}-${currentTile.rowIndex}`;
+      setAnsweredTiles(prev => {
+        const next = new Set([...prev, tileKey]);
+        if (next.size >= TOTAL_TILES) setGamePhase('finished');
+        return next;
+      });
+      setCurrentTeam(prev => (prev === 1 ? 2 : 1));
+    }
+    // If not answered — tile stays available, team stays the same
+
     setStealMode(false);
     setModalOpen(false);
-
-    if (answeredTiles.size + 1 >= TOTAL_TILES) {
-      setGamePhase('finished');
-    }
-  }, [modalPhase, answered, currentTile, answeredTiles, loadQuestion, stopTimer]);
+    setModalPhase('lifeline-before');
+  }, [answered, currentTile, stopTimer]);
 
   const handlePlayAgain = useCallback(() => {
     resetQuestionCache();
@@ -752,6 +742,7 @@ export default function Game() {
             onUseLifeline={handleUseLifeline}
             onRestSubmit={handleRestSubmit}
             onClose={handleCloseModal}
+            onShowQuestion={loadQuestion}
             answered={answered}
             selectedAnswer={selectedAnswer}
             isCorrect={isCorrect}

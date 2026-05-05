@@ -243,6 +243,7 @@ export default function QuestionModal({
   onUseLifeline,
   onRestSubmit,
   onClose,
+  onShowQuestion,
   answered,
   selectedAnswer,
   isCorrect,
@@ -325,12 +326,6 @@ export default function QuestionModal({
 
   const handleCloseClick = () => {
     if (answered) return;
-    setCloseClickCount(prev => prev + 1);
-    clearTimeout(closeTimeoutRef.current);
-    closeTimeoutRef.current = setTimeout(() => setCloseClickCount(0), 2000);
-    if (closeClickCount === 0) return;
-    toast('تم الإلغاء — الخلية متاحة مجدداً');
-    setCloseClickCount(0);
     onClose();
   };
 
@@ -472,7 +467,7 @@ export default function QuestionModal({
                 <p style={{ color:'#fef08a', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:13, margin:0 }}>💰 دبل يا كبير مفعّل! إجابة صح = خصم من الخصم</p>
               </div>
             )}
-            <Button onClick={onClose} className="w-full font-cairo font-bold bg-primary text-primary-foreground">أظهر السؤال</Button>
+            <Button onClick={onShowQuestion} className="w-full font-cairo font-bold bg-primary text-primary-foreground">أظهر السؤال</Button>
           </div>
         )}
 
