@@ -549,72 +549,27 @@ export default function Game() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* ── Horror atmosphere layers ── */}
+      {/* ── Subtle horror atmosphere (no blood) ── */}
       <style>{`
-        @keyframes bloodDripAnim {
-          0%   { height: 0px; opacity: 1; }
-          75%  { opacity: 0.85; }
-          100% { height: 55px; opacity: 0.5; }
-        }
-        @keyframes dripDrop {
-          0%   { transform: translateY(0) scale(1); opacity: 0.9; }
-          100% { transform: translateY(70px) scale(0.2); opacity: 0; }
-        }
         @keyframes skullFloat {
-          0%,100% { transform: translateY(0) rotate(-4deg); opacity:0.12; }
-          50%      { transform: translateY(-12px) rotate(4deg); opacity:0.2; }
+          0%,100% { transform: translateY(0) rotate(-4deg); opacity:0.1; }
+          50%      { transform: translateY(-10px) rotate(4deg); opacity:0.17; }
         }
         @keyframes fogPulse {
-          0%,100% { opacity: 0.06; }
-          50%      { opacity: 0.13; }
-        }
-        @keyframes crackleSpark {
-          0%,90%,100% { opacity:0; }
-          92%,98%     { opacity:0.6; }
-        }
-        .blood-drip-line {
-          position: absolute;
-          top: 0;
-          width: 6px;
-          border-radius: 0 0 50% 50%;
-          background: linear-gradient(to bottom, #6B0000, #CC0000, #FF2200);
-          transform-origin: top;
-          animation: bloodDripAnim ease-in infinite;
-        }
-        .blood-drop {
-          position: absolute;
-          width: 8px;
-          height: 10px;
-          border-radius: 50% 50% 60% 60%;
-          background: #CC0000;
-          animation: dripDrop ease-in infinite;
+          0%,100% { opacity: 0.08; }
+          50%      { opacity: 0.15; }
         }
       `}</style>
 
-      {/* Blood drip strip across top of game board */}
-      <div className="relative w-full overflow-visible pointer-events-none" style={{ height: 0, zIndex: 10 }}>
-        {[4,9,15,21,26,32,38,44,50,56,62,68,74,80,86,92].map((left, i) => (
-          <div key={i} className="blood-drip-line" style={{
-            left: `${left}%`,
-            height: `${20 + (i % 4) * 14}px`,
-            width: `${5 + (i % 3) * 2}px`,
-            animationDuration: `${3 + i * 0.35}s`,
-            animationDelay: `${i * 0.22}s`,
-          }} />
-        ))}
-      </div>
+      {/* Floating skull decorations - far corners, very subtle */}
+      <div className="fixed pointer-events-none select-none" style={{ left: '1.5%', top: '28%', fontSize: 42, animation: 'skullFloat 5s ease-in-out infinite', zIndex: 2 }}>💀</div>
+      <div className="fixed pointer-events-none select-none" style={{ right: '1.5%', top: '38%', fontSize: 34, animation: 'skullFloat 6s ease-in-out infinite 1.2s', zIndex: 2 }}>💀</div>
 
-      {/* Floating skull decorations - far corners */}
-      <div className="fixed pointer-events-none select-none" style={{ left: '2%', top: '30%', fontSize: 48, animation: 'skullFloat 4s ease-in-out infinite', zIndex: 2 }}>💀</div>
-      <div className="fixed pointer-events-none select-none" style={{ right: '2%', top: '40%', fontSize: 36, animation: 'skullFloat 5s ease-in-out infinite 1s', zIndex: 2 }}>💀</div>
-      <div className="fixed pointer-events-none select-none" style={{ left: '1%', bottom: '20%', fontSize: 28, animation: 'skullFloat 6s ease-in-out infinite 2s', zIndex: 2 }}>🩸</div>
-      <div className="fixed pointer-events-none select-none" style={{ right: '1%', bottom: '25%', fontSize: 28, animation: 'skullFloat 4.5s ease-in-out infinite 0.5s', zIndex: 2 }}>🩸</div>
-
-      {/* Fog/mist layer at bottom */}
+      {/* Dark bottom fog */}
       <div className="fixed bottom-0 left-0 right-0 pointer-events-none" style={{
-        height: '25vh',
-        background: 'linear-gradient(to top, rgba(80,0,0,0.25) 0%, transparent 100%)',
-        animation: 'fogPulse 4s ease-in-out infinite',
+        height: '20vh',
+        background: 'linear-gradient(to top, rgba(60,0,0,0.2) 0%, transparent 100%)',
+        animation: 'fogPulse 5s ease-in-out infinite',
         zIndex: 2,
       }} />
 
