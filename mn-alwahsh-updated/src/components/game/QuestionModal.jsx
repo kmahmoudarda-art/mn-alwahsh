@@ -590,8 +590,8 @@ export default function QuestionModal({
                       {!stealMode && !answered && (
                         <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
                           width:'100%', padding:'4px 10px', borderRadius:10, fontSize:11,
-                          background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(200,30,30,0.18)',
-                          border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(200,30,30,0.35)',
+                          background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(160,0,0,0.85)',
+                          border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(120,0,0,0.9)',
                           color: passToOtherUsed ? 'rgba(255,255,255,0.2)' : '#fff',
                           fontFamily:'var(--font-cairo)', cursor: passToOtherUsed ? 'not-allowed' : 'pointer',
                           textAlign:'center', opacity: passToOtherUsed ? 0.4 : 1,
@@ -730,8 +730,8 @@ export default function QuestionModal({
                       {!stealMode && !answered && (
                         <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
                           width:'100%', padding:'3px 10px', borderRadius:10, fontSize:10,
-                          background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(200,30,30,0.18)',
-                          border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(200,30,30,0.35)',
+                          background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(160,0,0,0.85)',
+                          border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(120,0,0,0.9)',
                           color: passToOtherUsed ? 'rgba(255,255,255,0.2)' : '#fff',
                           fontFamily:'var(--font-cairo)', cursor: passToOtherUsed ? 'not-allowed' : 'pointer',
                           textAlign:'center', opacity: passToOtherUsed ? 0.4 : 1,
@@ -799,8 +799,8 @@ export default function QuestionModal({
                     {!stealMode && !answered && (
                       <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
                         width:'100%', padding:'4px 10px', borderRadius:10, fontSize:11,
-                        background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(200,30,30,0.18)',
-                        border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(200,30,30,0.35)',
+                        background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(160,0,0,0.85)',
+                        border: passToOtherUsed ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(120,0,0,0.9)',
                         color: passToOtherUsed ? 'rgba(255,255,255,0.2)' : '#fff',
                         fontFamily:'var(--font-cairo)', cursor: passToOtherUsed ? 'not-allowed' : 'pointer',
                         textAlign:'center', opacity: passToOtherUsed ? 0.4 : 1,
