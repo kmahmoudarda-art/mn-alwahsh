@@ -33,14 +33,12 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
         style={{
           paddingTop: 'max(10px, env(safe-area-inset-top))',
           paddingBottom: 10,
-          background: '#0a0000',
-          borderBottom: '2px solid #6B0000',
-          boxShadow: '0 3px 20px rgba(100,0,0,0.5)',
+          background: '#ffffff',
+          borderBottom: '2px solid #e0e0e0',
+          boxShadow: '0 3px 16px rgba(0,0,0,0.12)',
           zIndex: 20,
         }}
       >
-        {/* Semi-transparent dark band so cards stay readable */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'rgba(0,0,0,0.35)', zIndex: 1 }} />
 
         {/* Content */}
         <div className="relative z-10 flex items-center justify-between gap-3 w-full">
@@ -56,10 +54,10 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
             <PayPalDonateButton />
             <HorrorMusic />
             <div className="flex gap-1 mt-0.5">
-              <button onClick={onBack} className="w-6 h-6 flex items-center justify-center rounded-full" style={{ background: 'rgba(255,255,255,0.08)', color: '#bbb' }}>
+              <button onClick={onBack} className="w-6 h-6 flex items-center justify-center rounded-full" style={{ background: 'rgba(0,0,0,0.08)', color: '#555' }}>
                 <X className="w-3.5 h-3.5" />
               </button>
-              <button onClick={() => setShowSettings(true)} className="w-6 h-6 flex items-center justify-center rounded-full" style={{ background: 'rgba(255,255,255,0.08)', color: '#bbb' }}>
+              <button onClick={() => setShowSettings(true)} className="w-6 h-6 flex items-center justify-center rounded-full" style={{ background: 'rgba(0,0,0,0.08)', color: '#555' }}>
                 <Settings className="w-3.5 h-3.5" />
               </button>
             </div>

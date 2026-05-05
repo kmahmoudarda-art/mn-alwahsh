@@ -21,110 +21,39 @@ function randomFrom(arr) {
 const DISPLAY_VALUES = [200, 200, 400, 400, 600, 600];
 
 /*
-  Per-column palettes: bright header, then 3 point-tier shades.
-  200 = lighter/airier, 400 = richer mid, 600 = deep/dramatic.
+  All headers share the same warm gold colour.
+  Tile rows are coloured by point tier (same across all columns):
+    200 → light mint green
+    400 → light periwinkle blue
+    600 → light lavender
 */
-const COL_PALETTES = [
-  // 0: Emerald green
-  {
-    header:       'linear-gradient(150deg, #1a7a3a, #0d5228)',
-    headerBorder: '#22cc66',
-    headerText:   '#ccffdd',
-    headerShadow: 'rgba(34,204,102,0.5)',
-    tile200:  'linear-gradient(150deg, #2e9e52, #1a6b38)',
-    tile400:  'linear-gradient(150deg, #1a6b38, #0d4524)',
-    tile600:  'linear-gradient(150deg, #0d4524, #072d18)',
-    border200: '#3dcc70', border400: '#1e9b52', border600: '#0e5c31',
-    glow200: 'rgba(61,204,112,0.4)', glow400: 'rgba(30,155,82,0.5)', glow600: 'rgba(14,92,49,0.6)',
-    text200: '#d4ffea', text400: '#aaf0cc', text600: '#88e0b0',
-  },
-  // 1: Royal blue
-  {
-    header:       'linear-gradient(150deg, #1a3d9e, #0d2570)',
-    headerBorder: '#4477ff',
-    headerText:   '#ccd9ff',
-    headerShadow: 'rgba(68,119,255,0.5)',
-    tile200:  'linear-gradient(150deg, #2a55cc, #1a3a99)',
-    tile400:  'linear-gradient(150deg, #1a3a99, #0d2266)',
-    tile600:  'linear-gradient(150deg, #0d2266, #081440)',
-    border200: '#5588ff', border400: '#2255dd', border600: '#1133aa',
-    glow200: 'rgba(85,136,255,0.4)', glow400: 'rgba(34,85,221,0.5)', glow600: 'rgba(17,51,170,0.6)',
-    text200: '#d0dcff', text400: '#aabcff', text600: '#8899ee',
-  },
-  // 2: Warm amber / gold
-  {
-    header:       'linear-gradient(150deg, #996600, #664400)',
-    headerBorder: '#ffcc22',
-    headerText:   '#fff3cc',
-    headerShadow: 'rgba(255,204,34,0.5)',
-    tile200:  'linear-gradient(150deg, #cc8800, #996600)',
-    tile400:  'linear-gradient(150deg, #996600, #664400)',
-    tile600:  'linear-gradient(150deg, #664400, #3d2800)',
-    border200: '#ffbb33', border400: '#cc8800', border600: '#885500',
-    glow200: 'rgba(255,187,51,0.4)', glow400: 'rgba(204,136,0,0.5)', glow600: 'rgba(136,85,0,0.6)',
-    text200: '#fff4cc', text400: '#ffe0aa', text600: '#ffcc88',
-  },
-  // 3: Teal / cyan
-  {
-    header:       'linear-gradient(150deg, #007777, #004d4d)',
-    headerBorder: '#00ddcc',
-    headerText:   '#ccfffa',
-    headerShadow: 'rgba(0,221,204,0.5)',
-    tile200:  'linear-gradient(150deg, #009999, #006666)',
-    tile400:  'linear-gradient(150deg, #006666, #004444)',
-    tile600:  'linear-gradient(150deg, #004444, #002828)',
-    border200: '#00ccbb', border400: '#009988', border600: '#006655',
-    glow200: 'rgba(0,204,187,0.4)', glow400: 'rgba(0,153,136,0.5)', glow600: 'rgba(0,102,85,0.6)',
-    text200: '#ccfff8', text400: '#aaffee', text600: '#88eedd',
-  },
-  // 4: Violet / purple
-  {
-    header:       'linear-gradient(150deg, #550099, #360066)',
-    headerBorder: '#bb55ff',
-    headerText:   '#f0ccff',
-    headerShadow: 'rgba(187,85,255,0.5)',
-    tile200:  'linear-gradient(150deg, #7722cc, #550099)',
-    tile400:  'linear-gradient(150deg, #550099, #380066)',
-    tile600:  'linear-gradient(150deg, #380066, #200040)',
-    border200: '#aa44ff', border400: '#7722cc', border600: '#550099',
-    glow200: 'rgba(170,68,255,0.4)', glow400: 'rgba(119,34,204,0.5)', glow600: 'rgba(85,0,153,0.6)',
-    text200: '#f2deff', text400: '#e0bbff', text600: '#cc99ff',
-  },
-  // 5: Crimson red
-  {
-    header:       'linear-gradient(150deg, #990000, #660000)',
-    headerBorder: '#ff4444',
-    headerText:   '#ffcccc',
-    headerShadow: 'rgba(255,68,68,0.5)',
-    tile200:  'linear-gradient(150deg, #cc2222, #991111)',
-    tile400:  'linear-gradient(150deg, #991111, #660000)',
-    tile600:  'linear-gradient(150deg, #660000, #3d0000)',
-    border200: '#ff5555', border400: '#cc2222', border600: '#991111',
-    glow200: 'rgba(255,85,85,0.4)', glow400: 'rgba(204,34,34,0.5)', glow600: 'rgba(153,17,17,0.6)',
-    text200: '#ffdddd', text400: '#ffbbbb', text600: '#ff9999',
-  },
-];
+const HEADER_STYLE = {
+  background:   '#C8A84B',
+  border:       '2px solid #e0c06a',
+  color:        '#ffffff',
+  boxShadow:    '0 3px 10px rgba(180,140,40,0.35)',
+};
 
-function getColStyle(colIndex, points) {
-  const p = COL_PALETTES[colIndex % COL_PALETTES.length];
-  const isHigh = points === 600, isMid = points === 400;
-  const bg     = isHigh ? p.tile600     : isMid ? p.tile400     : p.tile200;
-  const border = isHigh ? p.border600   : isMid ? p.border400   : p.border200;
-  const glow   = isHigh ? p.glow600     : isMid ? p.glow400     : p.glow200;
-  const color  = isHigh ? p.text600     : isMid ? p.text400     : p.text200;
+const TIER = {
+  200: { bg: '#eaf7f0', border: '#a8dbb8', color: '#3a8a58', shadow: 'rgba(168,219,184,0.4)' },
+  400: { bg: '#e8eef8', border: '#a8bce0', color: '#3a5fa8', shadow: 'rgba(168,188,224,0.4)' },
+  600: { bg: '#f0ecf8', border: '#c0aee0', color: '#6a48a8', shadow: 'rgba(192,174,224,0.4)' },
+};
+
+function getColStyle(_colIndex, points) {
+  const t = TIER[points] || TIER[200];
   return {
-    borderRadius: '16px',
+    borderRadius: '14px',
     position: 'relative',
     overflow: 'hidden',
-    transition: 'all 0.2s ease',
+    transition: 'all 0.18s ease',
     cursor: 'pointer',
-    fontSize: points === 600 ? '24px' : points === 400 ? '22px' : '20px',
+    fontSize: points === 600 ? '22px' : points === 400 ? '20px' : '18px',
     fontWeight: 800,
-    letterSpacing: '0.01em',
-    background: bg,
-    border: `2px solid ${border}`,
-    color,
-    boxShadow: `0 4px 16px ${glow}, inset 0 1px 0 rgba(255,255,255,0.12)`,
+    background: t.bg,
+    border: `2px solid ${t.border}`,
+    color: t.color,
+    boxShadow: `0 3px 12px ${t.shadow}`,
   };
 }
 
@@ -286,32 +215,27 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
           ))}
         </div>
 
-        {/* Category Headers - each column has its own palette colour */}
+        {/* Category Headers - unified gold style */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1 md:gap-2 mb-1 md:mb-2">
-          {categories.map((cat, i) => {
-            const p = COL_PALETTES[i % COL_PALETTES.length];
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.08 }}
-                style={{
-                  background: p.header,
-                  border: `2px solid ${p.headerBorder}`,
-                  boxShadow: `0 3px 12px rgba(0,0,0,0.45), 0 0 10px ${p.headerShadow}`,
-                  borderRadius: '12px',
-                  padding: '9px 4px',
-                  textAlign: 'center',
-                }}
-              >
-                <p className="text-[10px] sm:text-xs md:text-sm font-cairo font-bold leading-tight truncate"
-                  style={{ color: p.headerText }}>
-                  {cat}
-                </p>
-              </motion.div>
-            );
-          })}
+          {categories.map((cat, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08 }}
+              style={{
+                ...HEADER_STYLE,
+                borderRadius: '12px',
+                padding: '9px 4px',
+                textAlign: 'center',
+              }}
+            >
+              <p className="text-[10px] sm:text-xs md:text-sm font-cairo font-bold leading-tight truncate"
+                style={{ color: '#fff' }}>
+                {cat}
+              </p>
+            </motion.div>
+          ))}
         </div>
 
         {/* Point Grid */}
