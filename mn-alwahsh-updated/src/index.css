@@ -8,6 +8,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'BouyaMessy';
+  src: url('/fonts/ff-bouya-messy.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -44,6 +52,7 @@
     --font-rakkas: 'Rakkas', cursive;
     --font-mirza: 'Mirza', cursive;
     --font-helpme: 'HelpMe', cursive;
+    --font-bouya: 'BouyaMessy', cursive;
     --sidebar-background: 0 100% 3%;
     --sidebar-foreground: 0 100% 95%;
     --sidebar-primary: 0 100% 40%;

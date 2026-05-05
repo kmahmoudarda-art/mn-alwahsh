@@ -10,6 +10,7 @@ module.exports = {
                         rakkas: ['var(--font-rakkas)'],
                         mirza: ['var(--font-mirza)'],
                         helpme: ['var(--font-helpme)'],
+                        bouya: ['var(--font-bouya)'],
                 },
                 borderRadius: {
                         lg: 'var(--radius)',
