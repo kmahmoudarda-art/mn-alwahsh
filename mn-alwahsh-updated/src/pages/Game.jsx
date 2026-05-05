@@ -610,9 +610,54 @@ export default function Game() {
         }
       `}</style>
 
+      {/* ── Fixed side score columns ── */}
+      {(() => {
+        const s1 = teams[1].score, s2 = teams[2].score;
+        const tied = s1 === s2;
+        const color1 = tied ? '#ffffff' : s1 > s2 ? '#22c55e' : '#ef4444';
+        const color2 = tied ? '#ffffff' : s2 > s1 ? '#22c55e' : '#ef4444';
+        const border1 = tied ? 'rgba(255,255,255,0.15)' : s1 > s2 ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)';
+        const border2 = tied ? 'rgba(255,255,255,0.15)' : s2 > s1 ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)';
+        const colStyle = (color, border) => ({
+          position: 'fixed', top: 0, bottom: 0, width: 52,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
+          background: 'rgba(0,0,0,0.55)', borderWidth: 0,
+          borderStyle: 'solid', borderColor: border,
+          zIndex: 15, pointerEvents: 'none', backdropFilter: 'blur(4px)',
+        });
+        const nameStyle = {
+          writingMode: 'vertical-rl', textOrientation: 'mixed',
+          fontFamily: 'var(--font-cairo)', fontWeight: 800, fontSize: 12,
+          color: 'rgba(255,255,255,0.7)', letterSpacing: 1,
+          maxHeight: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        };
+        const scoreStyle = (color) => ({
+          fontFamily: 'var(--font-cairo)', fontWeight: 900, fontSize: 22,
+          color, textShadow: `0 0 10px ${color}88`, lineHeight: 1, textAlign: 'center',
+        });
+        return (
+          <>
+            {/* Right edge — Team 1 */}
+            <div style={{ ...colStyle(color1, border1), right: 0, borderLeftWidth: 2 }}>
+              <span style={nameStyle}>{teams[1].name}</span>
+              <div style={{ width: 28, height: 1, background: 'rgba(255,255,255,0.2)' }} />
+              <span style={scoreStyle(color1)}>{s1}</span>
+              {s1 > s2 && !tied && <span style={{ fontSize: 16 }}>🏆</span>}
+            </div>
+            {/* Left edge — Team 2 */}
+            <div style={{ ...colStyle(color2, border2), left: 0, borderRightWidth: 2 }}>
+              <span style={{ ...nameStyle, writingMode: 'vertical-lr', transform: 'rotate(180deg)' }}>{teams[2].name}</span>
+              <div style={{ width: 28, height: 1, background: 'rgba(255,255,255,0.2)' }} />
+              <span style={scoreStyle(color2)}>{s2}</span>
+              {s2 > s1 && !tied && <span style={{ fontSize: 16 }}>🏆</span>}
+            </div>
+          </>
+        );
+      })()}
+
       {/* Floating skull decorations */}
-      <div className="fixed pointer-events-none select-none" style={{ left: '1.5%', top: '28%', fontSize: 42, animation: 'skullFloat 5s ease-in-out infinite', zIndex: 2 }}>💀</div>
-      <div className="fixed pointer-events-none select-none" style={{ right: '1.5%', top: '38%', fontSize: 34, animation: 'skullFloat 6s ease-in-out infinite 1.2s', zIndex: 2 }}>💀</div>
+      <div className="fixed pointer-events-none select-none" style={{ left: '8%', top: '28%', fontSize: 36, animation: 'skullFloat 5s ease-in-out infinite', zIndex: 2 }}>💀</div>
+      <div className="fixed pointer-events-none select-none" style={{ right: '8%', top: '38%', fontSize: 30, animation: 'skullFloat 6s ease-in-out infinite 1.2s', zIndex: 2 }}>💀</div>
 
       {/* Dark bottom fog */}
       <div className="fixed bottom-0 left-0 right-0 pointer-events-none" style={{
