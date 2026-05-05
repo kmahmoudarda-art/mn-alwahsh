@@ -94,6 +94,38 @@ export default function GameNameScreen({ onEnter }) {
         }
         .horror-input::placeholder { color: rgba(255,100,100,0.4); }
         .horror-input:focus { outline: none; box-shadow: 0 0 0 2px #CC0000, 0 0 20px rgba(204,0,0,0.35) !important; }
+
+        /* Landscape phone layout */
+        @media (orientation: landscape) and (max-height: 600px) {
+          .gns-main {
+            flex-direction: row !important;
+            gap: 12px !important;
+            padding: 6px 80px 6px 16px !important;
+            min-height: 100svh !important;
+            align-items: center !important;
+          }
+          .gns-title-block {
+            flex: 0 0 auto;
+            width: 45% !important;
+          }
+          .gns-title {
+            font-size: clamp(32px, 14vh, 90px) !important;
+          }
+          .gns-form-block {
+            flex: 1 1 auto;
+            max-width: 360px !important;
+          }
+          .gns-form-card {
+            padding: 12px !important;
+          }
+          .gns-form-card p {
+            margin-bottom: 8px !important;
+            font-size: 12px !important;
+          }
+          .gns-skull { display: none !important; }
+          .gns-buttons { margin-bottom: 6px !important; }
+          .gns-subtitle { margin-bottom: 6px !important; font-size: 11px !important; }
+        }
       `}</style>
 
       <AnimatePresence>{showManual && <InstructionManual onClose={() => setShowManual(false)} />}</AnimatePresence>
@@ -125,7 +157,7 @@ export default function GameNameScreen({ onEnter }) {
         { left: '7%',  bottom: '16%', fontSize: 28, dur: '6s',   del: '2s'   },
         { right: '6%', bottom: '20%', fontSize: 44, dur: '4s',   del: '0.5s' },
       ].map((s, i) => (
-        <div key={i} className="absolute pointer-events-none select-none"
+        <div key={i} className="gns-skull absolute pointer-events-none select-none"
           style={{ ...s, zIndex: 3, animation: `skullHover ${s.dur} ease-in-out infinite ${s.del}` }}>
           💀
         </div>
@@ -136,10 +168,10 @@ export default function GameNameScreen({ onEnter }) {
         animation: 'fogBase 4s ease-in-out infinite', zIndex: 2,
       }} />
 
-      {/* Main content — centered column */}
-      <div style={{
+      {/* Main content — centered column (row in landscape) */}
+      <div className="gns-main" style={{
         position: 'relative', zIndex: 10,
-        minHeight: '100vh',
+        minHeight: '100svh',
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
         gap: '5vh',
@@ -147,6 +179,7 @@ export default function GameNameScreen({ onEnter }) {
       }}>
         {/* Title block */}
         <motion.div
+          className="gns-title-block"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
@@ -156,7 +189,7 @@ export default function GameNameScreen({ onEnter }) {
             initial={{ scale: 0.85, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.15, type: 'spring', stiffness: 110 }}
-            className="font-bouya"
+            className="gns-title font-bouya"
             style={{
               fontSize: 'clamp(72px, 18vw, 200px)',
               color: '#CC0000',
@@ -172,13 +205,14 @@ export default function GameNameScreen({ onEnter }) {
 
         {/* Form block */}
         <motion.div
+          className="gns-form-block"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.3 }}
           style={{ width: '100%', maxWidth: 420 }}
         >
           {/* How to play + Install row */}
-          <div className="flex items-center justify-center gap-3" style={{ marginBottom: 10 }}>
+          <div className="gns-buttons flex items-center justify-center gap-3" style={{ marginBottom: 10 }}>
             <button onClick={() => setShowManual(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl font-cairo font-bold text-sm transition-all"
               style={{ background: 'rgba(10,0,0,0.7)', border: '1px solid rgba(139,0,0,0.7)', color: '#FFE4E4', backdropFilter: 'blur(8px)' }}
@@ -200,7 +234,7 @@ export default function GameNameScreen({ onEnter }) {
             </button>
           </div>
 
-          <p className="font-tajawal font-bold" style={{
+          <p className="gns-subtitle font-tajawal font-bold" style={{
             color: '#FF6666', textShadow: '0 0 10px rgba(204,0,0,0.6)',
             fontSize: 'clamp(12px, 1.8vw, 16px)', marginBottom: 12, textAlign: 'center',
           }}>
@@ -208,7 +242,7 @@ export default function GameNameScreen({ onEnter }) {
           </p>
 
           {/* Game name form */}
-          <div style={{
+          <div className="gns-form-card" style={{
             background: 'rgba(5,0,0,0.75)', borderRadius: 18,
             border: '1.5px solid rgba(139,0,0,0.4)', padding: 20,
             backdropFilter: 'blur(10px)',

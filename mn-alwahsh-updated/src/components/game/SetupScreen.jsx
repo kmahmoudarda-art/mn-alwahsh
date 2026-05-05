@@ -134,6 +134,35 @@ export default function SetupScreen({ onStartGame }) {
           0%, 100% { text-shadow: 0 0 10px rgba(204,0,0,0.8), 0 0 30px rgba(139,0,0,0.5); }
           50%       { text-shadow: 0 0 20px rgba(255,0,0,1), 0 0 60px rgba(204,0,0,0.8); }
         }
+        @media (orientation: landscape) and (max-height: 600px) {
+          .setup-hero { display: none !important; }
+          .setup-start-top { display: none !important; }
+          .setup-wrapper {
+            padding: 4px !important;
+            gap: 4px !important;
+          }
+          .setup-grid {
+            gap: 4px !important;
+            margin-bottom: 6px !important;
+          }
+          .setup-start-bottom {
+            margin-top: 4px !important;
+          }
+          .setup-start-bottom button {
+            padding: 8px 24px !important;
+            font-size: 15px !important;
+          }
+          .team-card {
+            padding: 8px !important;
+          }
+          .team-card .mb-3 { margin-bottom: 6px !important; }
+          .team-card input { height: 36px !important; font-size: 13px !important; margin-bottom: 6px !important; }
+          .cat-scroll-area { height: calc(100svh - 120px) !important; }
+          .side-col { width: 60px !important; }
+          .side-col-card { width: 52px !important; min-height: 52px !important; }
+          .side-col-card span:first-child { font-size: 16px !important; }
+          .side-col-card span:last-child { font-size: 7px !important; }
+        }
       `}</style>
 
       {/* Side columns — only on setup page */}
@@ -157,7 +186,7 @@ export default function SetupScreen({ onStartGame }) {
         className="w-full max-w-3xl"
         style={{ position: 'relative', zIndex: 1 }}
       >
-        <div className="text-center mb-10">
+        <div className="setup-hero text-center mb-10">
           <motion.h1
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
@@ -172,7 +201,7 @@ export default function SetupScreen({ onStartGame }) {
 
         {/* Start button — TOP */}
         <motion.div
-          className="flex justify-center mb-6"
+          className="setup-start-top flex justify-center mb-6"
           whileHover={{ scale: isValid ? 1.02 : 1 }}
           whileTap={{ scale: isValid ? 0.98 : 1 }}
         >
@@ -193,7 +222,7 @@ export default function SetupScreen({ onStartGame }) {
           </Button>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="setup-grid grid md:grid-cols-2 gap-6 mb-8">
           <TeamSetupCard
             teamNumber={1}
             teamName={team1Name}
@@ -214,7 +243,7 @@ export default function SetupScreen({ onStartGame }) {
 
         {/* Start button — BOTTOM */}
         <motion.div
-          className="flex justify-center"
+          className="setup-start-bottom flex justify-center"
           whileHover={{ scale: isValid ? 1.02 : 1 }}
           whileTap={{ scale: isValid ? 0.98 : 1 }}
         >
@@ -245,7 +274,7 @@ function TeamSetupCard({ teamNumber, teamName, onNameChange, categories, onToggl
       initial={{ opacity: 0, x: teamNumber === 1 ? 30 : -30 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 0.3 + teamNumber * 0.1 }}
-      className="rounded-2xl p-4"
+      className="team-card rounded-2xl p-4"
       style={{
         background: 'linear-gradient(135deg, rgba(139,0,0,0.15), rgba(74,0,0,0.25))',
         border: '1px solid #8B0000',

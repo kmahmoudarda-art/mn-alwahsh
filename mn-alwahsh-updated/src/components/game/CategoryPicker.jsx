@@ -92,6 +92,12 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
           box-shadow: 0 0 12px rgba(204,0,0,0.6), inset 0 0 8px rgba(139,0,0,0.2) !important;
           border-color: #CC0000 !important;
         }
+        @media (orientation: landscape) and (max-height: 600px) {
+          .cat-scroll-area { height: calc(100svh - 130px) !important; }
+          .cat-btn { height: 64px !important; }
+          .cat-btn span:first-child { font-size: 22px !important; }
+          .cat-btn span:last-child { font-size: 10px !important; }
+        }
       `}</style>
 
       {/* Random pick button */}
@@ -114,7 +120,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
         اختيار عشوائي
       </motion.button>
 
-      <div className="category-scroll overflow-y-auto overflow-x-hidden" style={{ height: '60vh', scrollBehavior: 'smooth' }}>
+      <div className="cat-scroll-area category-scroll overflow-y-auto overflow-x-hidden" style={{ height: '60vh', scrollBehavior: 'smooth' }}>
         {Object.entries(grouped).map(([groupName, cats]) => {
           const isOpen = openGroups.has(groupName);
           const selectedCount = cats.filter(c => selected.includes(c)).length;
