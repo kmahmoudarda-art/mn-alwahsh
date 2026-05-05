@@ -141,8 +141,9 @@ export default function GameNameScreen({ onEnter }) {
         position: 'relative', zIndex: 10,
         minHeight: '100vh',
         display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'space-between',
-        padding: '6vh 16px 5vh',
+        alignItems: 'center', justifyContent: 'center',
+        gap: '5vh',
+        padding: '6vh 16px',
       }}>
         {/* Title block */}
         <motion.div
