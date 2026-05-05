@@ -396,6 +396,8 @@ export default function QuestionModal({
           zIndex: 1, pointerEvents: 'none',
         }} />
 
+        {/* Content sits above the video */}
+        <div style={{ position: 'relative', zIndex: 2, flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
         {/* Header */}
         <div style={{
           flexShrink: 0, height: 56,
@@ -917,7 +919,8 @@ export default function QuestionModal({
             )}
           </>
         )}
-      </div>
+        </div>{/* end content wrapper */}
+      </div>{/* end modalStyle */}
 
       <AnimatePresence>
         {showToast && (
