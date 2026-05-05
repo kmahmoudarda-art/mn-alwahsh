@@ -7,6 +7,8 @@ const TABLE_FANAN = 'Fanan';
 const TABLE_FAM = 'Fam';
 const TABLE_FALSAFA = 'falsafa';
 const TABLE_LOGO1 = 'logo1';
+const TABLE_LOGO1 = 'logoo';
+
 
 const BASE_HEADERS = {
   apikey: SUPABASE_ANON_KEY,
@@ -28,7 +30,7 @@ try {
     console.log('[Supabase] All 4 tables reset on startup');
 
     // Log row counts for all 4 tables
-    const allTables = [TABLE_MAIN, TABLE_FLAGS, TABLE_FANAN, TABLE_FAM, TABLE_FALSAFA,TABLE_LOGO1];
+    const allTables = [TABLE_MAIN, TABLE_FLAGS, TABLE_FANAN, TABLE_FAM, TABLE_FALSAFA,TABLE_LOGO1,TABLE_LOGOO];
     const counts = await Promise.all(allTables.map(async (table) => {
       const res = await fetch(
         `${SUPABASE_URL}/rest/v1/${table}?select=*&limit=1`,
@@ -61,7 +63,7 @@ export async function resetAllQuestions() {
       console.warn(`[Supabase] Reset failed for ${table}:`, res.status, txt);
     }
   };
-  await Promise.all([reset(TABLE_MAIN), reset(TABLE_FLAGS), reset(TABLE_FANAN), reset(TABLE_FAM), reset(TABLE_FALSAFA), reset(TABLE_LOGO1)]);
+  await Promise.all([reset(TABLE_MAIN), reset(TABLE_FLAGS), reset(TABLE_FANAN), reset(TABLE_FAM), reset(TABLE_FALSAFA), reset(TABLE_LOGO1), reset(TABLE_LOGOO)]);
   console.log('[Supabase] All 6 tables reset successfully');
 }
 
@@ -85,16 +87,17 @@ async function fetchAllRows(table, select = 'category') {
 
 // Fetch distinct categories from ALL 4 tables merged — always fresh, no cache
 export async function fetchCategories() {
-  const [mainRows, flagRows, fananRows, famRows, falsafaRows, logo1Rows] = await Promise.all([
+  const [mainRows, flagRows, fananRows, famRows, falsafaRows, logo1Rows , logooRows] = await Promise.all([
     fetchAllRows(TABLE_MAIN, 'category'),
     fetchAllRows(TABLE_FLAGS, 'category'),
     fetchAllRows(TABLE_FANAN, 'category'),
     fetchAllRows(TABLE_FAM, 'category'),
     fetchAllRows(TABLE_FALSAFA, 'category'),
     fetchAllRows(TABLE_LOGO1, 'category'),
+    fetchAllRows(TABLE_LOGOO, 'category'),
 
   ]);
-  const allRows = [...mainRows, ...flagRows, ...fananRows, ...famRows, ...falsafaRows, ...logo1Rows];
+  const allRows = [...mainRows, ...flagRows, ...fananRows, ...famRows, ...falsafaRows, ...logo1Rows], ...logooRows;
   const unique = [...new Set(allRows.map(r => r.category).filter(Boolean))];
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('Total categories loaded:', unique.length);
@@ -157,7 +160,7 @@ async function resetTable(table) {
 // Fetch question — tries all tables in order, returns first match
 // If a table is exhausted, resets it and retries once
 export async function fetchQuestion(category, points) {
-  const tables = [TABLE_MAIN, TABLE_FLAGS, TABLE_FANAN, TABLE_FAM, TABLE_FALSAFA,TABLE_LOGO1];
+  const tables = [TABLE_MAIN, TABLE_FLAGS, TABLE_FANAN, TABLE_FAM, TABLE_FALSAFA,TABLE_LOGO1,TABLE_LOGOO];
 
   for (const table of tables) {
     console.log(`[fetchQuestion] Trying ${table} for "${category}" ${parseInt(points, 10)}pts`);
