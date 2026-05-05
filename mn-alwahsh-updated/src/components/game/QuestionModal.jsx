@@ -602,7 +602,7 @@ export default function QuestionModal({
                 );
               }
 
-              // ── LANDSCAPE WITH IMAGE: same split layout as portrait ──
+             // ── LANDSCAPE WITH IMAGE: same split layout as portrait ──
               // LEFT: answers stacked | RIGHT: image + question
               if (resolvedHeroUrl && isLandscape) {
                 const optionEntries = Object.entries(question.options);
@@ -614,7 +614,7 @@ export default function QuestionModal({
                       direction: 'rtl', alignItems: 'stretch',
                       overflow: 'hidden',
                     }}>
-                      {/* LEFT: answers stacked */}
+                      {/* LEFT: answers stacked - 50% */}
                       <div style={{
                         flex: 1, display: 'flex', flexDirection: 'column', gap: 5,
                         justifyContent: 'center', overflow: 'hidden',
@@ -657,7 +657,7 @@ export default function QuestionModal({
                         })}
                       </div>
 
-                      {/* RIGHT: image + question — 50% width */}
+                      {/* RIGHT: image + question - 50% */}
                       <div style={{
                         flex: 1, flexShrink: 0,
                         display: 'flex', flexDirection: 'column',
@@ -740,7 +740,6 @@ export default function QuestionModal({
                   </>
                 );
               }
-
               // ── NO IMAGE: standard layout ──
               return (
                 <>
