@@ -262,16 +262,6 @@ body {
   .gb-tier-pair { gap: 1px !important; margin-top: 2px !important; }
   .gb-tier-pair:first-of-type { margin-top: 0 !important; }
 
-  /* Tiles at ~1/3 portrait height */
-  .gb-tile {
-    min-height: 14px !important;
-    padding-top: 1px !important;
-    padding-bottom: 1px !important;
-    font-size: 8px !important;
-    border-radius: 4px !important;
-    border-width: 1px !important;
-    box-shadow: none !important;
-  }
 
   .gb-zoom-controls { padding-top: 1px !important; padding-bottom: 1px !important; gap: 4px !important; }
   .gb-zoom-controls .gb-zoom-slider { width: 50px !important; }
