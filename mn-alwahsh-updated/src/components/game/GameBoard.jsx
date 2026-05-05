@@ -23,38 +23,39 @@ const DISPLAY_VALUES = [200, 200, 400, 400, 600, 600];
 
 function getGlassStyle(points) {
   const baseStyle = {
-    borderRadius: '16px',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
+    borderRadius: '14px',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
     position: 'relative',
     overflow: 'hidden',
-    transition: 'all 0.3s ease',
+    transition: 'all 0.25s ease',
     cursor: 'pointer',
-    fontSize: '20px',
-    fontWeight: 600,
+    fontSize: '22px',
+    fontWeight: 700,
+    letterSpacing: '0.02em',
   };
 
   const styles = {
     200: {
       ...baseStyle,
-      background: 'linear-gradient(135deg, rgba(139,0,0,0.35), rgba(74,0,0,0.55))',
-      border: '1px solid rgba(139,0,0,0.6)',
-      color: '#FFE4E4',
-      boxShadow: '0 4px 16px rgba(139,0,0,0.25), 0 0 8px rgba(204,0,0,0.2)',
+      background: 'linear-gradient(145deg, rgba(80,0,0,0.55) 0%, rgba(40,0,0,0.75) 100%)',
+      border: '1.5px solid rgba(139,0,0,0.55)',
+      color: '#FFD0D0',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,60,60,0.1)',
     },
     400: {
       ...baseStyle,
-      background: 'linear-gradient(135deg, rgba(160,0,0,0.45), rgba(90,0,0,0.65))',
-      border: '1px solid rgba(180,0,0,0.65)',
-      color: '#FFE4E4',
-      boxShadow: '0 4px 16px rgba(180,0,0,0.3), 0 0 10px rgba(204,0,0,0.3)',
+      background: 'linear-gradient(145deg, rgba(120,0,0,0.65) 0%, rgba(60,0,0,0.85) 100%)',
+      border: '1.5px solid rgba(180,0,0,0.65)',
+      color: '#FFE0D0',
+      boxShadow: '0 4px 16px rgba(0,0,0,0.55), 0 0 8px rgba(180,0,0,0.25), inset 0 1px 0 rgba(255,80,80,0.12)',
     },
     600: {
       ...baseStyle,
-      background: 'linear-gradient(135deg, rgba(204,0,0,0.55), rgba(120,0,0,0.75))',
-      border: '1px solid rgba(220,0,0,0.7)',
-      color: '#FFE4E4',
-      boxShadow: '0 4px 16px rgba(204,0,0,0.4), 0 0 14px rgba(255,0,0,0.35)',
+      background: 'linear-gradient(145deg, rgba(180,0,0,0.7) 0%, rgba(90,0,0,0.9) 100%)',
+      border: '2px solid rgba(220,0,0,0.75)',
+      color: '#FFF0D0',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.6), 0 0 15px rgba(220,0,0,0.35), inset 0 1px 0 rgba(255,100,100,0.2)',
     },
   };
 

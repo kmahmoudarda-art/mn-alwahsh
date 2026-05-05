@@ -544,24 +544,93 @@ export default function Game() {
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-background"
+      className="min-h-screen flex flex-col bg-background relative overflow-hidden"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', transition: 'transform 0.2s ease' }}
     >
+      {/* ── Horror atmosphere layers ── */}
+      <style>{`
+        @keyframes bloodDripAnim {
+          0%   { height: 0px; opacity: 1; }
+          75%  { opacity: 0.85; }
+          100% { height: 55px; opacity: 0.5; }
+        }
+        @keyframes dripDrop {
+          0%   { transform: translateY(0) scale(1); opacity: 0.9; }
+          100% { transform: translateY(70px) scale(0.2); opacity: 0; }
+        }
+        @keyframes skullFloat {
+          0%,100% { transform: translateY(0) rotate(-4deg); opacity:0.12; }
+          50%      { transform: translateY(-12px) rotate(4deg); opacity:0.2; }
+        }
+        @keyframes fogPulse {
+          0%,100% { opacity: 0.06; }
+          50%      { opacity: 0.13; }
+        }
+        @keyframes crackleSpark {
+          0%,90%,100% { opacity:0; }
+          92%,98%     { opacity:0.6; }
+        }
+        .blood-drip-line {
+          position: absolute;
+          top: 0;
+          width: 6px;
+          border-radius: 0 0 50% 50%;
+          background: linear-gradient(to bottom, #6B0000, #CC0000, #FF2200);
+          transform-origin: top;
+          animation: bloodDripAnim ease-in infinite;
+        }
+        .blood-drop {
+          position: absolute;
+          width: 8px;
+          height: 10px;
+          border-radius: 50% 50% 60% 60%;
+          background: #CC0000;
+          animation: dripDrop ease-in infinite;
+        }
+      `}</style>
+
+      {/* Blood drip strip across top of game board */}
+      <div className="relative w-full overflow-visible pointer-events-none" style={{ height: 0, zIndex: 10 }}>
+        {[4,9,15,21,26,32,38,44,50,56,62,68,74,80,86,92].map((left, i) => (
+          <div key={i} className="blood-drip-line" style={{
+            left: `${left}%`,
+            height: `${20 + (i % 4) * 14}px`,
+            width: `${5 + (i % 3) * 2}px`,
+            animationDuration: `${3 + i * 0.35}s`,
+            animationDelay: `${i * 0.22}s`,
+          }} />
+        ))}
+      </div>
+
+      {/* Floating skull decorations - far corners */}
+      <div className="fixed pointer-events-none select-none" style={{ left: '2%', top: '30%', fontSize: 48, animation: 'skullFloat 4s ease-in-out infinite', zIndex: 2 }}>💀</div>
+      <div className="fixed pointer-events-none select-none" style={{ right: '2%', top: '40%', fontSize: 36, animation: 'skullFloat 5s ease-in-out infinite 1s', zIndex: 2 }}>💀</div>
+      <div className="fixed pointer-events-none select-none" style={{ left: '1%', bottom: '20%', fontSize: 28, animation: 'skullFloat 6s ease-in-out infinite 2s', zIndex: 2 }}>🩸</div>
+      <div className="fixed pointer-events-none select-none" style={{ right: '1%', bottom: '25%', fontSize: 28, animation: 'skullFloat 4.5s ease-in-out infinite 0.5s', zIndex: 2 }}>🩸</div>
+
+      {/* Fog/mist layer at bottom */}
+      <div className="fixed bottom-0 left-0 right-0 pointer-events-none" style={{
+        height: '25vh',
+        background: 'linear-gradient(to top, rgba(80,0,0,0.25) 0%, transparent 100%)',
+        animation: 'fogPulse 4s ease-in-out infinite',
+        zIndex: 2,
+      }} />
+
       {pulling && (
-        <div
-          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center transition-all"
-          style={{ height: pullProgress, background: 'hsl(var(--primary)/0.15)' }}
-        >
-          <span className="text-primary font-cairo text-sm">
+        <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center transition-all"
+          style={{ height: pullProgress, background: 'rgba(139,0,0,0.2)' }}>
+          <span className="font-cairo text-sm" style={{ color: '#FF6666' }}>
             {pullProgress >= PULL_THRESHOLD ? '↑ أفلت للإعادة' : '↓ اسحب للإعادة'}
           </span>
         </div>
       )}
+
       {showLuckyPopup && <LuckyDoublePopup teamName={luckyCell ? teams[luckyCell.losingTeam]?.name : ''} />}
+
       <ScoreBar team1={teams[1]} team2={teams[2]} currentTeam={currentTeam} onAdjust={handleAdjustScore} onBack={handlePlayAgain} />
+
       <SpecialCards
         team1={teams[1]}
         team2={teams[2]}
@@ -573,32 +642,36 @@ export default function Game() {
       />
 
       {/* Zoom controls */}
-      <div className="flex items-center justify-center gap-3 py-2" style={{ transform: `scale(${1 / zoom})` }}>
+      <div
+        className="flex items-center justify-center gap-3 py-2"
+        style={{ transform: `scale(${1 / zoom})`, position: 'relative', zIndex: 5 }}
+      >
         <button
           onClick={() => setZoom(z => Math.max(0.5, +(z - 0.1).toFixed(1)))}
-          className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-foreground hover:bg-secondary/70 transition-colors"
+          className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+          style={{ background: 'rgba(139,0,0,0.3)', color: '#FF6666', border: '1px solid #4a0000' }}
         >
           <ZoomOut className="w-4 h-4" />
         </button>
         <input
-          type="range"
-          min="0.5"
-          max="1.5"
-          step="0.05"
-          value={zoom}
+          type="range" min="0.5" max="1.5" step="0.05" value={zoom}
           onChange={(e) => setZoom(parseFloat(e.target.value))}
           className="w-32 accent-primary"
         />
         <button
           onClick={() => setZoom(z => Math.min(1.5, +(z + 0.1).toFixed(1)))}
-          className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-foreground hover:bg-secondary/70 transition-colors"
+          className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+          style={{ background: 'rgba(139,0,0,0.3)', color: '#FF6666', border: '1px solid #4a0000' }}
         >
           <ZoomIn className="w-4 h-4" />
         </button>
-        <span className="text-xs text-muted-foreground font-cairo w-10 text-center">{Math.round(zoom * 100)}%</span>
+        <span className="text-xs font-cairo w-10 text-center" style={{ color: '#FF6666' }}>{Math.round(zoom * 100)}%</span>
       </div>
 
-      <div className="flex-1 py-4 overflow-auto">
+      <div
+        className="flex-1 py-4 overflow-auto relative"
+        style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', transition: 'transform 0.2s ease', zIndex: 5 }}
+      >
         <GameBoard
           categories={categories}
           answeredTiles={answeredTiles}
