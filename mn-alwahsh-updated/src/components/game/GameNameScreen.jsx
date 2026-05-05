@@ -60,40 +60,24 @@ export default function GameNameScreen({ onEnter }) {
 
       <AnimatePresence>{showManual && <InstructionManual onClose={() => setShowManual(false)} />}</AnimatePresence>
 
-      {/* ── Static fallback background (shows while video loads) ── */}
+      {/* ── Full-screen background image ── */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(ellipse 110% 70% at 50% 30%, #2a0000 0%, #0d0000 60%, #050000 100%)',
-        zIndex: 0,
-      }} />
-      <div className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: `url('https://media.base44.com/images/public/69dca0dfc53463f8eae196fc/30ca55b32_image.png')`,
-        backgroundSize: 'cover', backgroundPosition: 'center 30%',
-        opacity: 0.22, filter: 'sepia(1) saturate(4) hue-rotate(320deg) contrast(1.3)',
+        backgroundImage: 'url(/bg-image.jpeg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
         zIndex: 0,
       }} />
 
-      {/* ── Looping video background ── */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 w-full h-full pointer-events-none"
-        style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 1 }}
-      >
-        <source src="/bg-video.mp4" type="video/mp4" />
-      </video>
-
-      {/* Subtle dark overlay so text stays readable over the video */}
+      {/* Dark overlay so text stays readable */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'rgba(0,0,0,0.32)',
-        zIndex: 2,
+        background: 'rgba(0,0,0,0.45)',
+        zIndex: 1,
       }} />
 
       {/* Edge vignette */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%)',
-        zIndex: 2,
+        background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.65) 100%)',
+        zIndex: 1,
       }} />
 
       {/* Floating skulls */}

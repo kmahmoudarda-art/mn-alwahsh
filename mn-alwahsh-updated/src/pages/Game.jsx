@@ -544,31 +544,44 @@ export default function Game() {
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-background relative overflow-hidden"
+      className="min-h-screen flex flex-col relative overflow-hidden"
+      style={{ background: '#050000' }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* ── Subtle horror atmosphere (no blood) ── */}
+      {/* ── Full-screen background image ── */}
+      <div className="fixed inset-0 pointer-events-none" style={{
+        backgroundImage: 'url(/bg-image.jpeg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        zIndex: 0,
+      }} />
+      <div className="fixed inset-0 pointer-events-none" style={{
+        background: 'rgba(0,0,0,0.55)',
+        zIndex: 0,
+      }} />
+
+      {/* ── Subtle horror atmosphere ── */}
       <style>{`
         @keyframes skullFloat {
-          0%,100% { transform: translateY(0) rotate(-4deg); opacity:0.1; }
-          50%      { transform: translateY(-10px) rotate(4deg); opacity:0.17; }
+          0%,100% { transform: translateY(0) rotate(-4deg); opacity:0.18; }
+          50%      { transform: translateY(-10px) rotate(4deg); opacity:0.28; }
         }
         @keyframes fogPulse {
-          0%,100% { opacity: 0.08; }
-          50%      { opacity: 0.15; }
+          0%,100% { opacity: 0.12; }
+          50%      { opacity: 0.22; }
         }
       `}</style>
 
-      {/* Floating skull decorations - far corners, very subtle */}
+      {/* Floating skull decorations */}
       <div className="fixed pointer-events-none select-none" style={{ left: '1.5%', top: '28%', fontSize: 42, animation: 'skullFloat 5s ease-in-out infinite', zIndex: 2 }}>💀</div>
       <div className="fixed pointer-events-none select-none" style={{ right: '1.5%', top: '38%', fontSize: 34, animation: 'skullFloat 6s ease-in-out infinite 1.2s', zIndex: 2 }}>💀</div>
 
       {/* Dark bottom fog */}
       <div className="fixed bottom-0 left-0 right-0 pointer-events-none" style={{
         height: '20vh',
-        background: 'linear-gradient(to top, rgba(60,0,0,0.2) 0%, transparent 100%)',
+        background: 'linear-gradient(to top, rgba(60,0,0,0.25) 0%, transparent 100%)',
         animation: 'fogPulse 5s ease-in-out infinite',
         zIndex: 2,
       }} />
