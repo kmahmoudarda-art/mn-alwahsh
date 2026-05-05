@@ -140,7 +140,7 @@ export default function GameNameScreen({ onEnter }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
         className="w-full max-w-md relative"
-        style={{ zIndex: 10 }}
+        style={{ zIndex: 10, marginTop: '-8vh' }}
       >
         {/* Title */}
         <div className="text-center mb-2">
