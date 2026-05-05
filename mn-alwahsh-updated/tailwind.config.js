@@ -8,6 +8,7 @@ module.exports = {
                         cairo: ['var(--font-cairo)'],
                         tajawal: ['var(--font-tajawal)'],
                         rakkas: ['var(--font-rakkas)'],
+                        mirza: ['var(--font-mirza)'],
                 },
                 borderRadius: {
                         lg: 'var(--radius)',

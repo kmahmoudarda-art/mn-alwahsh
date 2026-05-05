@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&family=Rakkas&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&family=Rakkas&family=Mirza:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -34,6 +34,7 @@
     --font-cairo: 'Cairo', sans-serif;
     --font-tajawal: 'Tajawal', sans-serif;
     --font-rakkas: 'Rakkas', cursive;
+    --font-mirza: 'Mirza', cursive;
     --sidebar-background: 0 100% 3%;
     --sidebar-foreground: 0 100% 95%;
     --sidebar-primary: 0 100% 40%;
