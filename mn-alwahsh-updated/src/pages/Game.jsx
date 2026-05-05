@@ -184,6 +184,13 @@ export default function Game() {
     });
   }, [gameName, gamePhase, categories, teams, currentTeam, answeredTiles, teamLifelines, usedLucky, usedQuickTimer]);
 
+  // Clear saved session when game is finished (game over — no resume needed)
+  useEffect(() => {
+    if (gamePhase === 'finished' && gameName) {
+      clearSession(gameName);
+    }
+  }, [gamePhase, gameName]);
+
   // Pre-generate all questions silently in background
   const startPregeneration = useCallback((allCategories) => {
     setReadyTiles(new Set());
@@ -469,6 +476,11 @@ export default function Game() {
     setModalPhase('lifeline-before');
   }, [answered, currentTile, stopTimer]);
 
+  // Exit without ending — game stays saved, player can resume by name
+  const handleExit = useCallback(() => {
+    setGameName(null);
+  }, []);
+
   const handlePlayAgain = useCallback(() => {
     resetQuestionCache();
     usedAnswersRef.current = {};
@@ -668,7 +680,7 @@ export default function Game() {
 
       {showLuckyPopup && <LuckyDoublePopup teamName={luckyCell ? teams[luckyCell.losingTeam]?.name : ''} />}
 
-      <ScoreBar team1={teams[1]} team2={teams[2]} currentTeam={currentTeam} onAdjust={handleAdjustScore} onBack={handlePlayAgain} modalOpen={modalOpen} />
+      <ScoreBar team1={teams[1]} team2={teams[2]} currentTeam={currentTeam} onAdjust={handleAdjustScore} onBack={handleExit} modalOpen={modalOpen} />
 
       <SpecialCards
         team1={teams[1]}

@@ -16,11 +16,16 @@ const BASE_HEADERS = {
   Accept: 'application/json',
 };
 
-// On startup: clear ALL local/session storage to bust any caches
+// On startup: clear only question/session caches — preserve game saves (mn_alwahsh_v3_* keys)
 try {
-  localStorage.clear();
+  const GAME_SAVE_PREFIX = 'mn_alwahsh_v3_';
+  const keysToRemove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && !k.startsWith(GAME_SAVE_PREFIX)) keysToRemove.push(k);
+  }
+  keysToRemove.forEach(k => localStorage.removeItem(k));
   sessionStorage.clear();
-  console.log('[Supabase] Cleared localStorage and sessionStorage');
 } catch (e) { /* ignore */ }
 
 // On startup: reset all tables, log row counts per table
