@@ -232,8 +232,9 @@
 .animate-monster-pulse  { animation: monsterPulse 1.5s ease-in-out infinite; }
 .animate-horror-pulse   { animation: horrorPulse 1.5s ease-in-out infinite; }
 
-body {
-  overscroll-behavior-y: contain;
+html, body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
 }
 
 /* ── Landscape phone: compact game board ── */
