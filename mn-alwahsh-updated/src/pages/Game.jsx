@@ -611,8 +611,8 @@ export default function Game() {
           50%      { opacity: 0.22; }
         }
         @keyframes teamGlowPulse {
-          0%,100% { opacity: 0.75; }
-          50%      { opacity: 1; }
+          0%,100% { opacity: 0.85; transform: scaleY(1); }
+          50%      { opacity: 1; transform: scaleY(1.04); }
         }
       `}</style>
 
@@ -687,20 +687,38 @@ export default function Game() {
       <ScoreBar team1={teams[1]} team2={teams[2]} currentTeam={currentTeam} onAdjust={handleAdjustScore} onBack={handleExit} modalOpen={modalOpen} />
 
       {/* ── Active-team glow beam under score bar ── */}
+      {/* Outer wide bloom */}
       <div
-        key={currentTeam}
+        key={`glow-outer-${currentTeam}`}
         className="fixed pointer-events-none"
         style={{
           top: 0,
           right: currentTeam === 1 ? 0 : 'auto',
           left: currentTeam === 2 ? 0 : 'auto',
-          width: '52%',
-          height: 320,
+          width: '70%',
+          height: 420,
           zIndex: 4,
           animation: 'teamGlowPulse 2s ease-in-out infinite',
           background: currentTeam === 1
-            ? 'radial-gradient(ellipse 80% 100% at 90% 0%, rgba(204,0,0,0.55) 0%, rgba(180,0,0,0.25) 40%, transparent 75%)'
-            : 'radial-gradient(ellipse 80% 100% at 10% 0%, rgba(30,80,220,0.55) 0%, rgba(20,60,200,0.25) 40%, transparent 75%)',
+            ? 'radial-gradient(ellipse 90% 100% at 95% 0%, rgba(220,0,0,0.7) 0%, rgba(180,0,0,0.35) 35%, rgba(120,0,0,0.12) 60%, transparent 80%)'
+            : 'radial-gradient(ellipse 90% 100% at 5% 0%, rgba(30,100,255,0.7) 0%, rgba(20,70,220,0.35) 35%, rgba(10,40,150,0.12) 60%, transparent 80%)',
+        }}
+      />
+      {/* Inner tight bright core */}
+      <div
+        key={`glow-inner-${currentTeam}`}
+        className="fixed pointer-events-none"
+        style={{
+          top: 0,
+          right: currentTeam === 1 ? 0 : 'auto',
+          left: currentTeam === 2 ? 0 : 'auto',
+          width: '40%',
+          height: 280,
+          zIndex: 5,
+          animation: 'teamGlowPulse 2s ease-in-out infinite 0.3s',
+          background: currentTeam === 1
+            ? 'radial-gradient(ellipse 70% 80% at 95% 0%, rgba(255,30,30,0.9) 0%, rgba(220,0,0,0.5) 25%, rgba(160,0,0,0.18) 55%, transparent 75%)'
+            : 'radial-gradient(ellipse 70% 80% at 5% 0%, rgba(60,130,255,0.9) 0%, rgba(30,90,255,0.5) 25%, rgba(15,55,200,0.18) 55%, transparent 75%)',
         }}
       />
 
