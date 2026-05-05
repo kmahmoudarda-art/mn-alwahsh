@@ -137,30 +137,41 @@ function TeamScore({ teamNum, name, score, isActive, scoreKey, reverse, onAdjust
     }, 2800);
   }, [modalOpen]);
 
-  // Portals render directly in document.body — unaffected by any ancestor transforms
+  // Score blast: appears on the team's side of the screen, not centered
+  // team 1 (isRed) is on the right; team 2 is on the left
   const scoreBlastPortal = blastScore !== null ? createPortal(
     <AnimatePresence>
       <motion.div
         key="score-blast"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        exit={{ opacity: 0, transition: { duration: 0.3 } }}
+        exit={{ opacity: 0, transition: { duration: 0.25 } }}
         style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'rgba(0,0,0,0.8)', pointerEvents: 'none',
+          position: 'fixed',
+          top: 0, bottom: 0,
+          ...(isRed
+            ? { right: 0, left: '30%' }
+            : { left: 0, right: '30%' }),
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: isRed
+            ? 'radial-gradient(ellipse at center, rgba(139,0,0,0.55) 0%, transparent 70%)'
+            : 'radial-gradient(ellipse at center, rgba(17,85,204,0.55) 0%, transparent 70%)',
+          pointerEvents: 'none',
         }}
       >
         <motion.span
-          initial={{ scale: 0.2, opacity: 0 }}
-          animate={{ scale: [0.2, 1.4, 1.1], opacity: [0, 1, 1] }}
-          exit={{ scale: 1.8, opacity: 0 }}
-          transition={{ duration: 0.6, times: [0, 0.5, 1] }}
+          initial={{ scale: 0.1, opacity: 0, y: 40 }}
+          animate={{ scale: [0.1, 1.5, 1.2], opacity: [0, 1, 1], y: [40, 0, 0] }}
+          exit={{ scale: 2, opacity: 0, y: -30 }}
+          transition={{ duration: 0.65, times: [0, 0.5, 1] }}
           style={{
             fontFamily: 'var(--font-cairo)', fontWeight: 900,
-            fontSize: 'clamp(80px, 22vw, 240px)',
+            fontSize: 'clamp(72px, 18vw, 200px)',
             color: '#ffffff',
-            textShadow: `0 0 60px ${C.primary}, 0 0 120px ${C.bright}`,
+            textShadow: `0 0 30px ${C.primary}, 0 0 80px ${C.bright}, 0 0 120px ${C.primary}`,
             lineHeight: 1,
           }}
         >
