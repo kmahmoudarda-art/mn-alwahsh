@@ -7,7 +7,7 @@ const TABLE_FANAN = 'Fanan';
 const TABLE_FAM = 'Fam';
 const TABLE_FALSAFA = 'falsafa';
 const TABLE_LOGO1 = 'logo1';
-const TABLE_LOGO1 = 'logoo';
+const TABLE_LOGOO = 'logoo';
 
 
 const BASE_HEADERS = {
@@ -64,7 +64,7 @@ export async function resetAllQuestions() {
     }
   };
   await Promise.all([reset(TABLE_MAIN), reset(TABLE_FLAGS), reset(TABLE_FANAN), reset(TABLE_FAM), reset(TABLE_FALSAFA), reset(TABLE_LOGO1), reset(TABLE_LOGOO)]);
-  console.log('[Supabase] All 6 tables reset successfully');
+  console.log('[Supabase] All 7 tables reset successfully');
 }
 
 // Fetch all rows from a single table with pagination
@@ -97,7 +97,7 @@ export async function fetchCategories() {
     fetchAllRows(TABLE_LOGOO, 'category'),
 
   ]);
-  const allRows = [...mainRows, ...flagRows, ...fananRows, ...famRows, ...falsafaRows, ...logo1Rows], ...logooRows;
+  const allRows = [...mainRows, ...flagRows, ...fananRows, ...famRows, ...falsafaRows, ...logo1Rows, ...logooRows];
   const unique = [...new Set(allRows.map(r => r.category).filter(Boolean))];
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('Total categories loaded:', unique.length);
