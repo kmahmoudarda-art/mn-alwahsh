@@ -509,39 +509,24 @@ export default function Game() {
   // Zoom state
   const [zoom, setZoom] = useState(0.9);
 
-  // Pull-to-refresh
-  const pullStartY = useRef(null);
-  const [pulling, setPulling] = useState(false);
-  const [pullProgress, setPullProgress] = useState(0);
-  const PULL_THRESHOLD = 80;
-
-  const handleTouchStart = useCallback((e) => {
-    // Block swipe-back gesture (horizontal swipe from edge)
-    const touch = e.touches[0];
-    if (touch.clientX < 30 || touch.clientX > window.innerWidth - 30) {
-      e.preventDefault();
-    }
-    if (window.scrollY === 0) pullStartY.current = touch.clientY;
+  // Block pull-to-refresh and overscroll on touch devices.
+  // Must use a non-passive listener — React's synthetic onTouchMove is passive
+  // and cannot call preventDefault() to cancel browser-native PTR gestures.
+  useEffect(() => {
+    let startY = 0;
+    const onTouchStart = (e) => { startY = e.touches[0].clientY; };
+    const onTouchMove = (e) => {
+      const delta = e.touches[0].clientY - startY;
+      // Block downward drag at the top of the page (pull-to-refresh)
+      if (delta > 0 && window.scrollY === 0) e.preventDefault();
+    };
+    document.addEventListener('touchstart', onTouchStart, { passive: true });
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
+    return () => {
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchmove', onTouchMove);
+    };
   }, []);
-
-  const handleTouchMove = useCallback((e) => {
-    if (pullStartY.current === null) return;
-    const delta = e.touches[0].clientY - pullStartY.current;
-    if (delta > 0) {
-      e.preventDefault();
-      setPulling(true);
-      setPullProgress(Math.min(delta, PULL_THRESHOLD));
-    }
-  }, []);
-
-  const handleTouchEnd = useCallback((e) => {
-    if (pullProgress >= PULL_THRESHOLD) {
-      handlePlayAgain();
-    }
-    pullStartY.current = null;
-    setPulling(false);
-    setPullProgress(0);
-  }, [pullProgress, handlePlayAgain]);
 
   const handleEnterGameName = useCallback(async (name) => {
     setGameName(name);
@@ -594,9 +579,6 @@ export default function Game() {
     <div
       className="min-h-screen flex flex-col relative overflow-hidden"
       style={{ background: '#050000' }}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
     >
       {/* ── Full-screen horror image background ── */}
       <div className="fixed inset-0 pointer-events-none" style={{ background: '#050000', zIndex: 0 }} />
@@ -686,15 +668,6 @@ export default function Game() {
         animation: 'fogPulse 5s ease-in-out infinite',
         zIndex: 2,
       }} />
-
-      {pulling && (
-        <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center transition-all"
-          style={{ height: pullProgress, background: 'rgba(139,0,0,0.2)' }}>
-          <span className="font-cairo text-sm" style={{ color: '#FF6666' }}>
-            {pullProgress >= PULL_THRESHOLD ? '↑ أفلت للإعادة' : '↓ اسحب للإعادة'}
-          </span>
-        </div>
-      )}
 
       {showLuckyPopup && <LuckyDoublePopup teamName={luckyCell ? teams[luckyCell.losingTeam]?.name : ''} />}
 
