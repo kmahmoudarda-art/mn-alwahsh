@@ -555,7 +555,7 @@ export default function Game() {
       <video autoPlay loop muted playsInline
         className="fixed inset-0 w-full h-full pointer-events-none"
         style={{ objectFit: 'cover', objectPosition: 'center', zIndex: 0 }}>
-        <source src="/bg-scorebar.mp4" type="video/mp4" />
+        <source src="/bg-new.mp4" type="video/mp4" />
       </video>
       <div className="fixed inset-0 pointer-events-none" style={{
         background: 'rgba(0,0,0,0.5)',
