@@ -678,7 +678,7 @@ export default function Game() {
 
       {showLuckyPopup && <LuckyDoublePopup teamName={luckyCell ? teams[luckyCell.losingTeam]?.name : ''} />}
 
-      <ScoreBar team1={teams[1]} team2={teams[2]} currentTeam={currentTeam} onAdjust={handleAdjustScore} onBack={handlePlayAgain} />
+      <ScoreBar team1={teams[1]} team2={teams[2]} currentTeam={currentTeam} onAdjust={handleAdjustScore} onBack={handlePlayAgain} modalOpen={modalOpen} />
 
       <SpecialCards
         team1={teams[1]}

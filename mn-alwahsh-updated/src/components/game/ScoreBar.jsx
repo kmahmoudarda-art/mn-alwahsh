@@ -15,7 +15,7 @@ function getBadge(score) {
   return null;
 }
 
-export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }) {
+export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack, modalOpen }) {
 
   return (
     <>
@@ -58,7 +58,7 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
         }}
       >
         <div className="relative z-10 flex items-center justify-between gap-3 w-full">
-          <TeamScore name={team1.name} score={team1.score} isActive={currentTeam === 1} scoreKey={team1.scoreKey} onAdjust={d => onAdjust(1, d)} align="right" />
+          <TeamScore name={team1.name} score={team1.score} isActive={currentTeam === 1} scoreKey={team1.scoreKey} onAdjust={d => onAdjust(1, d)} align="right" modalOpen={modalOpen} />
 
           {/* Centre */}
           <div className="flex flex-col items-center shrink-0 gap-0.5">
@@ -75,7 +75,7 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
             </div>
           </div>
 
-          <TeamScore name={team2.name} score={team2.score} isActive={currentTeam === 2} scoreKey={team2.scoreKey} onAdjust={d => onAdjust(2, d)} align="left" reverse />
+          <TeamScore name={team2.name} score={team2.score} isActive={currentTeam === 2} scoreKey={team2.scoreKey} onAdjust={d => onAdjust(2, d)} align="left" reverse modalOpen={modalOpen} />
         </div>
       </div>
 
@@ -83,38 +83,50 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
   );
 }
 
-function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }) {
+function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align, modalOpen }) {
   const [shaking, setShaking] = useState(false);
   const [blastScore, setBlastScore] = useState(null);
   const [blastBadge, setBlastBadge] = useState(null);
   const prevScoreRef = useRef(score);
+  const pendingShakeRef = useRef(null); // stores the badge to blast when modal closes
 
   const badge = getBadge(score);
 
+  // Detect milestone hit — store pending instead of firing immediately
   useEffect(() => {
     const prev = prevScoreRef.current;
     const hitMilestone = MILESTONES.some(m => prev < m && score >= m);
     if (hitMilestone) {
-      const newBadge = getBadge(score);
-      setShaking(true);
-      setBlastScore(score);
-      document.documentElement.classList.add('screen-shake');
-
-      // After 800ms: hide score, show badge text
-      setTimeout(() => {
-        setBlastScore(null);
-        if (newBadge) setBlastBadge(newBadge);
-      }, 800);
-
-      // After 2800ms: hide badge (badge dances for 2 full seconds)
-      setTimeout(() => {
-        setBlastBadge(null);
-        document.documentElement.classList.remove('screen-shake');
-        setShaking(false);
-      }, 2800);
+      pendingShakeRef.current = { score, badge: getBadge(score) };
     }
     prevScoreRef.current = score;
   }, [score]);
+
+  // Fire the shake only once the modal has closed
+  useEffect(() => {
+    if (modalOpen) return; // modal still open — wait
+    if (!pendingShakeRef.current) return; // nothing pending
+
+    const { score: blastScoreVal, badge: newBadge } = pendingShakeRef.current;
+    pendingShakeRef.current = null;
+
+    setShaking(true);
+    setBlastScore(blastScoreVal);
+    document.documentElement.classList.add('screen-shake');
+
+    // After 800ms: hide score, show badge text
+    setTimeout(() => {
+      setBlastScore(null);
+      if (newBadge) setBlastBadge(newBadge);
+    }, 800);
+
+    // After 2800ms: hide badge (badge dances for 2 full seconds)
+    setTimeout(() => {
+      setBlastBadge(null);
+      document.documentElement.classList.remove('screen-shake');
+      setShaking(false);
+    }, 2800);
+  }, [modalOpen]);
 
   return (
     <>
