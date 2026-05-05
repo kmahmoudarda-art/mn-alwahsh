@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Plus, Minus, X } from 'lucide-react';
 import PayPalDonateButton from './PayPalDonateButton';
@@ -121,7 +122,8 @@ function TeamScore({ teamNum, name, score, isActive, scoreKey, reverse, onAdjust
 
     setShaking(true);
     setBlastScore(blastScoreVal);
-    document.documentElement.classList.add('screen-shake');
+    // Apply shake to body instead of html to avoid breaking fixed-position children
+    document.body.classList.add('screen-shake');
 
     setTimeout(() => {
       setBlastScore(null);
@@ -130,85 +132,89 @@ function TeamScore({ teamNum, name, score, isActive, scoreKey, reverse, onAdjust
 
     setTimeout(() => {
       setBlastBadge(null);
-      document.documentElement.classList.remove('screen-shake');
+      document.body.classList.remove('screen-shake');
       setShaking(false);
     }, 2800);
   }, [modalOpen]);
 
+  // Portals render directly in document.body — unaffected by any ancestor transforms
+  const scoreBlastPortal = blastScore !== null ? createPortal(
+    <AnimatePresence>
+      <motion.div
+        key="score-blast"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0, transition: { duration: 0.3 } }}
+        style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.8)', pointerEvents: 'none',
+        }}
+      >
+        <motion.span
+          initial={{ scale: 0.2, opacity: 0 }}
+          animate={{ scale: [0.2, 1.4, 1.1], opacity: [0, 1, 1] }}
+          exit={{ scale: 1.8, opacity: 0 }}
+          transition={{ duration: 0.6, times: [0, 0.5, 1] }}
+          style={{
+            fontFamily: 'var(--font-cairo)', fontWeight: 900,
+            fontSize: 'clamp(80px, 22vw, 240px)',
+            color: '#ffffff',
+            textShadow: `0 0 60px ${C.primary}, 0 0 120px ${C.bright}`,
+            lineHeight: 1,
+          }}
+        >
+          {blastScore}
+        </motion.span>
+      </motion.div>
+    </AnimatePresence>,
+    document.body
+  ) : null;
+
+  const badgeBlastPortal = blastBadge !== null ? createPortal(
+    <AnimatePresence>
+      <motion.div
+        key="badge-blast"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0, transition: { duration: 0.4 } }}
+        style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.85)', pointerEvents: 'none',
+        }}
+      >
+        <motion.span
+          initial={{ scale: 0.1, opacity: 0, rotate: -20 }}
+          animate={{
+            scale:  [0.1, 1.5, 1.1, 1.25, 0.95, 1.15, 1.0, 1.1, 1.0],
+            opacity:[0,   1,   1,   1,    1,    1,    1,   1,   1  ],
+            rotate: [-20, 8,   -5,  6,    -4,   5,    -3,  3,   0  ],
+            y:      [0,   0,  -25,  0,   -18,   0,   -12,  0,   0  ],
+          }}
+          exit={{ scale: 2.2, opacity: 0, transition: { duration: 0.35 } }}
+          transition={{ duration: 2, times: [0, 0.12, 0.28, 0.42, 0.56, 0.68, 0.80, 0.90, 1.0], ease: 'easeInOut' }}
+          style={{
+            fontFamily: 'var(--font-cairo)', fontWeight: 900,
+            fontSize: 'clamp(56px, 14vw, 140px)',
+            color: blastBadge.color,
+            textShadow: `0 0 40px ${blastBadge.glow}, 0 0 80px ${blastBadge.glow}88, 0 0 120px ${blastBadge.glow}44`,
+            lineHeight: 1,
+            whiteSpace: 'nowrap',
+            display: 'inline-block',
+          }}
+        >
+          {blastBadge.text}
+        </motion.span>
+      </motion.div>
+    </AnimatePresence>,
+    document.body
+  ) : null;
+
   return (
     <>
-      {/* Score number blast */}
-      <AnimatePresence>
-        {blastScore !== null && (
-          <motion.div
-            key="score-blast"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.3 } }}
-            style={{
-              position: 'fixed', inset: 0, zIndex: 9999,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'rgba(0,0,0,0.8)', pointerEvents: 'none',
-            }}
-          >
-            <motion.span
-              initial={{ scale: 0.2, opacity: 0 }}
-              animate={{ scale: [0.2, 1.4, 1.1], opacity: [0, 1, 1] }}
-              exit={{ scale: 1.8, opacity: 0 }}
-              transition={{ duration: 0.6, times: [0, 0.5, 1] }}
-              style={{
-                fontFamily: 'var(--font-cairo)', fontWeight: 900,
-                fontSize: 'clamp(120px, 30vw, 280px)',
-                color: '#ffffff',
-                textShadow: `0 0 60px ${C.primary}, 0 0 120px ${C.bright}`,
-                lineHeight: 1,
-              }}
-            >
-              {blastScore}
-            </motion.span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Badge text blast */}
-      <AnimatePresence>
-        {blastBadge !== null && (
-          <motion.div
-            key="badge-blast"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.4 } }}
-            style={{
-              position: 'fixed', inset: 0, zIndex: 9999,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'rgba(0,0,0,0.85)', pointerEvents: 'none',
-            }}
-          >
-            <motion.span
-              initial={{ scale: 0.1, opacity: 0, rotate: -20 }}
-              animate={{
-                scale:  [0.1, 1.5, 1.1, 1.25, 0.95, 1.15, 1.0, 1.1, 1.0],
-                opacity:[0,   1,   1,   1,    1,    1,    1,   1,   1  ],
-                rotate: [-20, 8,   -5,  6,    -4,   5,    -3,  3,   0  ],
-                y:      [0,   0,  -25,  0,   -18,   0,   -12,  0,   0  ],
-              }}
-              exit={{ scale: 2.2, opacity: 0, transition: { duration: 0.35 } }}
-              transition={{ duration: 2, times: [0, 0.12, 0.28, 0.42, 0.56, 0.68, 0.80, 0.90, 1.0], ease: 'easeInOut' }}
-              style={{
-                fontFamily: 'var(--font-cairo)', fontWeight: 900,
-                fontSize: 'clamp(64px, 16vw, 160px)',
-                color: blastBadge.color,
-                textShadow: `0 0 40px ${blastBadge.glow}, 0 0 80px ${blastBadge.glow}88, 0 0 120px ${blastBadge.glow}44`,
-                lineHeight: 1,
-                whiteSpace: 'nowrap',
-                display: 'inline-block',
-              }}
-            >
-              {blastBadge.text}
-            </motion.span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {scoreBlastPortal}
+      {badgeBlastPortal}
 
       {/* Score card */}
       <motion.div

@@ -6,6 +6,87 @@ import { Input } from '@/components/ui/input';
 import InstructionManual from './InstructionManual';
 import ScreenMirrorButton from './ScreenMirrorButton';
 
+const checkIsIOS = () =>
+  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+const checkIsStandalone = () =>
+  window.matchMedia('(display-mode: standalone)').matches ||
+  window.navigator.standalone === true;
+
+function IOSInstallModal({ onClose }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 9000,
+        background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(10px)',
+        display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+        padding: '0 0 24px',
+      }}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ y: 80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 80, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: 'rgba(8,0,0,0.98)',
+          border: '1.5px solid rgba(204,0,0,0.45)',
+          borderRadius: 20,
+          padding: '24px 20px',
+          width: '100%',
+          maxWidth: 420,
+          boxShadow: '0 0 50px rgba(204,0,0,0.3)',
+        }}
+        dir="rtl"
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <span style={{ fontSize: 17, fontWeight: 900, color: '#FFE4E4', fontFamily: 'var(--font-cairo)' }}>
+            📲 ثبّت التطبيق على iPhone
+          </span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,100,100,0.6)' }}>
+            <X style={{ width: 20, height: 20 }} />
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {[
+            { num: '١', icon: '⬆️', text: 'اضغط على زر المشاركة في Safari', sub: 'الزر في أسفل الشاشة (مربع بسهم للأعلى)' },
+            { num: '٢', icon: '➕', text: 'اختر "إضافة إلى الشاشة الرئيسية"', sub: '"Add to Home Screen"' },
+            { num: '٣', icon: '✅', text: 'اضغط "إضافة" في الأعلى', sub: 'التطبيق سيظهر على شاشتك الرئيسية' },
+          ].map(s => (
+            <div key={s.num} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+              <span style={{
+                background: '#CC0000', color: '#fff', borderRadius: 99,
+                width: 26, height: 26, flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 13, fontWeight: 900, fontFamily: 'var(--font-cairo)',
+              }}>{s.num}</span>
+              <div>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#FFE4E4', fontFamily: 'var(--font-cairo)' }}>
+                  {s.icon} {s.text}
+                </p>
+                <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,150,150,0.7)', fontFamily: 'var(--font-cairo)' }}>
+                  {s.sub}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <p style={{ textAlign: 'center', marginTop: 18, fontSize: 11, color: 'rgba(255,100,100,0.4)', fontFamily: 'var(--font-cairo)' }}>
+          يعمل فقط من متصفح Safari على iPhone
+        </p>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function InstallBanner({ prompt, onDismiss }) {
   return (
     <motion.div
@@ -57,6 +138,10 @@ export default function GameNameScreen({ onEnter }) {
   const [showManual, setShowManual] = useState(false);
   const [installPrompt, setInstallPrompt] = useState(null);
   const [showInstall, setShowInstall] = useState(false);
+  const [showIOSModal, setShowIOSModal] = useState(false);
+
+  const isIOS = checkIsIOS();
+  const isStandalone = checkIsStandalone();
 
   useEffect(() => {
     const handler = (e) => {
@@ -67,6 +152,15 @@ export default function GameNameScreen({ onEnter }) {
     window.addEventListener('beforeinstallprompt', handler);
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
+
+  const handleInstallClick = () => {
+    if (isIOS) {
+      setShowIOSModal(true);
+    } else if (installPrompt) {
+      installPrompt.prompt();
+      setShowInstall(false);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -129,6 +223,7 @@ export default function GameNameScreen({ onEnter }) {
       `}</style>
 
       <AnimatePresence>{showManual && <InstructionManual onClose={() => setShowManual(false)} />}</AnimatePresence>
+      <AnimatePresence>{showIOSModal && <IOSInstallModal onClose={() => setShowIOSModal(false)} />}</AnimatePresence>
       <ScreenMirrorButton />
 
       <AnimatePresence>
@@ -222,16 +317,18 @@ export default function GameNameScreen({ onEnter }) {
               <BookOpen className="w-4 h-4" style={{ color: '#CC0000' }} />
               كيف تلعب؟
             </button>
-            <button
-              onClick={() => installPrompt ? (installPrompt.prompt(), setShowInstall(false)) : setShowInstall(v => !v)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl font-cairo font-bold text-sm transition-all"
-              style={{ background: 'rgba(10,0,0,0.7)', border: '1px solid rgba(139,0,0,0.7)', color: '#FFE4E4', backdropFilter: 'blur(8px)' }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,0,0,0.3)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(10,0,0,0.7)'; }}
-            >
-              <Download className="w-4 h-4" style={{ color: '#CC0000' }} />
-              تثبيت
-            </button>
+            {!isStandalone && (
+              <button
+                onClick={handleInstallClick}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl font-cairo font-bold text-sm transition-all"
+                style={{ background: 'rgba(10,0,0,0.7)', border: '1px solid rgba(139,0,0,0.7)', color: '#FFE4E4', backdropFilter: 'blur(8px)' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(139,0,0,0.3)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(10,0,0,0.7)'; }}
+              >
+                <Download className="w-4 h-4" style={{ color: '#CC0000' }} />
+                تثبيت
+              </button>
+            )}
           </div>
 
           <p className="gns-subtitle font-tajawal font-bold" style={{

@@ -1,73 +1,120 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Tv2, X, Cast, Wifi } from 'lucide-react';
+import { Tv2, X, Wifi } from 'lucide-react';
+
+const isIOS = () =>
+  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+const isAndroid = () => /Android/i.test(navigator.userAgent);
 
 function MirrorModal({ onClose }) {
-  const [casting, setCasting] = useState(false);
-  const [castAvailable, setCastAvailable] = useState(!!window.__castReady);
+  const ios = isIOS();
+  const android = isAndroid();
 
-  useEffect(() => {
-    const handler = () => setCastAvailable(true);
-    window.addEventListener('castready', handler);
-    return () => window.removeEventListener('castready', handler);
-  }, []);
-
-  const handleCast = async () => {
-    // Try Google Cast (works on Chrome with Chromecast / built-in Chromecast TVs)
-    if (window.__castReady && window.cast) {
-      try {
-        setCasting(true);
-        const ctx = cast.framework.CastContext.getInstance();
-        await ctx.requestSession();
-        setCasting(false);
-        onClose();
-        return;
-      } catch (e) {
-        setCasting(false);
-      }
-    }
-    // Fallback: Presentation API
-    if (window.PresentationRequest) {
-      try {
-        const req = new PresentationRequest([window.location.href]);
-        await req.start();
-        onClose();
-      } catch (e) {}
-    }
-  };
-
-  const brands = [
+  const sections = ios ? [
     {
-      name: 'Samsung',
+      title: 'AirPlay على Apple TV أو Samsung / LG',
+      color: '#CC0000',
+      icon: '📱',
+      steps: [
+        'افتح مركز التحكم (اسحب من الأعلى يميناً)',
+        'اضغط على "Screen Mirroring" أو "نسخ الشاشة"',
+        'اختر التلفزيون من القائمة',
+        'تأكد أن هاتفك والتلفزيون على نفس الواي فاي',
+      ],
+    },
+    {
+      title: 'Samsung Smart TV',
       color: '#1428A0',
       icon: '📺',
       steps: [
-        'اضغط على زر "SmartThings" في ريموت Samsung',
-        'أو افتح تطبيق SmartThings على هاتفك',
-        'اختر "نسخ الشاشة" أو "Screen Mirroring"',
+        'افتح تطبيق SmartThings على iPhone',
+        'أو اضغط "SmartView" في ريموت Samsung',
+        'اختر iPhone من قائمة الأجهزة',
+        'اقبل الاتصال على التلفزيون',
+      ],
+    },
+    {
+      title: 'LG TV',
+      color: '#A50034',
+      icon: '📺',
+      steps: [
+        'اضغط زر المنزل في ريموت LG',
+        'اذهب إلى الإعدادات ← مشاركة الشاشة',
+        'شغّل Screen Share وانتظر الاتصال',
+        'أو استخدم AirPlay إن كان LG يدعمه',
+      ],
+    },
+  ] : android ? [
+    {
+      title: 'عرض على التلفزيون',
+      color: '#CC0000',
+      icon: '📡',
+      steps: [
+        'افتح لوحة الإشعارات (اسحب من الأعلى)',
+        'ابحث عن "نسخ الشاشة" أو "Screen Cast"',
+        'اختر التلفزيون من القائمة',
+        'تأكد أن هاتفك والتلفزيون على نفس الواي فاي',
+      ],
+    },
+    {
+      title: 'Samsung — Smart View',
+      color: '#1428A0',
+      icon: '📺',
+      steps: [
+        'اسحب لوحة الإشعارات ← Smart View',
+        'أو افتح تطبيق SmartThings',
+        'اختر التلفزيون واضغط "نسخ الشاشة"',
+      ],
+    },
+    {
+      title: 'Google Chromecast / Built-in Cast',
+      color: '#DB4437',
+      icon: '📡',
+      steps: [
+        'افتح متصفح Chrome على هاتفك',
+        'اضغط النقاط الثلاث (⋮) في الأعلى',
+        'اختر "Cast" أو "بث"',
         'اختر التلفزيون من القائمة',
       ],
     },
     {
-      name: 'LG',
+      title: 'LG TV',
       color: '#A50034',
       icon: '📺',
       steps: [
-        'اضغط على زر المنزل في ريموت LG',
+        'اضغط زر المنزل في ريموت LG',
         'اذهب إلى الإعدادات ← مشاركة الشاشة',
-        'أو استخدم "Screen Share" من بلوتوث هاتفك',
-        'على iPhone: اضغط Screen Mirroring',
+        'شغّل وانتظر الاتصال من هاتفك',
+      ],
+    },
+  ] : [
+    {
+      title: 'iPhone / iPad — AirPlay',
+      color: '#CC0000',
+      icon: '📱',
+      steps: [
+        'مركز التحكم ← Screen Mirroring',
+        'اختر التلفزيون من القائمة',
       ],
     },
     {
-      name: 'Philips',
-      color: '#0050A0',
-      icon: '📺',
+      title: 'Android — نسخ الشاشة',
+      color: '#3DDC84',
+      icon: '📱',
       steps: [
-        'معظم شاشات Philips الحديثة تدعم Chromecast',
-        'استخدم زر Cast في متصفح Chrome',
-        'أو اضغط "نسخ الشاشة" من إعدادات هاتفك الأندرويد',
-        'على iPhone: استخدم AirPlay إن كان مدعوماً',
+        'لوحة الإشعارات ← نسخ الشاشة / Smart View',
+        'اختر التلفزيون من القائمة',
+      ],
+    },
+    {
+      title: 'Google Cast (Chrome)',
+      color: '#DB4437',
+      icon: '📡',
+      steps: [
+        'متصفح Chrome ← النقاط ⋮ ← Cast',
+        'اختر التلفزيون',
       ],
     },
   ];
@@ -98,7 +145,7 @@ function MirrorModal({ onClose }) {
           padding: 24,
           width: '100%',
           maxWidth: 480,
-          maxHeight: '90vh',
+          maxHeight: '90svh',
           overflowY: 'auto',
           boxShadow: '0 0 60px rgba(204,0,0,0.25)',
         }}
@@ -117,59 +164,27 @@ function MirrorModal({ onClose }) {
           </button>
         </div>
 
-        {/* Cast button — shown on Chrome when Cast SDK is available or Presentation API exists */}
-        {(castAvailable || (typeof PresentationRequest !== 'undefined')) && (
-          <button
-            onClick={handleCast}
-            disabled={casting}
-            style={{
-              width: '100%',
-              padding: '14px 20px',
-              borderRadius: 14,
-              background: casting
-                ? 'rgba(139,0,0,0.3)'
-                : 'linear-gradient(135deg, #6B0000 0%, #CC0000 50%, #6B0000 100%)',
-              border: '1px solid rgba(255,60,60,0.4)',
-              color: '#FFE4E4',
-              fontFamily: 'var(--font-cairo)',
-              fontWeight: 700,
-              fontSize: 15,
-              cursor: casting ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 10,
-              marginBottom: 20,
-              boxShadow: '0 0 20px rgba(204,0,0,0.4)',
-            }}
-          >
-            <Cast style={{ width: 18, height: 18 }} />
-            {casting ? 'جارٍ البحث عن التلفزيون...' : 'اعرض على التلفزيون (Cast)'}
-          </button>
-        )}
-
-        <p style={{ fontSize: 12, color: 'rgba(255,150,150,0.6)', fontFamily: 'var(--font-cairo)', marginBottom: 16, textAlign: 'center' }}>
-          أو اتبع الخطوات حسب نوع تلفزيونك
+        <p style={{ fontSize: 12, color: 'rgba(255,150,150,0.7)', fontFamily: 'var(--font-cairo)', marginBottom: 16, textAlign: 'center' }}>
+          {ios ? 'اتبع الخطوات حسب نوع تلفزيونك — iPhone / iPad' : android ? 'اتبع الخطوات حسب نوع تلفزيونك — Android' : 'اتبع الخطوات حسب جهازك ونوع التلفزيون'}
         </p>
 
-        {/* Per-brand instructions */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {brands.map(brand => (
-            <div key={brand.name} style={{
+          {sections.map((s, i) => (
+            <div key={i} style={{
               background: 'rgba(255,255,255,0.04)',
-              border: `1px solid ${brand.color}44`,
+              border: `1px solid ${s.color}44`,
               borderRadius: 14,
               padding: '14px 16px',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                <Wifi style={{ width: 16, height: 16, color: brand.color }} />
-                <span style={{ fontSize: 15, fontWeight: 800, color: '#FFE4E4', fontFamily: 'var(--font-cairo)' }}>
-                  {brand.name}
+                <Wifi style={{ width: 16, height: 16, color: s.color }} />
+                <span style={{ fontSize: 14, fontWeight: 800, color: '#FFE4E4', fontFamily: 'var(--font-cairo)' }}>
+                  {s.icon} {s.title}
                 </span>
               </div>
               <ol style={{ margin: 0, paddingRight: 18, listStyleType: 'decimal' }}>
-                {brand.steps.map((step, i) => (
-                  <li key={i} style={{ fontSize: 12, color: 'rgba(255,220,220,0.8)', fontFamily: 'var(--font-cairo)', marginBottom: 4, lineHeight: 1.5 }}>
+                {s.steps.map((step, j) => (
+                  <li key={j} style={{ fontSize: 12, color: 'rgba(255,220,220,0.85)', fontFamily: 'var(--font-cairo)', marginBottom: 5, lineHeight: 1.6 }}>
                     {step}
                   </li>
                 ))}
