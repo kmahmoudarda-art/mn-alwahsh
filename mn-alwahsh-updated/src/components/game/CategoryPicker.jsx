@@ -1,25 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { fetchCategories } from '../../utils/supabaseClient';
-
-const CATEGORY_ICONS = {
-  'رياضة': '⚽', 'تاريخ': '📜', 'جغرافيا': '🌍', 'علوم': '🔬',
-  'أفلام عربية': '🎬', 'أفلام إنجليزية': '🎥', 'نتفليكس': '🎞️',
-  'بريكينج باد': '🧪', 'بيكي بلايندرز': '🎩', 'بريزون بريك': '🔓',
-  'مسلسلات تركية': '🌙', 'أفلام رعب': '👻', 'CR7': '🥇', 'ميسي': '🐐',
-  'أم كلثوم': '🎤', 'عبد الحليم': '🎵', 'حمو بيكا': '🎧',
-  'تامر حسني': '🎶', 'عمرو دياب': '🌟', 'Arab Idol': '🏆',
-  'Arab Got Talent': '🎭', 'الإمارات': '🇦🇪', 'الأردن': '🇯🇴',
-  'دبي': '🏙️', 'كأس العرب': '🏆', 'كأس آسيا': '🥈',
-  'Champions League': '⭐', 'المنتخب الأردني': '⚽', 'هواتف ذكية': '📱',
-  'تكنولوجيا': '💻', 'سيارات': '🚗', 'براندات': '👜', 'سبيستون': '🚀',
-  'بنات فقط': '👑', 'مسرحيات عربية': '🎭', 'حيوانات': '🦁',
-  'أغاني': '🎼', 'أغاني قديمة': '📻', 'Friends': '☕',
-  'League of Legends': '🎮', 'أكل عربي': '🍽️', 'IQ': '🧠',
-  'رياضيات': '➗', 'English Lang': '🔤', 'Logos': '🖼️',
-  'football logo': '🗿', 'Football logo': '🗿', 'FOOTBALL LOGO': '🗿', 'football Logo': '🗿',
-};
+import CATEGORY_ICONS, { getIcon } from '../../utils/categoryIcons';
 
 const CATEGORY_GROUPS = {
   '⚽ رياضة': ['football logo', 'رياضة', 'CR7', 'ميسي', 'كأس العرب', 'كأس آسيا', 'Champions League', 'المنتخب الأردني', 'League of Legends', 'Real Madrid', 'Barcelona', 'WildRift', 'ريال مدريد', 'برشلونة', 'برشلونه', 'وايلد ريفت', 'محترف كرة'],
@@ -39,13 +22,6 @@ for (const [group, cats] of Object.entries(CATEGORY_GROUPS)) {
   }
 }
 
-const iconCache = {};
-function getAutoIcon(categoryName) {
-  if (iconCache[categoryName]) return iconCache[categoryName];
-  const icon = CATEGORY_ICONS[categoryName] || CATEGORY_ICONS[categoryName?.trim()] || '🎯';
-  iconCache[categoryName] = icon;
-  return icon;
-}
 
 function groupCategories(categories) {
   const groups = {};
@@ -67,9 +43,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [icons, setIcons] = useState({ ...CATEGORY_ICONS });
   const [openGroups, setOpenGroups] = useState(new Set());
-  const loadingIcons = useRef(new Set());
 
   const load = () => {
     setLoading(true);
@@ -81,20 +55,6 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   };
 
   useEffect(() => { load(); }, []);
-
-  useEffect(() => {
-    if (!categories.length) return;
-    const unknowns = categories.filter(c => !CATEGORY_ICONS[c] && !CATEGORY_ICONS[c.toLowerCase().trim()] && !loadingIcons.current.has(c));
-    if (!unknowns.length) return;
-    unknowns.forEach(c => loadingIcons.current.add(c));
-    Promise.all(unknowns.map(async (c) => [c, await getAutoIcon(c)])).then(results => {
-      setIcons(prev => {
-        const next = { ...prev };
-        results.forEach(([c, emoji]) => { next[c] = emoji; });
-        return next;
-      });
-    });
-  }, [categories]);
 
   const toggleGroup = (g) => {
     setOpenGroups(prev => {
@@ -218,7 +178,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                       {cats.map((name) => {
                         const isSelected = selected.includes(name);
                         const isDisabled = !isSelected && selected.length >= max;
-                        const emoji = CATEGORY_ICONS[name] || CATEGORY_ICONS[name.toLowerCase().trim()] || icons[name] || '⏳';
+                        const emoji = getIcon(name);
 
                         return (
                           <motion.button

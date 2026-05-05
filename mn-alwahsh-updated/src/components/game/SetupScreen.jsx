@@ -4,28 +4,7 @@ import { Users, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import CategoryPicker from './CategoryPicker';
-
-const CATEGORY_ICONS = {
-  'رياضة': '⚽', 'تاريخ': '📜', 'جغرافيا': '🌍', 'علوم': '🔬',
-  'أفلام عربية': '🎬', 'أفلام إنجليزية': '🎥', 'نتفليكس': '🎞️',
-  'بريكينج باد': '🧪', 'بيكي بلايندرز': '🎩', 'بريزون بريك': '🔓',
-  'مسلسلات تركية': '🌙', 'أفلام رعب': '👻', 'CR7': '🥇', 'ميسي': '🐐',
-  'أم كلثوم': '🎤', 'عبد الحليم': '🎵', 'حمو بيكا': '🎧',
-  'تامر حسني': '🎶', 'عمرو دياب': '🌟', 'Arab Idol': '🏆',
-  'Arab Got Talent': '🎭', 'الإمارات': '🇦🇪', 'الأردن': '🇯🇴',
-  'دبي': '🏙️', 'كأس العرب': '🏆', 'كأس آسيا': '🥈',
-  'Champions League': '⭐', 'المنتخب الأردني': '⚽', 'هواتف ذكية': '📱',
-  'تكنولوجيا': '💻', 'سيارات': '🚗', 'براندات': '👜', 'سبيستون': '🚀',
-  'بنات فقط': '👑', 'مسرحيات عربية': '🎭', 'حيوانات': '🦁',
-  'أغاني': '🎼', 'أغاني قديمة': '📻', 'Friends': '☕',
-  'League of Legends': '🎮', 'أكل عربي': '🍽️', 'IQ': '🧠',
-  'رياضيات': '➗', 'English Lang': '🔤', 'Logos': '🖼️',
-  'football logo': '🗿', 'Football logo': '🗿', 'FOOTBALL LOGO': '🗿', 'football Logo': '🗿',
-};
-
-function getIcon(name) {
-  return CATEGORY_ICONS[name] || CATEGORY_ICONS[name?.trim()] || '🎯';
-}
+import { getIcon } from '../../utils/categoryIcons';
 
 function SelectedCategoryColumn({ categories, teamName, side, onRemove }) {
   const isRed = side === 'right';
