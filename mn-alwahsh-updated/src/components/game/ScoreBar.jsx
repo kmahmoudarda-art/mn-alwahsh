@@ -3,9 +3,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Plus, Minus, Settings, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PayPalDonateButton from './PayPalDonateButton';
-import HorrorMusic from './HorrorMusic';
 
 const MILESTONES = [1000, 2000, 3000, 4000, 5000, 6000];
+
+function getBadge(score) {
+  if (score >= 6000) return { text: 'Unreal ⚡', color: '#00ccff', glow: '#00eeff' };
+  if (score >= 5000) return { text: 'Legend 🏆', color: '#FFD700', glow: '#FFD700' };
+  if (score >= 4000) return { text: 'امبراطور 👑', color: '#8B6914', glow: '#FFD700' };
+  if (score >= 3000) return { text: 'اسطورة 🌟', color: '#cc5500', glow: '#FF8C00' };
+  if (score >= 2000) return { text: 'ملك 🔥', color: '#cc0000', glow: '#FF4444' };
+  if (score >= 1000) return { text: 'وحش 💪', color: '#8B0000', glow: '#CC0000' };
+  return null;
+}
 
 export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }) {
   const [showSettings, setShowSettings] = useState(false);
@@ -45,15 +54,14 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
         .screen-shake { animation: screenShake 1.5s ease !important; }
       `}</style>
 
+      {/* Transparent top bar — background image shows through */}
       <div
         dir="rtl"
         className="relative flex items-center justify-between gap-3 px-3 overflow-hidden"
         style={{
           paddingTop: 'max(10px, env(safe-area-inset-top))',
           paddingBottom: 10,
-          background: '#ffffff',
-          borderBottom: '2px solid #e0e0e0',
-          boxShadow: '0 3px 16px rgba(0,0,0,0.12)',
+          background: 'transparent',
           zIndex: 20,
         }}
       >
@@ -63,17 +71,16 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
           {/* Centre */}
           <div className="flex flex-col items-center shrink-0 gap-0.5">
             <div className="relative">
-              <Trophy className="w-6 h-6" style={{ color: '#CC0000', filter: 'drop-shadow(0 0 6px #FF0000)' }} />
+              <Trophy className="w-6 h-6" style={{ color: '#FF4444', filter: 'drop-shadow(0 0 6px #FF0000)' }} />
               <span className="absolute -top-1 -right-1 text-xs">💀</span>
             </div>
             <span className="text-[10px] font-cairo font-black tracking-widest" style={{ color: '#FF4444', textShadow: '0 0 6px #FF0000' }}>من الوحش</span>
             <PayPalDonateButton />
-            <HorrorMusic />
             <div className="flex gap-1 mt-0.5">
-              <button onClick={onBack} className="w-6 h-6 flex items-center justify-center rounded-full" style={{ background: 'rgba(0,0,0,0.08)', color: '#555' }}>
+              <button onClick={onBack} className="w-6 h-6 flex items-center justify-center rounded-full" style={{ background: 'rgba(0,0,0,0.5)', color: '#fff' }}>
                 <X className="w-3.5 h-3.5" />
               </button>
-              <button onClick={() => setShowSettings(true)} className="w-6 h-6 flex items-center justify-center rounded-full" style={{ background: 'rgba(0,0,0,0.08)', color: '#555' }}>
+              <button onClick={() => setShowSettings(true)} className="w-6 h-6 flex items-center justify-center rounded-full" style={{ background: 'rgba(0,0,0,0.5)', color: '#fff' }}>
                 <Settings className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -106,19 +113,10 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
   );
 }
 
-function getBadge(score) {
-  if (score >= 6000) return { text: 'Unreal ⚡', color: '#00ccff', glow: '#00eeff' };
-  if (score >= 5000) return { text: 'Legend 🏆', color: '#FFD700', glow: '#FFD700' };
-  if (score >= 4000) return { text: 'امبراطور 👑', color: '#8B6914', glow: '#FFD700' };
-  if (score >= 3000) return { text: 'اسطورة 🌟', color: '#cc5500', glow: '#FF8C00' };
-  if (score >= 2000) return { text: 'ملك 🔥', color: '#cc0000', glow: '#FF4444' };
-  if (score >= 1000) return { text: 'وحش 💪', color: '#8B0000', glow: '#CC0000' };
-  return null;
-}
-
 function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }) {
   const [shaking, setShaking] = useState(false);
   const [blastScore, setBlastScore] = useState(null);
+  const [blastBadge, setBlastBadge] = useState(null);
   const prevScoreRef = useRef(score);
 
   const badge = getBadge(score);
@@ -127,47 +125,50 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }
     const prev = prevScoreRef.current;
     const hitMilestone = MILESTONES.some(m => prev < m && score >= m);
     if (hitMilestone) {
+      const newBadge = getBadge(score);
       setShaking(true);
       setBlastScore(score);
       document.documentElement.classList.add('screen-shake');
+
+      // After 800ms: hide score, show badge text
       setTimeout(() => {
+        setBlastScore(null);
+        if (newBadge) setBlastBadge(newBadge);
+      }, 800);
+
+      // After 1600ms: hide badge, end shake
+      setTimeout(() => {
+        setBlastBadge(null);
         document.documentElement.classList.remove('screen-shake');
         setShaking(false);
-      }, 1500);
-      setTimeout(() => setBlastScore(null), 1600);
+      }, 1600);
     }
     prevScoreRef.current = score;
   }, [score]);
 
   return (
     <>
-      {/* Full-screen score blast overlay */}
+      {/* Score number blast */}
       <AnimatePresence>
         {blastScore !== null && (
           <motion.div
             key="score-blast"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.4 } }}
+            exit={{ opacity: 0, transition: { duration: 0.3 } }}
             style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 9999,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'rgba(0,0,0,0.75)',
-              pointerEvents: 'none',
+              position: 'fixed', inset: 0, zIndex: 9999,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'rgba(0,0,0,0.8)', pointerEvents: 'none',
             }}
           >
             <motion.span
               initial={{ scale: 0.2, opacity: 0 }}
               animate={{ scale: [0.2, 1.4, 1.1], opacity: [0, 1, 1] }}
-              exit={{ scale: 2, opacity: 0 }}
-              transition={{ duration: 0.7, times: [0, 0.5, 1] }}
+              exit={{ scale: 1.8, opacity: 0 }}
+              transition={{ duration: 0.6, times: [0, 0.5, 1] }}
               style={{
-                fontFamily: 'var(--font-cairo)',
-                fontWeight: 900,
+                fontFamily: 'var(--font-cairo)', fontWeight: 900,
                 fontSize: 'clamp(120px, 30vw, 280px)',
                 color: '#ffffff',
                 textShadow: '0 0 60px #CC0000, 0 0 120px #FF0000',
@@ -180,6 +181,41 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }
         )}
       </AnimatePresence>
 
+      {/* Badge text blast */}
+      <AnimatePresence>
+        {blastBadge !== null && (
+          <motion.div
+            key="badge-blast"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.4 } }}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'rgba(0,0,0,0.8)', pointerEvents: 'none',
+            }}
+          >
+            <motion.span
+              initial={{ scale: 0.2, opacity: 0, rotate: -15 }}
+              animate={{ scale: [0.2, 1.35, 1.05], opacity: [0, 1, 1], rotate: [-15, 5, 0] }}
+              exit={{ scale: 1.8, opacity: 0 }}
+              transition={{ duration: 0.6, times: [0, 0.5, 1] }}
+              style={{
+                fontFamily: 'var(--font-cairo)', fontWeight: 900,
+                fontSize: 'clamp(64px, 16vw, 160px)',
+                color: blastBadge.color,
+                textShadow: `0 0 40px ${blastBadge.glow}, 0 0 80px ${blastBadge.glow}88`,
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {blastBadge.text}
+            </motion.span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Score card — stays white */}
       <motion.div
         layout
         animate={shaking ? { x: [0, -14, 14, -12, 12, -8, 8, -4, 4, 0] } : {}}
@@ -188,7 +224,7 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }
         style={
           isActive
             ? { background: '#ffffff', animation: 'activeCardGlow 1.6s ease-in-out infinite' }
-            : { background: '#ffffff', boxShadow: '0 2px 12px rgba(0,0,0,0.35)' }
+            : { background: '#ffffff', boxShadow: '0 2px 12px rgba(0,0,0,0.45)' }
         }
       >
         {/* Top accent bar */}
@@ -208,10 +244,8 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }
             {isActive && <span className="text-[9px] mr-1" style={{ color: '#CC0000' }}>● دورهم</span>}
           </p>
 
-          {/* Score + badge + buttons in one row */}
+          {/* Score + badge + buttons */}
           <div className={`flex items-center gap-2 mt-0.5 ${reverse ? 'flex-row' : 'flex-row-reverse'}`}>
-
-            {/* Score number + badge inline */}
             <div className={`flex-1 flex items-center gap-2 ${align === 'left' ? 'flex-row' : 'flex-row-reverse'}`}>
               <motion.p
                 key={scoreKey}
@@ -233,13 +267,10 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }
                     exit={{ scale: 0, opacity: 0 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 12 }}
                     style={{
-                      fontSize: 22,
-                      fontFamily: 'var(--font-cairo)',
-                      fontWeight: 900,
+                      fontSize: 22, fontFamily: 'var(--font-cairo)', fontWeight: 900,
                       color: badge.color,
                       textShadow: `0 0 8px ${badge.glow}55`,
-                      whiteSpace: 'nowrap',
-                      lineHeight: 1,
+                      whiteSpace: 'nowrap', lineHeight: 1,
                     }}
                   >
                     {badge.text}
@@ -248,7 +279,6 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }
               </AnimatePresence>
             </div>
 
-            {/* +/- buttons */}
             <div className="flex flex-col gap-1 shrink-0">
               <button onClick={() => onAdjust(100)} className="w-7 h-7 rounded-lg flex items-center justify-center font-bold shadow-sm"
                 style={{ background: '#22c55e', color: '#fff' }}>
