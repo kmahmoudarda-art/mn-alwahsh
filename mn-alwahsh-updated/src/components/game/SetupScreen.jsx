@@ -82,6 +82,7 @@ export default function SetupScreen({ onStartGame }) {
             onNameChange={setTeam1Name}
             categories={team1Categories}
             onToggle={(name) => toggleCategory(1, name)}
+            onSetSelected={(cats) => setTeam1Categories(cats)}
           />
           <TeamSetupCard
             teamNumber={2}
@@ -89,6 +90,7 @@ export default function SetupScreen({ onStartGame }) {
             onNameChange={setTeam2Name}
             categories={team2Categories}
             onToggle={(name) => toggleCategory(2, name)}
+            onSetSelected={(cats) => setTeam2Categories(cats)}
           />
         </div>
 
@@ -118,7 +120,7 @@ export default function SetupScreen({ onStartGame }) {
   );
 }
 
-function TeamSetupCard({ teamNumber, teamName, onNameChange, categories, onToggle }) {
+function TeamSetupCard({ teamNumber, teamName, onNameChange, categories, onToggle, onSetSelected }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: teamNumber === 1 ? 30 : -30 }}
@@ -151,7 +153,7 @@ function TeamSetupCard({ teamNumber, teamName, onNameChange, categories, onToggl
       <p className="text-xs font-tajawal mb-2" style={{ color: '#FF6666' }}>
         اختر ٣ فئات ({categories.length}/3)
       </p>
-      <CategoryPicker selected={categories} onToggle={onToggle} max={3} />
+      <CategoryPicker selected={categories} onToggle={onToggle} onSetSelected={onSetSelected} max={3} />
     </motion.div>
   );
 }

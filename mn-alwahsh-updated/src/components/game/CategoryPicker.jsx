@@ -68,7 +68,7 @@ function groupCategories(categories) {
   return Object.fromEntries(Object.entries(groups).filter(([, cats]) => cats.length > 0));
 }
 
-export default function CategoryPicker({ selected, onToggle, max }) {
+export default function CategoryPicker({ selected, onToggle, onSetSelected, max }) {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -116,6 +116,12 @@ export default function CategoryPicker({ selected, onToggle, max }) {
 
   const grouped = groupCategories(categories);
 
+  const pickRandom = () => {
+    if (!categories.length) return;
+    const shuffled = [...categories].sort(() => Math.random() - 0.5);
+    onSetSelected(shuffled.slice(0, Math.min(max, shuffled.length)));
+  };
+
   return (
     <>
       <style>{`
@@ -126,7 +132,35 @@ export default function CategoryPicker({ selected, onToggle, max }) {
           box-shadow: 0 0 12px rgba(204,0,0,0.6), inset 0 0 8px rgba(139,0,0,0.2) !important;
           border-color: #CC0000 !important;
         }
+        @keyframes spinDice {
+          0%   { transform: rotate(0deg) scale(1); }
+          30%  { transform: rotate(180deg) scale(1.3); }
+          60%  { transform: rotate(300deg) scale(1.1); }
+          100% { transform: rotate(360deg) scale(1); }
+        }
+        .spin-once { animation: spinDice 0.5s ease-out; }
       `}</style>
+
+      {/* Random pick button */}
+      <motion.button
+        whileTap={{ scale: 0.92 }}
+        onClick={pickRandom}
+        dir="rtl"
+        className="w-full mb-3 flex items-center justify-center gap-2 rounded-xl font-cairo font-bold"
+        style={{
+          padding: '10px 16px',
+          background: 'linear-gradient(135deg, rgba(80,0,0,0.7), rgba(40,0,0,0.9))',
+          border: '1.5px solid #CC0000',
+          color: '#FFE4E4',
+          fontSize: 14,
+          boxShadow: '0 0 12px rgba(139,0,0,0.4)',
+          cursor: 'pointer',
+        }}
+      >
+        <span style={{ fontSize: 18 }}>🎲</span>
+        اختيار عشوائي
+      </motion.button>
+
       <div className="category-scroll overflow-y-auto overflow-x-hidden" style={{ height: '60vh', scrollBehavior: 'smooth' }}>
         {Object.entries(grouped).map(([groupName, cats]) => (
           <div key={groupName} style={{ marginBottom: 16 }}>
