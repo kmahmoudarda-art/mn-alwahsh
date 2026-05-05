@@ -98,7 +98,7 @@ export async function fetchCategories() {
 
   ]);
   const allRows = [...mainRows, ...flagRows, ...fananRows, ...famRows, ...falsafaRows, ...logo1Rows, ...logooRows];
-  const unique = [...new Set(allRows.map(r => r.category).filter(Boolean))];
+const unique = [...new Set(allRows.map(r => r.category).filter(Boolean))].filter(c => !c.startsWith('_hidden_'));
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('Total categories loaded:', unique.length);
   console.log('All categories:', unique);
