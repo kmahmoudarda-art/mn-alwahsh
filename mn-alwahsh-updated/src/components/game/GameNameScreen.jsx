@@ -168,12 +168,6 @@ export default function GameNameScreen({ onEnter }) {
           >
             من الوحش
           </motion.h1>
-          <p className="font-tajawal font-bold" style={{
-            color: '#FF6666', textShadow: '0 0 10px rgba(204,0,0,0.6)',
-            fontSize: 'clamp(13px, 2vw, 20px)', marginTop: '1.5vh', textAlign: 'center',
-          }}>
-            لعبة المعرفة والتحدي
-          </p>
         </motion.div>
 
         {/* Form block */}
@@ -184,7 +178,7 @@ export default function GameNameScreen({ onEnter }) {
           style={{ width: '100%', maxWidth: 420 }}
         >
           {/* How to play + Install row */}
-          <div className="flex items-center justify-center gap-3" style={{ marginBottom: 14 }}>
+          <div className="flex items-center justify-center gap-3" style={{ marginBottom: 10 }}>
             <button onClick={() => setShowManual(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl font-cairo font-bold text-sm transition-all"
               style={{ background: 'rgba(10,0,0,0.7)', border: '1px solid rgba(139,0,0,0.7)', color: '#FFE4E4', backdropFilter: 'blur(8px)' }}
@@ -205,6 +199,13 @@ export default function GameNameScreen({ onEnter }) {
               تثبيت
             </button>
           </div>
+
+          <p className="font-tajawal font-bold" style={{
+            color: '#FF6666', textShadow: '0 0 10px rgba(204,0,0,0.6)',
+            fontSize: 'clamp(12px, 1.8vw, 16px)', marginBottom: 12, textAlign: 'center',
+          }}>
+            لعبة المعرفة والتحدي
+          </p>
 
           {/* Game name form */}
           <div style={{
