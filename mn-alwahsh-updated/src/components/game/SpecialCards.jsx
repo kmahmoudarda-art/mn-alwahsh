@@ -178,6 +178,26 @@ export default function SpecialCards({
     }, 800);
   };
 
+  const btnActive = (color, glow) => ({
+    border: `2px solid ${color}`,
+    color: '#ffffff',
+    background: `linear-gradient(135deg, ${color}cc, ${color}88)`,
+    boxShadow: `0 0 10px ${glow}, 0 2px 8px rgba(0,0,0,0.5)`,
+    cursor: 'pointer',
+    fontWeight: 700,
+    fontSize: 13,
+  });
+  const btnUsed = {
+    opacity: 0.25,
+    textDecoration: 'line-through',
+    border: '2px solid rgba(255,255,255,0.1)',
+    color: 'rgba(255,255,255,0.3)',
+    background: 'rgba(0,0,0,0.3)',
+    cursor: 'not-allowed',
+    fontWeight: 700,
+    fontSize: 13,
+  };
+
   return (
     <>
       <style>{`
@@ -187,20 +207,19 @@ export default function SpecialCards({
           60%  { transform: scale(0.95) rotate(2deg); }
           100% { transform: scale(1) rotate(0deg); }
         }
+        .special-btn { transition: transform 0.12s, box-shadow 0.12s; }
+        .special-btn:not(:disabled):hover { transform: scale(1.08); }
+        .special-btn:not(:disabled):active { transform: scale(0.95); }
       `}</style>
-      <div className="flex items-center justify-center gap-2 px-4 pb-2 flex-wrap" dir="rtl">
-        {/* Team 1 cards */}
-        <div className="flex gap-1">
+      <div className="flex items-center justify-center gap-3 px-4 pb-2 flex-wrap" dir="rtl">
+        {/* Team 1 cards — red */}
+        <div className="flex gap-2">
           <button
             ref={doubleLuckBtnRef}
             onClick={() => handleLucky(1)}
             disabled={team1UsedLucky || spinning}
-            className="text-xs font-cairo px-2 py-1 rounded-lg border transition-all"
-            style={
-              team1UsedLucky
-                ? { opacity: 0.3, textDecoration: 'line-through', border: '1px solid #4a0000', color: '#880000', cursor: 'not-allowed' }
-                : { border: '1px solid #CC0000', color: '#FF6666', background: 'rgba(139,0,0,0.15)', cursor: 'pointer' }
-            }
+            className="special-btn font-cairo px-3 py-1.5 rounded-xl"
+            style={team1UsedLucky ? btnUsed : btnActive('#CC0000', 'rgba(204,0,0,0.6)')}
             title="بطاقة الحظ - تسرق نقاط أو تخسر"
           >
             🃏 حظ
@@ -208,31 +227,23 @@ export default function SpecialCards({
           <button
             onClick={() => onQuickTimer(1)}
             disabled={team1UsedQuick}
-            className="text-xs font-cairo px-2 py-1 rounded-lg border transition-all"
-            style={
-              team1UsedQuick
-                ? { opacity: 0.3, textDecoration: 'line-through', border: '1px solid #4a0000', color: '#880000', cursor: 'not-allowed' }
-                : { border: '1px solid #CC0000', color: '#FF6666', background: 'rgba(139,0,0,0.15)', cursor: 'pointer' }
-            }
+            className="special-btn font-cairo px-3 py-1.5 rounded-xl"
+            style={team1UsedQuick ? btnUsed : btnActive('#CC0000', 'rgba(204,0,0,0.6)')}
             title="ضغط الوقت - يجعل السؤال 15 ثانية"
           >
             ⏱️ 15ث
           </button>
         </div>
 
-        <span className="text-xs font-tajawal" style={{ color: '#CC0000' }}>vs</span>
+        <span className="font-cairo font-black text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>⚔️</span>
 
-        {/* Team 2 cards */}
-        <div className="flex gap-1">
+        {/* Team 2 cards — blue */}
+        <div className="flex gap-2">
           <button
             onClick={() => handleLucky(2)}
             disabled={team2UsedLucky || spinning}
-            className="text-xs font-cairo px-2 py-1 rounded-lg border transition-all"
-            style={
-              team2UsedLucky
-                ? { opacity: 0.3, textDecoration: 'line-through', border: '1px solid #4a0000', color: '#880000', cursor: 'not-allowed' }
-                : { border: '1px solid #CC0000', color: '#FF6666', background: 'rgba(139,0,0,0.15)', cursor: 'pointer' }
-            }
+            className="special-btn font-cairo px-3 py-1.5 rounded-xl"
+            style={team2UsedLucky ? btnUsed : btnActive('#1a6fff', 'rgba(30,100,255,0.6)')}
             title="بطاقة الحظ - تسرق نقاط أو تخسر"
           >
             🃏 حظ
@@ -240,12 +251,8 @@ export default function SpecialCards({
           <button
             onClick={() => onQuickTimer(2)}
             disabled={team2UsedQuick}
-            className="text-xs font-cairo px-2 py-1 rounded-lg border transition-all"
-            style={
-              team2UsedQuick
-                ? { opacity: 0.3, textDecoration: 'line-through', border: '1px solid #4a0000', color: '#880000', cursor: 'not-allowed' }
-                : { border: '1px solid #CC0000', color: '#FF6666', background: 'rgba(139,0,0,0.15)', cursor: 'pointer' }
-            }
+            className="special-btn font-cairo px-3 py-1.5 rounded-xl"
+            style={team2UsedQuick ? btnUsed : btnActive('#1a6fff', 'rgba(30,100,255,0.6)')}
             title="ضغط الوقت - يجعل السؤال 15 ثانية"
           >
             ⏱️ 15ث
