@@ -20,11 +20,19 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack, 
   return (
     <>
       <style>{`
-        @keyframes activeCardGlow {
-          0%,100% { box-shadow: 0 0 0 2.5px #CC0000, 0 4px 24px rgba(204,0,0,0.3); }
-          50%      { box-shadow: 0 0 0 3px #FF2222, 0 6px 32px rgba(255,0,0,0.45); }
+        @keyframes activeCardGlowRed {
+          0%,100% { box-shadow: 0 0 0 2.5px #CC0000, 0 4px 24px rgba(204,0,0,0.35); }
+          50%      { box-shadow: 0 0 0 3px #FF2222, 0 6px 32px rgba(255,0,0,0.5); }
         }
-        @keyframes shimmerBar {
+        @keyframes activeCardGlowBlue {
+          0%,100% { box-shadow: 0 0 0 2.5px #1a6fff, 0 4px 24px rgba(30,100,255,0.35); }
+          50%      { box-shadow: 0 0 0 3px #4488ff, 0 6px 32px rgba(60,130,255,0.5); }
+        }
+        @keyframes shimmerBarRed {
+          0%   { background-position: 200% center; }
+          100% { background-position: -200% center; }
+        }
+        @keyframes shimmerBarBlue {
           0%   { background-position: 200% center; }
           100% { background-position: -200% center; }
         }
@@ -46,7 +54,6 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack, 
         .screen-shake { animation: screenShake 1.5s ease !important; }
       `}</style>
 
-      {/* Transparent top bar — background image shows through */}
       <div
         dir="rtl"
         className="relative flex items-center justify-between gap-3 px-3 overflow-hidden"
@@ -58,7 +65,7 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack, 
         }}
       >
         <div className="relative z-10 flex items-center justify-between gap-3 w-full">
-          <TeamScore name={team1.name} score={team1.score} isActive={currentTeam === 1} scoreKey={team1.scoreKey} onAdjust={d => onAdjust(1, d)} align="right" modalOpen={modalOpen} />
+          <TeamScore teamNum={1} name={team1.name} score={team1.score} isActive={currentTeam === 1} scoreKey={team1.scoreKey} onAdjust={d => onAdjust(1, d)} align="right" modalOpen={modalOpen} />
 
           {/* Centre */}
           <div className="flex flex-col items-center shrink-0 gap-0.5">
@@ -75,24 +82,27 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack, 
             </div>
           </div>
 
-          <TeamScore name={team2.name} score={team2.score} isActive={currentTeam === 2} scoreKey={team2.scoreKey} onAdjust={d => onAdjust(2, d)} align="left" reverse modalOpen={modalOpen} />
+          <TeamScore teamNum={2} name={team2.name} score={team2.score} isActive={currentTeam === 2} scoreKey={team2.scoreKey} onAdjust={d => onAdjust(2, d)} align="left" reverse modalOpen={modalOpen} />
         </div>
       </div>
-
     </>
   );
 }
 
-function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align, modalOpen }) {
+function TeamScore({ teamNum, name, score, isActive, scoreKey, reverse, onAdjust, align, modalOpen }) {
   const [shaking, setShaking] = useState(false);
   const [blastScore, setBlastScore] = useState(null);
   const [blastBadge, setBlastBadge] = useState(null);
   const prevScoreRef = useRef(score);
-  const pendingShakeRef = useRef(null); // stores the badge to blast when modal closes
+  const pendingShakeRef = useRef(null);
+
+  const isRed = teamNum === 1;
+  const C = isRed
+    ? { primary: '#CC0000', bright: '#FF2222', dark: '#8B0000', glow: 'rgba(204,0,0,0.35)', shimmer: 'linear-gradient(90deg, #8B0000, #FF0000, #CC0000, #FF0000, #8B0000)', cardGlowAnim: 'activeCardGlowRed', shimmerAnim: 'shimmerBarRed' }
+    : { primary: '#1a6fff', bright: '#4488ff', dark: '#0044cc', glow: 'rgba(30,100,255,0.35)', shimmer: 'linear-gradient(90deg, #0033aa, #4488ff, #1a6fff, #4488ff, #0033aa)', cardGlowAnim: 'activeCardGlowBlue', shimmerAnim: 'shimmerBarBlue' };
 
   const badge = getBadge(score);
 
-  // Detect milestone hit — store pending instead of firing immediately
   useEffect(() => {
     const prev = prevScoreRef.current;
     const hitMilestone = MILESTONES.some(m => prev < m && score >= m);
@@ -102,10 +112,9 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align, 
     prevScoreRef.current = score;
   }, [score]);
 
-  // Fire the shake only once the modal has closed
   useEffect(() => {
-    if (modalOpen) return; // modal still open — wait
-    if (!pendingShakeRef.current) return; // nothing pending
+    if (modalOpen) return;
+    if (!pendingShakeRef.current) return;
 
     const { score: blastScoreVal, badge: newBadge } = pendingShakeRef.current;
     pendingShakeRef.current = null;
@@ -114,13 +123,11 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align, 
     setBlastScore(blastScoreVal);
     document.documentElement.classList.add('screen-shake');
 
-    // After 800ms: hide score, show badge text
     setTimeout(() => {
       setBlastScore(null);
       if (newBadge) setBlastBadge(newBadge);
     }, 800);
 
-    // After 2800ms: hide badge (badge dances for 2 full seconds)
     setTimeout(() => {
       setBlastBadge(null);
       document.documentElement.classList.remove('screen-shake');
@@ -153,7 +160,7 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align, 
                 fontFamily: 'var(--font-cairo)', fontWeight: 900,
                 fontSize: 'clamp(120px, 30vw, 280px)',
                 color: '#ffffff',
-                textShadow: '0 0 60px #CC0000, 0 0 120px #FF0000',
+                textShadow: `0 0 60px ${C.primary}, 0 0 120px ${C.bright}`,
                 lineHeight: 1,
               }}
             >
@@ -163,7 +170,7 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align, 
         )}
       </AnimatePresence>
 
-      {/* Badge text blast — dances for 2 seconds */}
+      {/* Badge text blast */}
       <AnimatePresence>
         {blastBadge !== null && (
           <motion.div
@@ -203,7 +210,7 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align, 
         )}
       </AnimatePresence>
 
-      {/* Score card — stays white */}
+      {/* Score card */}
       <motion.div
         layout
         animate={shaking ? { x: [0, -14, 14, -12, 12, -8, 8, -4, 4, 0] } : {}}
@@ -211,36 +218,33 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align, 
         className="flex-1 max-w-[330px] rounded-2xl overflow-hidden"
         style={
           isActive
-            ? { background: '#ffffff', animation: 'activeCardGlow 1.6s ease-in-out infinite' }
+            ? { background: '#ffffff', animation: `${C.cardGlowAnim} 1.6s ease-in-out infinite` }
             : { background: '#ffffff', boxShadow: '0 2px 12px rgba(0,0,0,0.45)' }
         }
       >
         {/* Top accent bar */}
         <div style={{
           height: 5,
-          background: isActive
-            ? 'linear-gradient(90deg, #8B0000, #FF0000, #CC0000, #FF0000, #8B0000)'
-            : '#e5e5e5',
+          backgroundImage: isActive ? C.shimmer : 'none',
+          backgroundColor: isActive ? 'transparent' : '#e5e5e5',
           backgroundSize: isActive ? '300% 100%' : 'auto',
-          animation: isActive ? 'shimmerBar 2.5s linear infinite' : 'none',
+          animation: isActive ? `${C.shimmerAnim} 2.5s linear infinite` : 'none',
         }} />
 
         <div className={`px-3 py-2 ${align === 'left' ? 'text-left' : 'text-right'}`}>
-          {/* Name */}
-          <p className="text-[11px] font-cairo font-bold truncate" style={{ color: isActive ? '#8B0000' : '#555' }}>
+          <p className="text-[11px] font-cairo font-bold truncate" style={{ color: isActive ? C.dark : '#555' }}>
             {name}
-            {isActive && <span className="text-[9px] mr-1" style={{ color: '#CC0000' }}>● دورهم</span>}
+            {isActive && <span className="text-[9px] mr-1" style={{ color: C.primary }}>● دورهم</span>}
           </p>
 
-          {/* Score + badge + buttons */}
           <div className={`flex items-center gap-2 mt-0.5 ${reverse ? 'flex-row' : 'flex-row-reverse'}`}>
             <div className={`flex-1 flex items-center gap-2 ${align === 'left' ? 'flex-row' : 'flex-row-reverse'}`}>
               <motion.p
                 key={scoreKey}
                 className="text-4xl md:text-5xl font-cairo font-black leading-none"
-                style={{ color: isActive ? '#8B0000' : '#1a1a1a' }}
-                initial={{ scale: 1.3, color: '#CC0000' }}
-                animate={{ scale: 1, color: isActive ? '#8B0000' : '#1a1a1a' }}
+                style={{ color: isActive ? C.dark : '#1a1a1a' }}
+                initial={{ scale: 1.3, color: C.primary }}
+                animate={{ scale: 1, color: isActive ? C.dark : '#1a1a1a' }}
                 transition={{ type: 'spring', stiffness: 350 }}
               >
                 {score}
@@ -273,7 +277,7 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align, 
                 <Plus className="w-3.5 h-3.5" />
               </button>
               <button onClick={() => onAdjust(-100)} className="w-7 h-7 rounded-lg flex items-center justify-center font-bold shadow-sm"
-                style={{ background: '#CC0000', color: '#fff' }}>
+                style={{ background: C.primary, color: '#fff' }}>
                 <Minus className="w-3.5 h-3.5" />
               </button>
             </div>

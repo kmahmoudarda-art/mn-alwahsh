@@ -620,40 +620,43 @@ export default function Game() {
       {(() => {
         const s1 = teams[1].score, s2 = teams[2].score;
         const tied = s1 === s2;
-        const color1 = tied ? '#ffffff' : s1 > s2 ? '#22c55e' : '#ef4444';
-        const color2 = tied ? '#ffffff' : s2 > s1 ? '#22c55e' : '#ef4444';
-        const border1 = tied ? 'rgba(255,255,255,0.15)' : s1 > s2 ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)';
-        const border2 = tied ? 'rgba(255,255,255,0.15)' : s2 > s1 ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)';
-        const colStyle = (color, border) => ({
+        // Team 1 = always red, Team 2 = always blue
+        const color1 = currentTeam === 1 ? '#FF4444' : tied ? '#CC3333' : s1 > s2 ? '#FF6666' : '#993333';
+        const color2 = currentTeam === 2 ? '#4499ff' : tied ? '#2266cc' : s2 > s1 ? '#66aaff' : '#114488';
+        const border1 = currentTeam === 1 ? 'rgba(255,50,50,0.7)' : 'rgba(180,0,0,0.3)';
+        const border2 = currentTeam === 2 ? 'rgba(50,130,255,0.7)' : 'rgba(0,60,180,0.3)';
+        const bg1 = currentTeam === 1 ? 'rgba(80,0,0,0.65)' : 'rgba(0,0,0,0.55)';
+        const bg2 = currentTeam === 2 ? 'rgba(0,20,80,0.65)' : 'rgba(0,0,0,0.55)';
+        const colStyle = (bg, border) => ({
           position: 'fixed', top: 0, bottom: 0, width: 52,
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
-          background: 'rgba(0,0,0,0.55)', borderWidth: 0,
+          background: bg, borderWidth: 0,
           borderStyle: 'solid', borderColor: border,
           zIndex: 15, pointerEvents: 'none', backdropFilter: 'blur(4px)',
         });
         const nameStyle = {
           writingMode: 'vertical-rl', textOrientation: 'mixed',
           fontFamily: 'var(--font-cairo)', fontWeight: 800, fontSize: 12,
-          color: 'rgba(255,255,255,0.7)', letterSpacing: 1,
+          color: 'rgba(255,255,255,0.8)', letterSpacing: 1,
           maxHeight: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         };
         const scoreStyle = (color) => ({
           fontFamily: 'var(--font-cairo)', fontWeight: 900, fontSize: 22,
-          color, textShadow: `0 0 10px ${color}88`, lineHeight: 1, textAlign: 'center',
+          color, textShadow: `0 0 12px ${color}`, lineHeight: 1, textAlign: 'center',
         });
         return (
           <>
-            {/* Right edge — Team 1 */}
-            <div style={{ ...colStyle(color1, border1), right: 0, borderLeftWidth: 2 }}>
+            {/* Right edge — Team 1 (red) */}
+            <div style={{ ...colStyle(bg1, border1), right: 0, borderLeftWidth: 2 }}>
               <span style={nameStyle}>{teams[1].name}</span>
-              <div style={{ width: 28, height: 1, background: 'rgba(255,255,255,0.2)' }} />
+              <div style={{ width: 28, height: 1, background: 'rgba(255,80,80,0.3)' }} />
               <span style={scoreStyle(color1)}>{s1}</span>
               {s1 > s2 && !tied && <span style={{ fontSize: 16 }}>🏆</span>}
             </div>
-            {/* Left edge — Team 2 */}
-            <div style={{ ...colStyle(color2, border2), left: 0, borderRightWidth: 2 }}>
+            {/* Left edge — Team 2 (blue) */}
+            <div style={{ ...colStyle(bg2, border2), left: 0, borderRightWidth: 2 }}>
               <span style={{ ...nameStyle, writingMode: 'vertical-lr', transform: 'rotate(180deg)' }}>{teams[2].name}</span>
-              <div style={{ width: 28, height: 1, background: 'rgba(255,255,255,0.2)' }} />
+              <div style={{ width: 28, height: 1, background: 'rgba(80,130,255,0.3)' }} />
               <span style={scoreStyle(color2)}>{s2}</span>
               {s2 > s1 && !tied && <span style={{ fontSize: 16 }}>🏆</span>}
             </div>
