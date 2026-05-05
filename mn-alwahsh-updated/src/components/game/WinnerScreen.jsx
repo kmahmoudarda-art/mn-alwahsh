@@ -79,7 +79,7 @@ export default function WinnerScreen({ team1, team2, onPlayAgain }) {
           <>
             <h1
               className="text-4xl md:text-5xl font-cairo font-black mb-2"
-              style={{ color: '#CC0000', animation: 'titleShine 2s ease-in-out infinite' }}
+              style={{ color: '#ffffff', animation: 'titleShine 2s ease-in-out infinite' }}
             >
               🏆 الفائز 🏆
             </h1>
