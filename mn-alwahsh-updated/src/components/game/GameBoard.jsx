@@ -205,81 +205,95 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
           button:hover .shine-overlay { left: 130%; }
         `}</style>
 
-        {/* Team Labels */}
-        <div className="gb-team-labels grid grid-cols-2 gap-1 md:gap-2 mb-1">
-          {[teamNames?.[0] || 'الفريق الأول', teamNames?.[1] || 'الفريق الثاني'].map((name, i) => (
-            <div key={i} className="text-center text-sm font-cairo font-bold rounded-lg py-1"
-              style={{ color: '#FF6666', background: 'rgba(139,0,0,0.2)' }}>
-              {name}
-            </div>
-          ))}
+        {/*
+          Two team sections side-by-side in landscape, stacked in portrait.
+          Each section has: team label + 3 category columns.
+          Each category column has its header directly above its tiles.
+        */}
+        <div className="gb-teams-wrapper flex flex-col sm:flex-row gap-1 sm:gap-2">
+          {[0, 1].map(teamIdx => {
+            const teamName = teamNames?.[teamIdx] || (teamIdx === 0 ? 'الفريق الأول' : 'الفريق الثاني');
+            const teamCats = categories.slice(teamIdx * 3, teamIdx * 3 + 3);
+            const colOffset = teamIdx * 3;
+
+            return (
+              <div key={teamIdx} className="gb-team-section flex-1 flex flex-col gap-1">
+                {/* Team label */}
+                <div className="gb-team-label text-center font-cairo font-bold text-sm rounded-lg py-1"
+                  style={{ color: '#FF6666', background: 'rgba(139,0,0,0.2)' }}>
+                  {teamName}
+                </div>
+
+                {/* 3 category columns side by side */}
+                <div className="grid grid-cols-3 gap-1 sm:gap-1.5 flex-1">
+                  {teamCats.map((cat, i) => {
+                    const colIndex = colOffset + i;
+                    return (
+                      <div key={colIndex} className="gb-cat-col flex flex-col gap-0.5">
+                        {/* Category header */}
+                        <motion.div
+                          className="gb-cat-cell text-center"
+                          initial={{ opacity: 0, y: -12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: colIndex * 0.07 }}
+                          style={{
+                            ...HEADER_STYLE,
+                            borderRadius: '10px',
+                            padding: '7px 3px',
+                          }}
+                        >
+                          <p className="gb-cat-text text-[10px] sm:text-xs font-cairo font-bold leading-tight truncate"
+                            style={{ color: '#fff' }}>
+                            {cat}
+                          </p>
+                        </motion.div>
+
+                        {/* Tiles grouped by tier — each pair directly under the header */}
+                        {[[200, 0, 1], [400, 2, 3], [600, 4, 5]].map(([points, rowA, rowB], tierIdx) => (
+                          <div key={points} className="gb-tier-pair flex flex-col gap-px"
+                            style={{ marginTop: tierIdx > 0 ? '3px' : 0 }}>
+                            {[rowA, rowB].map(rowIndex => {
+                              const tileKey = `${colIndex}-${rowIndex}`;
+                              const isAnswered = answeredTiles.has(tileKey);
+                              return (
+                                <motion.button
+                                  key={tileKey}
+                                  className="gb-tile tile-btn relative min-h-[36px] py-2 text-center font-cairo font-bold overflow-hidden"
+                                  initial={{ opacity: 0, scale: 0.85 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ delay: (rowIndex * 6 + colIndex) * 0.015 + 0.2 }}
+                                  whileTap={!isAnswered ? { scale: 0.95 } : {}}
+                                  onClick={() => !isAnswered && handleTileClick(colIndex, rowIndex, cat, points)}
+                                  disabled={isAnswered || !!popupType}
+                                  style={isAnswered
+                                    ? {
+                                        background: 'rgba(255,255,255,0.04)',
+                                        color: 'rgba(200,200,200,0.25)',
+                                        borderRadius: '10px',
+                                        border: '1px solid rgba(255,255,255,0.06)',
+                                        fontSize: '16px',
+                                        cursor: 'not-allowed',
+                                        opacity: 0.45,
+                                        transition: 'all 0.3s ease',
+                                      }
+                                    : { ...getColStyle(colIndex, points), borderRadius: '10px' }
+                                  }
+                                >
+                                  {isAnswered ? '✓' : points}
+                                  {!isAnswered && <div className="shine-overlay" />}
+                                </motion.button>
+                              );
+                            })}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
         </div>
-
-        {/* Category Headers - unified gold style */}
-        <div className="gb-cat-row grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1 md:gap-2 mb-1 md:mb-2">
-          {categories.map((cat, i) => (
-            <motion.div
-              key={i}
-              className="gb-cat-cell"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-              style={{
-                ...HEADER_STYLE,
-                borderRadius: '12px',
-                padding: '9px 4px',
-                textAlign: 'center',
-              }}
-            >
-              <p className="gb-cat-text text-[10px] sm:text-xs md:text-sm font-cairo font-bold leading-tight truncate"
-                style={{ color: '#fff' }}>
-                {cat}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Point Grid — grouped by tier so same-category same-value tiles sit directly under each other */}
-        {[[200, 0, 1], [400, 2, 3], [600, 4, 5]].map(([points, rowA, rowB]) => (
-          <div key={points} className="gb-tier-group grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-x-1 gap-y-0.5 md:gap-x-2 md:gap-y-1 mb-1 md:mb-2">
-            {[rowA, rowB].map(rowIndex =>
-              categories.map((cat, colIndex) => {
-                const tileKey = `${colIndex}-${rowIndex}`;
-                const isAnswered = answeredTiles.has(tileKey);
-
-                return (
-                  <motion.button
-                    key={tileKey}
-                    className="gb-tile tile-btn relative min-h-[44px] py-3 sm:py-4 md:py-5 text-center font-cairo font-bold overflow-hidden"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: (rowIndex * 6 + colIndex) * 0.02 + 0.3 }}
-                    whileTap={!isAnswered ? { scale: 0.96 } : {}}
-                    onClick={() => !isAnswered && handleTileClick(colIndex, rowIndex, cat, points)}
-                    disabled={isAnswered || !!popupType}
-                    style={
-                      isAnswered
-                        ? {
-                            background: 'rgba(255,255,255,0.04)',
-                            color: 'rgba(200,200,200,0.25)',
-                            borderRadius: '14px',
-                            border: '1px solid rgba(255,255,255,0.06)',
-                            fontSize: '18px',
-                            cursor: 'not-allowed',
-                            opacity: 0.45,
-                            transition: 'all 0.3s ease',
-                          }
-                        : getColStyle(colIndex, points)
-                    }
-                  >
-                    {isAnswered ? '✓' : points}
-                    {!isAnswered && <div className="shine-overlay" />}
-                  </motion.button>
-                );
-              })
-            )}
-          </div>
-        ))}
       </div>
     </>
   );
