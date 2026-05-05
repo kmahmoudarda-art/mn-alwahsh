@@ -235,3 +235,24 @@
 body {
   overscroll-behavior-y: contain;
 }
+
+/* ── Landscape phone: compact game board ── */
+@media (orientation: landscape) and (max-height: 600px) {
+  .gb-board { padding-left: 2px !important; padding-right: 2px !important; }
+
+  .gb-team-labels { margin-bottom: 1px !important; gap: 2px !important; }
+  .gb-team-labels > div { padding-top: 1px !important; padding-bottom: 1px !important; font-size: 9px !important; border-radius: 4px !important; }
+
+  .gb-cat-row { gap: 2px !important; margin-bottom: 1px !important; }
+  .gb-cat-cell { padding: 3px 2px !important; border-radius: 6px !important; }
+  .gb-cat-text { font-size: 8px !important; }
+
+  .gb-tile-row { gap: 2px !important; }
+  .gb-tile { min-height: 28px !important; padding-top: 3px !important; padding-bottom: 3px !important; font-size: 11px !important; border-radius: 7px !important; }
+
+  .gb-zoom-controls { padding-top: 2px !important; padding-bottom: 2px !important; gap: 6px !important; }
+  .gb-zoom-controls .gb-zoom-slider { width: 60px !important; }
+  .gb-zoom-controls span { font-size: 9px !important; width: 28px !important; }
+
+  .gb-board-wrapper { padding-top: 2px !important; padding-bottom: 2px !important; }
+}

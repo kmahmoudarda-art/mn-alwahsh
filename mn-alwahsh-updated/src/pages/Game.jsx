@@ -748,7 +748,7 @@ export default function Game() {
 
       {/* Zoom controls */}
       <div
-        className="flex items-center justify-center gap-3 py-2"
+        className="gb-zoom-controls flex items-center justify-center gap-3 py-2"
         style={{ transform: `scale(${1 / zoom})`, position: 'relative', zIndex: 5 }}
       >
         <button
@@ -761,7 +761,7 @@ export default function Game() {
         <input
           type="range" min="0.5" max="1.5" step="0.05" value={zoom}
           onChange={(e) => setZoom(parseFloat(e.target.value))}
-          className="w-32 accent-primary"
+          className="gb-zoom-slider w-32 accent-primary"
         />
         <button
           onClick={() => setZoom(z => Math.min(1.5, +(z + 0.1).toFixed(1)))}
@@ -774,7 +774,7 @@ export default function Game() {
       </div>
 
       <div
-        className="flex-1 py-4 overflow-auto relative"
+        className="gb-board-wrapper flex-1 py-4 overflow-auto relative"
         style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', transition: 'transform 0.2s ease', zIndex: 5 }}
       >
         <GameBoard

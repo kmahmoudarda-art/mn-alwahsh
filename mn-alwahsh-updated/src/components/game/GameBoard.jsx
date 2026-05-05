@@ -183,7 +183,7 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
         {popupType === 'medium' && popupMessage && <MediumPopup message={popupMessage} />}
       </AnimatePresence>
 
-      <div className="w-full px-1 md:px-4" dir="rtl"
+      <div className="gb-board w-full px-1 md:px-4" dir="rtl"
         style={popupType === 'danger' ? { animation: 'dangerShake 0.6s ease' } : {}}>
         <style>{`
           @keyframes dangerShake {
@@ -206,7 +206,7 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
         `}</style>
 
         {/* Team Labels */}
-        <div className="grid grid-cols-2 gap-1 md:gap-2 mb-1">
+        <div className="gb-team-labels grid grid-cols-2 gap-1 md:gap-2 mb-1">
           {[teamNames?.[0] || 'الفريق الأول', teamNames?.[1] || 'الفريق الثاني'].map((name, i) => (
             <div key={i} className="text-center text-sm font-cairo font-bold rounded-lg py-1"
               style={{ color: '#FF6666', background: 'rgba(139,0,0,0.2)' }}>
@@ -216,10 +216,11 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
         </div>
 
         {/* Category Headers - unified gold style */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1 md:gap-2 mb-1 md:mb-2">
+        <div className="gb-cat-row grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1 md:gap-2 mb-1 md:mb-2">
           {categories.map((cat, i) => (
             <motion.div
               key={i}
+              className="gb-cat-cell"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08 }}
@@ -230,7 +231,7 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
                 textAlign: 'center',
               }}
             >
-              <p className="text-[10px] sm:text-xs md:text-sm font-cairo font-bold leading-tight truncate"
+              <p className="gb-cat-text text-[10px] sm:text-xs md:text-sm font-cairo font-bold leading-tight truncate"
                 style={{ color: '#fff' }}>
                 {cat}
               </p>
@@ -239,7 +240,7 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
         </div>
 
         {/* Point Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1 md:gap-2">
+        <div className="gb-tile-row grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1 md:gap-2">
           {DISPLAY_VALUES.map((points, rowIndex) =>
             categories.map((cat, colIndex) => {
               const tileKey = `${colIndex}-${rowIndex}`;
@@ -248,7 +249,7 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
               return (
                 <motion.button
                   key={tileKey}
-                  className="tile-btn relative min-h-[44px] py-3 sm:py-4 md:py-5 text-center font-cairo font-bold overflow-hidden"
+                  className="gb-tile tile-btn relative min-h-[44px] py-3 sm:py-4 md:py-5 text-center font-cairo font-bold overflow-hidden"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: (rowIndex * 6 + colIndex) * 0.02 + 0.3 }}
