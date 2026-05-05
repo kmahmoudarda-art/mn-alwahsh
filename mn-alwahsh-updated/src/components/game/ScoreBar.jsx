@@ -1,9 +1,11 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Plus, Minus, Settings, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PayPalDonateButton from './PayPalDonateButton';
 import HorrorMusic from './HorrorMusic';
+
+const MILESTONES = [1000, 2000, 3000, 4000, 5000];
 
 export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }) {
   const [showSettings, setShowSettings] = useState(false);
@@ -25,6 +27,19 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
           0%   { background-position: 200% center; }
           100% { background-position: -200% center; }
         }
+        @keyframes screenShake {
+          0%,100% { transform: translate(0,0) rotate(0deg); }
+          10%     { transform: translate(-10px,-5px) rotate(-1.5deg); }
+          20%     { transform: translate(10px,5px) rotate(1.5deg); }
+          30%     { transform: translate(-10px,5px) rotate(-1deg); }
+          40%     { transform: translate(10px,-5px) rotate(1deg); }
+          50%     { transform: translate(-7px,3px) rotate(-1deg); }
+          60%     { transform: translate(7px,-3px) rotate(0.5deg); }
+          70%     { transform: translate(-4px,4px) rotate(-0.5deg); }
+          80%     { transform: translate(4px,-2px) rotate(0.5deg); }
+          90%     { transform: translate(-2px,2px) rotate(0deg); }
+        }
+        .screen-shake { animation: screenShake 0.75s ease !important; }
       `}</style>
 
       <div
@@ -39,8 +54,6 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
           zIndex: 20,
         }}
       >
-
-        {/* Content */}
         <div className="relative z-10 flex items-center justify-between gap-3 w-full">
           <TeamScore name={team1.name} score={team1.score} isActive={currentTeam === 1} scoreKey={team1.scoreKey} onAdjust={d => onAdjust(1, d)} align="right" />
 
@@ -91,15 +104,35 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack }
 }
 
 function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }) {
-  const badge = score >= 3000 ? { text: 'امبراطور 👑', color: '#b8860b' }
-    : score >= 2500 ? { text: 'اسطورة 🌟', color: '#cc5500' }
-    : score >= 2000 ? { text: 'ملك 🔥', color: '#cc0000' }
-    : score >= 1000 ? { text: 'وحش 💪', color: '#8B0000' }
+  const [shaking, setShaking] = useState(false);
+  const prevScoreRef = useRef(score);
+
+  const badge = score >= 5000 ? { text: 'وحش 💪🔥', color: '#8B0000', glow: '#FF0000' }
+    : score >= 4000 ? { text: 'امبراطور 👑', color: '#8B6914', glow: '#FFD700' }
+    : score >= 3000 ? { text: 'اسطورة 🌟', color: '#cc5500', glow: '#FF8C00' }
+    : score >= 2000 ? { text: 'ملك 🔥', color: '#cc0000', glow: '#FF4444' }
+    : score >= 1000 ? { text: 'وحش 💪', color: '#8B0000', glow: '#CC0000' }
     : null;
+
+  useEffect(() => {
+    const prev = prevScoreRef.current;
+    const hitMilestone = MILESTONES.some(m => prev < m && score >= m);
+    if (hitMilestone) {
+      setShaking(true);
+      document.documentElement.classList.add('screen-shake');
+      setTimeout(() => {
+        document.documentElement.classList.remove('screen-shake');
+        setShaking(false);
+      }, 750);
+    }
+    prevScoreRef.current = score;
+  }, [score]);
 
   return (
     <motion.div
       layout
+      animate={shaking ? { x: [0, -12, 12, -10, 10, -6, 6, -3, 3, 0] } : {}}
+      transition={shaking ? { duration: 0.7, ease: 'easeInOut' } : {}}
       className="flex-1 max-w-[330px] rounded-2xl overflow-hidden"
       style={
         isActive
@@ -124,19 +157,48 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }
           {isActive && <span className="text-[9px] mr-1" style={{ color: '#CC0000' }}>● دورهم</span>}
         </p>
 
-        {/* Score + buttons */}
+        {/* Score + badge + buttons in one row */}
         <div className={`flex items-center gap-2 mt-0.5 ${reverse ? 'flex-row' : 'flex-row-reverse'}`}>
-          <motion.p
-            key={scoreKey}
-            className={`text-4xl md:text-5xl font-cairo font-black flex-1 leading-none ${align === 'left' ? 'text-left' : 'text-right'}`}
-            style={{ color: isActive ? '#8B0000' : '#1a1a1a' }}
-            initial={{ scale: 1.3, color: '#CC0000' }}
-            animate={{ scale: 1, color: isActive ? '#8B0000' : '#1a1a1a' }}
-            transition={{ type: 'spring', stiffness: 350 }}
-          >
-            {score}
-          </motion.p>
-          <div className="flex flex-col gap-1">
+
+          {/* Score number + badge inline */}
+          <div className={`flex-1 flex items-center gap-2 ${align === 'left' ? 'flex-row' : 'flex-row-reverse'}`}>
+            <motion.p
+              key={scoreKey}
+              className="text-4xl md:text-5xl font-cairo font-black leading-none"
+              style={{ color: isActive ? '#8B0000' : '#1a1a1a' }}
+              initial={{ scale: 1.3, color: '#CC0000' }}
+              animate={{ scale: 1, color: isActive ? '#8B0000' : '#1a1a1a' }}
+              transition={{ type: 'spring', stiffness: 350 }}
+            >
+              {score}
+            </motion.p>
+
+            <AnimatePresence mode="wait">
+              {badge && (
+                <motion.span
+                  key={badge.text}
+                  initial={{ scale: 0, opacity: 0, rotate: -15 }}
+                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 12 }}
+                  style={{
+                    fontSize: 22,
+                    fontFamily: 'var(--font-cairo)',
+                    fontWeight: 900,
+                    color: badge.color,
+                    textShadow: `0 0 8px ${badge.glow}55`,
+                    whiteSpace: 'nowrap',
+                    lineHeight: 1,
+                  }}
+                >
+                  {badge.text}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* +/- buttons */}
+          <div className="flex flex-col gap-1 shrink-0">
             <button onClick={() => onAdjust(100)} className="w-7 h-7 rounded-lg flex items-center justify-center font-bold shadow-sm"
               style={{ background: '#22c55e', color: '#fff' }}>
               <Plus className="w-3.5 h-3.5" />
@@ -147,8 +209,6 @@ function TeamScore({ name, score, isActive, scoreKey, reverse, onAdjust, align }
             </button>
           </div>
         </div>
-
-        {badge && <p className="text-[10px] font-cairo font-bold mt-0.5" style={{ color: badge.color }}>{badge.text}</p>}
       </div>
     </motion.div>
   );
