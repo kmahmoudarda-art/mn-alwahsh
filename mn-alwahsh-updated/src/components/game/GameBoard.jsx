@@ -239,45 +239,47 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
           ))}
         </div>
 
-        {/* Point Grid */}
-        <div className="gb-tile-row grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1 md:gap-2">
-          {DISPLAY_VALUES.map((points, rowIndex) =>
-            categories.map((cat, colIndex) => {
-              const tileKey = `${colIndex}-${rowIndex}`;
-              const isAnswered = answeredTiles.has(tileKey);
+        {/* Point Grid — grouped by tier so same-category same-value tiles sit directly under each other */}
+        {[[200, 0, 1], [400, 2, 3], [600, 4, 5]].map(([points, rowA, rowB]) => (
+          <div key={points} className="gb-tier-group grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-x-1 gap-y-0.5 md:gap-x-2 md:gap-y-1 mb-1 md:mb-2">
+            {[rowA, rowB].map(rowIndex =>
+              categories.map((cat, colIndex) => {
+                const tileKey = `${colIndex}-${rowIndex}`;
+                const isAnswered = answeredTiles.has(tileKey);
 
-              return (
-                <motion.button
-                  key={tileKey}
-                  className="gb-tile tile-btn relative min-h-[44px] py-3 sm:py-4 md:py-5 text-center font-cairo font-bold overflow-hidden"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: (rowIndex * 6 + colIndex) * 0.02 + 0.3 }}
-                  whileTap={!isAnswered ? { scale: 0.96 } : {}}
-                  onClick={() => !isAnswered && handleTileClick(colIndex, rowIndex, cat, points)}
-                  disabled={isAnswered || !!popupType}
-                  style={
-                    isAnswered
-                      ? {
-                          background: 'rgba(255,255,255,0.04)',
-                          color: 'rgba(200,200,200,0.25)',
-                          borderRadius: '14px',
-                          border: '1px solid rgba(255,255,255,0.06)',
-                          fontSize: '18px',
-                          cursor: 'not-allowed',
-                          opacity: 0.45,
-                          transition: 'all 0.3s ease',
-                        }
-                      : getColStyle(colIndex, points)
-                  }
-                >
-                  {isAnswered ? '✓' : points}
-                  {!isAnswered && <div className="shine-overlay" />}
-                </motion.button>
-              );
-            })
-          )}
-        </div>
+                return (
+                  <motion.button
+                    key={tileKey}
+                    className="gb-tile tile-btn relative min-h-[44px] py-3 sm:py-4 md:py-5 text-center font-cairo font-bold overflow-hidden"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: (rowIndex * 6 + colIndex) * 0.02 + 0.3 }}
+                    whileTap={!isAnswered ? { scale: 0.96 } : {}}
+                    onClick={() => !isAnswered && handleTileClick(colIndex, rowIndex, cat, points)}
+                    disabled={isAnswered || !!popupType}
+                    style={
+                      isAnswered
+                        ? {
+                            background: 'rgba(255,255,255,0.04)',
+                            color: 'rgba(200,200,200,0.25)',
+                            borderRadius: '14px',
+                            border: '1px solid rgba(255,255,255,0.06)',
+                            fontSize: '18px',
+                            cursor: 'not-allowed',
+                            opacity: 0.45,
+                            transition: 'all 0.3s ease',
+                          }
+                        : getColStyle(colIndex, points)
+                    }
+                  >
+                    {isAnswered ? '✓' : points}
+                    {!isAnswered && <div className="shine-overlay" />}
+                  </motion.button>
+                );
+              })
+            )}
+          </div>
+        ))}
       </div>
     </>
   );
