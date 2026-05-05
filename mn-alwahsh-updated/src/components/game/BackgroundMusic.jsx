@@ -9,15 +9,6 @@ const TRACKS = [
   '/track3.mpeg',
   '/track4.mpeg',
   '/track5.mpeg',
-  '/track6.mp3',
-  '/track7.mp3',
-  '/track8.mp3',
-  '/track9.mp3',
-  '/track10.mp3',
-  '/track11.mp3',
-  '/track12.mp3',
-  '/track13.mp3',
-  '/track14.mp3',
 ];
 
 function shuffled(arr) {
