@@ -34,13 +34,12 @@ export default function SetupScreen({ onStartGame }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" dir="rtl" style={{ background: '#0a0000' }}>
-      {/* Full-screen horror forest background */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: 'url(/bg-setup.jpeg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        zIndex: 0,
-      }} />
+      {/* Full-screen video background */}
+      <video autoPlay loop muted playsInline className="absolute inset-0 pointer-events-none" style={{
+        width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', zIndex: 0,
+      }}>
+        <source src="/bg-new.mp4" type="video/mp4" />
+      </video>
       <div className="absolute inset-0 pointer-events-none" style={{
         background: 'rgba(0,0,0,0.45)',
         zIndex: 0,

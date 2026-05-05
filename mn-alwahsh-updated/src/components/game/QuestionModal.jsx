@@ -387,7 +387,7 @@ export default function QuestionModal({
             objectFit: 'cover', objectPosition: 'center',
             zIndex: 0, pointerEvents: 'none',
           }}>
-          <source src="/bg-question.mp4" type="video/mp4" />
+          <source src="/bg-new.mp4" type="video/mp4" />
         </video>
         {/* Bright overlay so text stays readable */}
         <div style={{
