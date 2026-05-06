@@ -656,8 +656,8 @@ export default function QuestionModal({
                       )}
                     </div>
 
-                    {/* Lifelines */}
-                    {!answered && (
+                    {/* Lifelines — hidden during steal mode */}
+                    {!stealMode && !answered && (
                       <div className="ll-scroll" style={{ flexShrink:0, display:'flex', flexDirection:'row', overflowX:'auto', gap:8, padding:'0 12px 6px' }}>
                         {LIFELINES.filter(ll => ll.id !== 'trap').map(ll => {
                           const isUsed = usedLifelines[ll.id];
@@ -797,8 +797,8 @@ export default function QuestionModal({
                       )}
                     </div>
 
-                    {/* Lifelines */}
-                    {!answered && (
+                    {/* Lifelines — hidden during steal mode */}
+                    {!stealMode && !answered && (
                       <div className="ll-scroll" style={{ flexShrink:0, display:'flex', flexDirection:'row', overflowX:'auto', gap:6, padding:'0 12px 4px' }}>
                         {LIFELINES.filter(ll => ll.id !== 'trap').map(ll => {
                           const isUsed = usedLifelines[ll.id];
@@ -866,8 +866,8 @@ export default function QuestionModal({
                     )}
                   </div>
 
-                  {/* Lifelines */}
-                  {!answered && (
+                  {/* Lifelines — hidden during steal mode */}
+                  {!stealMode && !answered && (
                     <div className="ll-scroll" style={{ flexShrink:0, display:'flex', flexDirection:'row', overflowX:'auto', gap:8, padding:'0 12px 6px' }}>
                       {LIFELINES.filter(ll => ll.id !== 'trap').map(ll => {
                         const isUsed = usedLifelines[ll.id];
