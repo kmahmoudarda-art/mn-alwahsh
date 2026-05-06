@@ -496,14 +496,17 @@ export default function QuestionModal({
             <div className="ll-scroll" style={{ display:'flex', flexDirection:'row', overflowX:'auto', gap:8, paddingBottom:4 }}>
               {LIFELINES.filter(ll => ll.phase === 'before').map(ll => {
                 const isUsed = usedLifelines[ll.id];
+                const isBlockedOnBonus = ll.id === 'trap' && !!bonusTier;
+                const isDisabled = isUsed || isBlockedOnBonus;
                 return (
-                  <button key={ll.id} onClick={() => !isUsed && onUseLifeline(ll.id)} disabled={isUsed}
+                  <button key={ll.id} onClick={() => !isDisabled && onUseLifeline(ll.id)} disabled={isDisabled}
+                    title={isBlockedOnBonus ? 'لا يمكن استخدام هذه الميزة على أسئلة المكافأة' : undefined}
                     style={{ whiteSpace:'nowrap', padding:'6px 12px', fontSize:13, borderRadius:20, flexShrink:0,
-                      background: isUsed ? 'rgba(255,255,255,0.03)' : GOLD_BG,
-                      color: isUsed ? 'rgba(255,255,255,0.3)' : '#000',
-                      border: `1px solid ${isUsed ? 'rgba(255,255,255,0.1)' : GOLD_BORDER}`,
-                      fontFamily:'var(--font-cairo)', opacity: isUsed ? 0.4 : 1,
-                      textDecoration: isUsed ? 'line-through' : 'none', cursor: isUsed ? 'not-allowed' : 'pointer',
+                      background: isDisabled ? 'rgba(255,255,255,0.03)' : GOLD_BG,
+                      color: isDisabled ? 'rgba(255,255,255,0.3)' : '#000',
+                      border: `1px solid ${isDisabled ? 'rgba(255,255,255,0.1)' : GOLD_BORDER}`,
+                      fontFamily:'var(--font-cairo)', opacity: isDisabled ? 0.4 : 1,
+                      textDecoration: isUsed ? 'line-through' : 'none', cursor: isDisabled ? 'not-allowed' : 'pointer',
                     }}>{ll.label}</button>
                 );
               })}
