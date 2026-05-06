@@ -256,6 +256,8 @@ export default function QuestionModal({
   luckyDoubleActive,
   onQuestionSwapped,
   onResetTimer,
+  bonusTier,
+  bonusConf,
 }) {
   const [restInput, setRestInput] = useState('');
   const [closeClickCount, setCloseClickCount] = useState(0);
@@ -440,6 +442,50 @@ export default function QuestionModal({
             </button>
           </div>
         </div>
+
+        {/* ── Bonus tile banner ── */}
+        {bonusTier && bonusConf?.[bonusTier] && (
+          <div style={{
+            flexShrink: 0,
+            background: 'linear-gradient(90deg, #7c3aed 0%, #a855f7 50%, #7c3aed 100%)',
+            padding: '10px 16px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            gap: 8, direction: 'rtl',
+            borderBottom: '2px solid rgba(168,85,247,0.5)',
+            boxShadow: '0 2px 12px rgba(168,85,247,0.4)',
+            animation: 'bonusPulse 2s ease-in-out infinite',
+          }}>
+            <style>{`
+              @keyframes bonusPulse {
+                0%,100% { box-shadow: 0 2px 12px rgba(168,85,247,0.4); }
+                50%      { box-shadow: 0 2px 28px rgba(168,85,247,0.9); }
+              }
+            `}</style>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 22 }}>⭐</span>
+              <div>
+                <p style={{ margin: 0, fontFamily: 'var(--font-cairo)', fontWeight: 900, fontSize: 14, color: '#fff', lineHeight: 1.2 }}>
+                  سؤال مكافأة!
+                </p>
+                <p style={{ margin: 0, fontFamily: 'var(--font-cairo)', fontWeight: 700, fontSize: 11, color: 'rgba(255,255,255,0.85)', lineHeight: 1.2 }}>
+                  إجابة صحيحة → <span style={{ color: '#fde68a', fontWeight: 900 }}>×{bonusConf[bonusTier].mult} = {Math.round(bonusTier * bonusConf[bonusTier].mult)} نقطة</span>
+                </p>
+              </div>
+            </div>
+            <div style={{
+              background: 'rgba(239,68,68,0.85)', borderRadius: 8,
+              padding: '5px 10px', textAlign: 'center',
+              border: '1px solid rgba(255,100,100,0.5)',
+            }}>
+              <p style={{ margin: 0, fontFamily: 'var(--font-cairo)', fontWeight: 900, fontSize: 13, color: '#fff', lineHeight: 1.1 }}>
+                خطأ ← <span style={{ color: '#fca5a5' }}>-{bonusConf[bonusTier].penalty}</span>
+              </p>
+              <p style={{ margin: 0, fontFamily: 'var(--font-cairo)', fontWeight: 600, fontSize: 10, color: 'rgba(255,255,255,0.75)', lineHeight: 1.1 }}>
+                تُخصم من فريقك
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Before question: lifelines */}
         {showLifelinesBefore && (

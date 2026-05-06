@@ -145,7 +145,13 @@ function MediumPopup({ message }) {
   );
 }
 
-export default function GameBoard({ categories, answeredTiles, onTileClick, teamNames, readyTiles = new Set() }) {
+const BONUS_BADGE = {
+  200: { label: '×1.5', color: '#a855f7', glow: 'rgba(168,85,247,0.7)' },
+  400: { label: '×1.3', color: '#8b5cf6', glow: 'rgba(139,92,246,0.7)' },
+  600: { label: '×1.2', color: '#7c3aed', glow: 'rgba(124,58,237,0.7)' },
+};
+
+export default function GameBoard({ categories, answeredTiles, onTileClick, teamNames, readyTiles = new Set(), bonusTiles = {} }) {
   const [popupType, setPopupType] = useState(null);
   const [popupMessage, setPopupMessage] = useState(null);
   const [pendingTile, setPendingTile] = useState(null);
@@ -191,6 +197,10 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
             30%  { transform: translateX(8px); }  45% { transform: translateX(-6px); }
             60%  { transform: translateX(6px); }  75% { transform: translateX(-4px); }
             90%  { transform: translateX(4px); }  100%{ transform: translateX(0); }
+          }
+          @keyframes starPulse {
+            0%,100% { opacity: 1; transform: scale(1); }
+            50%      { opacity: 0.75; transform: scale(1.12); }
           }
           .tile-btn:hover:not(:disabled) {
             filter: brightness(1.25) !important;
@@ -274,7 +284,9 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
                                   whileTap={!isAnswered ? { scale: 0.95 } : {}}
                                   onClick={() => !isAnswered && handleTileClick(colIndex, rowIndex, cat, points)}
                                   disabled={isAnswered || !!popupType}
-                                  style={isAnswered
+                                style={(() => {
+                                  const bonus = !isAnswered && bonusTiles[tileKey];
+                                  const base = isAnswered
                                     ? {
                                         background: 'rgba(255,255,255,0.04)',
                                         color: 'rgba(200,200,200,0.25)',
@@ -285,10 +297,32 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
                                         opacity: 0.45,
                                         transition: 'all 0.3s ease',
                                       }
-                                    : { ...getColStyle(colIndex, points), borderRadius: '10px' }
+                                    : { ...getColStyle(colIndex, points), borderRadius: '10px' };
+                                  if (bonus) {
+                                    const b = BONUS_BADGE[bonus];
+                                    return { ...base, border: `2px solid ${b.color}`, boxShadow: `0 0 10px ${b.glow}, 0 3px 12px ${b.glow}` };
                                   }
+                                  return base;
+                                })()}
                                 >
                                   {isAnswered ? '✓' : points}
+                                  {!isAnswered && bonusTiles[tileKey] && (() => {
+                                    const b = BONUS_BADGE[bonusTiles[tileKey]];
+                                    return (
+                                      <span style={{
+                                        position: 'absolute', top: 2, left: 2,
+                                        background: b.color,
+                                        color: '#fff',
+                                        fontSize: '8px', fontWeight: 900,
+                                        padding: '1px 4px', borderRadius: 4,
+                                        fontFamily: 'var(--font-cairo)',
+                                        lineHeight: 1.4,
+                                        boxShadow: `0 0 6px ${b.glow}`,
+                                        letterSpacing: '0.02em',
+                                        animation: 'starPulse 1.8s ease-in-out infinite',
+                                      }}>⭐{b.label}</span>
+                                    );
+                                  })()}
                                   {!isAnswered && <div className="shine-overlay" />}
                                 </motion.button>
                               );

@@ -18,6 +18,12 @@ import LuckyDoublePopup from '../components/game/LuckyDoublePopup';
 const TOTAL_TILES = 36;
 const POINT_VALUES = [200, 400, 600];
 
+const BONUS_CONF = {
+  200: { mult: 1.5, penalty: 50,  label: '×1.5', penaltyLabel: '-50'  },
+  400: { mult: 1.3, penalty: 100, label: '×1.3', penaltyLabel: '-100' },
+  600: { mult: 1.2, penalty: 200, label: '×1.2', penaltyLabel: '-200' },
+};
+
 export default function Game() {
   const [gameName, setGameName] = useState(null);
 
@@ -60,6 +66,9 @@ export default function Game() {
   const [luckyDoubleActive, setLuckyDoubleActive] = useState(false); // true when current tile is lucky for losing team
   const [showLuckyPopup, setShowLuckyPopup] = useState(false);
   const [luckyUsed, setLuckyUsed] = useState(false);
+
+  // Bonus tiles: { "col-row": pointsTier } — must be declared before useEffects that reference it
+  const [bonusTiles, setBonusTiles] = useState({});
 
   const startTimer = useCallback((seconds) => {
     setTimerSeconds(seconds);
@@ -181,8 +190,9 @@ export default function Game() {
       teamLifelines,
       usedLucky,
       usedQuickTimer,
+      bonusTiles,
     });
-  }, [gameName, gamePhase, categories, teams, currentTeam, answeredTiles, teamLifelines, usedLucky, usedQuickTimer]);
+  }, [gameName, gamePhase, categories, teams, currentTeam, answeredTiles, teamLifelines, usedLucky, usedQuickTimer, bonusTiles]);
 
   // Clear saved session when game is finished (game over — no resume needed)
   useEffect(() => {
@@ -210,6 +220,22 @@ export default function Game() {
     });
   }, []);
 
+  const generateBonusTiles = useCallback((numCategories) => {
+    const result = {};
+    [[0,1,200],[2,3,400],[4,5,600]].forEach(([rowA, rowB, pts]) => {
+      const pool = [];
+      for (let col = 0; col < numCategories; col++) {
+        pool.push(`${col}-${rowA}`, `${col}-${rowB}`);
+      }
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      pool.slice(0, 2).forEach(k => { result[k] = pts; });
+    });
+    return result;
+  }, []);
+
   const handleStartGame = useCallback((setup) => {
     const allCategories = [...setup.team1.categories, ...setup.team2.categories];
     setCategories(allCategories);
@@ -224,9 +250,10 @@ export default function Game() {
     setUsedQuickTimer({ 1: false, 2: false });
     setQuickTimerActiveFor(null);
     usedAnswersRef.current = {};
+    setBonusTiles(generateBonusTiles(allCategories.length));
     setGamePhase('playing');
     startPregeneration(allCategories);
-  }, [startPregeneration]);
+  }, [startPregeneration, generateBonusTiles]);
 
   const getQuestion = useCallback(async (category, points) => {
     const prevAnswers = usedAnswersRef.current[category] || [];
@@ -375,7 +402,14 @@ export default function Game() {
       sounds.wrong();
     }
 
-    const rawPts = currentTile.points;
+    const tileKey = `${currentTile.colIndex}-${currentTile.rowIndex}`;
+    const bonusTier = bonusTiles[tileKey] || null;
+    const bonusCfg = bonusTier ? BONUS_CONF[bonusTier] : null;
+
+    // Base points — apply bonus multiplier if correct on a bonus tile
+    let rawPts = currentTile.points;
+    if (bonusCfg && correct) rawPts = Math.round(rawPts * bonusCfg.mult);
+
     const scoringTeam = stealMode ? (currentTeam === 1 ? 2 : 1) : currentTeam;
     // Apply lucky double only when the losing team (non-steal) answers correctly
     const isLuckyScore = luckyDoubleActive && !stealMode && correct;
@@ -403,13 +437,25 @@ export default function Game() {
           ...prev,
           [opponent]: {
             ...prev[opponent],
-            score: prev[opponent].score - rawPts,
+            score: prev[opponent].score - currentTile.points,
             scoreKey: prev[opponent].scoreKey + 1,
           },
         }));
       }
+    } else {
+      // Wrong answer (both teams missed) — apply bonus penalty to the original team
+      if (bonusCfg) {
+        setTeams(prev => ({
+          ...prev,
+          [currentTeam]: {
+            ...prev[currentTeam],
+            score: prev[currentTeam].score - bonusCfg.penalty,
+            scoreKey: prev[currentTeam].scoreKey + 1,
+          },
+        }));
+      }
     }
-  }, [currentQuestion, currentTile, currentTeam, activeLifeline, twoAnswersMode, firstWrongAnswer, stealMode, stopTimer, startTimer, luckyDoubleActive]);
+  }, [currentQuestion, currentTile, currentTeam, activeLifeline, twoAnswersMode, firstWrongAnswer, stealMode, stopTimer, startTimer, luckyDoubleActive, bonusTiles]);
 
   const handleLuckyResult = useCallback((teamNum, delta) => {
     sounds.lucky();
@@ -502,9 +548,10 @@ export default function Game() {
     setLuckyUsed(false);
     setLuckyDoubleActive(false);
     setShowLuckyPopup(false);
+    setBonusTiles(generateBonusTiles(categories.length));
     setGamePhase('playing');
     if (categories.length > 0) startPregeneration(categories);
-  }, [teams, categories, startPregeneration]);
+  }, [teams, categories, startPregeneration, generateBonusTiles]);
 
   const handlePlayAgain = useCallback(() => {
     resetQuestionCache();
@@ -537,7 +584,6 @@ export default function Game() {
   // End game confirmation
   const [showEndConfirm, setShowEndConfirm] = useState(false);
 
-
   const handleEnterGameName = useCallback(async (name) => {
     setGameName(name);
     const existing = await loadSession(name);
@@ -551,6 +597,7 @@ export default function Game() {
       if (existing.teamLifelines) setTeamLifelines(existing.teamLifelines);
       if (existing.usedLucky) setUsedLucky(existing.usedLucky);
       if (existing.usedQuickTimer) setUsedQuickTimer(existing.usedQuickTimer);
+      if (existing.bonusTiles) setBonusTiles(existing.bonusTiles);
       if (existing.gamePhase === 'playing' && existing.categories?.length > 0) {
         startPregeneration(existing.categories);
       }
@@ -806,6 +853,7 @@ export default function Game() {
           onTileClick={handleTileClick}
           teamNames={[teams[1].name, teams[2].name]}
           readyTiles={readyTiles}
+          bonusTiles={bonusTiles}
         />
       </div>
 
@@ -955,6 +1003,8 @@ export default function Game() {
             passToOtherUsed={usedPassToOther[currentTeam]}
             onQuestionSwapped={(newQ) => setCurrentQuestion(newQ)}
             onResetTimer={() => startTimer(30)}
+            bonusTier={bonusTiles[`${currentTile?.colIndex}-${currentTile?.rowIndex}`] || null}
+            bonusConf={BONUS_CONF}
           />
         </AnimatePresence>,
         document.body
