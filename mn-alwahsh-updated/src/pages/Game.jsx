@@ -481,6 +481,31 @@ export default function Game() {
     setGameName(null);
   }, []);
 
+  // Restart — keep same categories, reset scores/tiles/lifelines/questions
+  const [showRestartConfirm, setShowRestartConfirm] = useState(false);
+
+  const handleRestartGame = useCallback(async () => {
+    resetQuestionCache();
+    usedAnswersRef.current = {};
+    // Reset Supabase used flags so all questions are available again
+    const { resetAllQuestions } = await import('../utils/supabaseClient');
+    resetAllQuestions().catch(() => {});
+    setAnsweredTiles(new Set());
+    setReadyTiles(new Set());
+    setTeams({ 1: { name: teams[1].name, score: 0, scoreKey: 0 }, 2: { name: teams[2].name, score: 0, scoreKey: 0 } });
+    setCurrentTeam(1);
+    setTeamLifelines({ 1: {}, 2: {} });
+    setUsedLucky({ 1: false, 2: false });
+    setUsedQuickTimer({ 1: false, 2: false });
+    setUsedPassToOther({ 1: false, 2: false });
+    setLuckyCell(null);
+    setLuckyUsed(false);
+    setLuckyDoubleActive(false);
+    setShowLuckyPopup(false);
+    setGamePhase('playing');
+    if (categories.length > 0) startPregeneration(categories);
+  }, [teams, categories, startPregeneration]);
+
   const handlePlayAgain = useCallback(() => {
     resetQuestionCache();
     usedAnswersRef.current = {};
@@ -730,6 +755,26 @@ export default function Game() {
         </button>
         <span className="text-xs font-cairo w-10 text-center" style={{ color: '#FF6666' }}>{Math.round(zoom * 100)}%</span>
 
+        {/* Restart Game button */}
+        <button
+          onClick={() => setShowRestartConfirm(true)}
+          style={{
+            marginLeft: 8,
+            padding: '4px 14px',
+            borderRadius: 8,
+            background: 'rgba(0,50,0,0.75)',
+            border: '1px solid rgba(0,180,0,0.5)',
+            color: '#99FF99',
+            fontFamily: 'var(--font-cairo)',
+            fontWeight: 800,
+            fontSize: 13,
+            cursor: 'pointer',
+            letterSpacing: 0.3,
+          }}
+        >
+          إعادة اللعبة
+        </button>
+
         {/* End Game button */}
         <button
           onClick={() => setShowEndConfirm(true)}
@@ -763,6 +808,63 @@ export default function Game() {
           readyTiles={readyTiles}
         />
       </div>
+
+      {/* Restart Game confirmation overlay */}
+      {showRestartConfirm && createPortal(
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 99999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(6px)',
+        }}>
+          <div style={{
+            background: 'linear-gradient(160deg, #001a00 0%, #000d00 100%)',
+            border: '1.5px solid rgba(0,180,0,0.4)',
+            borderRadius: 16, padding: '32px 36px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20,
+            boxShadow: '0 0 40px rgba(0,150,0,0.25)',
+            minWidth: 280,
+          }}>
+            <span style={{ fontSize: 40 }}>🔄</span>
+            <p style={{
+              fontFamily: 'var(--font-cairo)', fontWeight: 800, fontSize: 20,
+              color: '#E0FFE0', textAlign: 'center', margin: 0, direction: 'rtl',
+            }}>
+              إعادة اللعبة؟
+            </p>
+            <p style={{
+              fontFamily: 'var(--font-cairo)', fontWeight: 600, fontSize: 14,
+              color: 'rgba(180,255,180,0.7)', textAlign: 'center', margin: 0, direction: 'rtl',
+            }}>
+              سيتم إعادة ضبط النقاط والأسئلة مع الاحتفاظ بنفس الفئات
+            </p>
+            <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
+              <button
+                onClick={() => { setShowRestartConfirm(false); handleRestartGame(); }}
+                style={{
+                  padding: '10px 28px', borderRadius: 10,
+                  background: 'rgba(0,140,0,0.85)', border: '1px solid rgba(0,220,0,0.5)',
+                  color: '#E0FFE0', fontFamily: 'var(--font-cairo)', fontWeight: 800,
+                  fontSize: 15, cursor: 'pointer',
+                }}
+              >
+                نعم، أعِد اللعبة
+              </button>
+              <button
+                onClick={() => setShowRestartConfirm(false)}
+                style={{
+                  padding: '10px 22px', borderRadius: 10,
+                  background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)',
+                  color: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-cairo)', fontWeight: 700,
+                  fontSize: 15, cursor: 'pointer',
+                }}
+              >
+                رجوع
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* End Game confirmation overlay */}
       {showEndConfirm && createPortal(
