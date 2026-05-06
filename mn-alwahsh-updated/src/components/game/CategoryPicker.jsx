@@ -11,7 +11,7 @@ const CATEGORY_GROUPS = {
   '🌍 جغرافيا وثقافة': ['أعلام العالم', 'علوم', 'جغرافيا', 'الإمارات', 'الأردن', 'دبي', 'تاريخ', 'براندات', 'English Lang', 'English Questions', 'أسئلة إنجليزية'],
   '💻 تكنولوجيا': ['هواتف ذكية', 'تكنولوجيا', 'سيارات'],
   '👑 بنات': ['بنات فقط', 'سبيستون', 'Sephora', 'سيفورا', 'guess fashion', 'Guess Fashion', 'GUESS FASHION', 'Guess fashion'],
-  '🧒 أطفال': ['kids', 'Kids', 'KIDS', 'kids guess', 'Kids Guess', 'Kids guess', 'KIDS GUESS', 'Kids guess ', 'Kids Guess ', 'kids easy', 'Kids Easy', 'Kids easy', 'KIDS EASY', 'أطفال', 'عالم الأطفال', 'رسوم متحركة', 'كرتون', 'ديزني', 'Disney', 'بيبي شارك', 'Baby Shark', 'سبونج بوب', 'SpongeBob'],
+  '🧒 أطفال': ['kids', 'Kids', 'KIDS', 'kids guess', 'Kids Guess', 'Kids guess', 'KIDS GUESS', 'Kids guess ', 'Kids Guess ', 'kids easy', 'Kids Easy', 'Kids easy', 'KIDS EASY', 'guess fashion easy', 'Guess Fashion Easy', 'Guess fashion easy', 'GUESS FASHION EASY', 'أطفال', 'عالم الأطفال', 'رسوم متحركة', 'كرتون', 'ديزني', 'Disney', 'بيبي شارك', 'Baby Shark', 'سبونج بوب', 'SpongeBob'],
   '🧠 تحديات': ['IQ', 'رياضيات', 'الغاز محيرة', 'عادات غريبة', 'Logos'],
   '☪️ ديني': ['إسلامي', 'سيرة نبوية', 'فتوحات إسلامية'],
   '🎲 متفرقات': ['أكل عربي', 'حيوانات', 'Dangerous Animals', 'حيوانات خطرة'],
