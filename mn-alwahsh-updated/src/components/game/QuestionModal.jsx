@@ -550,7 +550,7 @@ export default function QuestionModal({
 
                       {/* RIGHT: image + question */}
                       <div style={{
-                        width: 130, flexShrink: 0,
+                        width: 200, flexShrink: 0,
                         display: 'flex', flexDirection: 'column',
                         alignItems: 'center', justifyContent: 'center', gap: 6,
                       }}>
@@ -558,10 +558,10 @@ export default function QuestionModal({
                           src={resolvedHeroUrl}
                           alt=""
                           style={{
-                            width: 110, height: 110,
-                            objectFit: isLogo ? 'contain' : 'cover',
+                            width: 185, height: 185,
+                            objectFit: 'contain',
                             objectPosition: 'center',
-                            borderRadius: isLogo ? 8 : '50%',
+                            borderRadius: 8,
                             border: 'none',
                             boxShadow: 'none',
                             display: 'block',
@@ -700,11 +700,11 @@ export default function QuestionModal({
                           src={resolvedHeroUrl}
                           alt=""
                           style={{
-                            width: '100%', maxWidth: 160,
-                            height: 'auto', maxHeight: 140,
-                            objectFit: isLogo ? 'contain' : 'cover',
+                            width: '100%', maxWidth: 240,
+                            height: 'auto', maxHeight: 200,
+                            objectFit: 'contain',
                             objectPosition: 'center',
-                            borderRadius: isLogo ? 8 : '50%',
+                            borderRadius: 8,
                             border: 'none', boxShadow: 'none', display: 'block',
                           }}
                           onError={(e) => { e.target.style.display = 'none'; }}
