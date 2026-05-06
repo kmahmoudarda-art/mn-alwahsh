@@ -509,6 +509,9 @@ export default function Game() {
   // Zoom state
   const [zoom, setZoom] = useState(0.9);
 
+  // End game confirmation
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
+
 
   const handleEnterGameName = useCallback(async (name) => {
     setGameName(name);
@@ -726,6 +729,26 @@ export default function Game() {
           <ZoomIn className="w-4 h-4" />
         </button>
         <span className="text-xs font-cairo w-10 text-center" style={{ color: '#FF6666' }}>{Math.round(zoom * 100)}%</span>
+
+        {/* End Game button */}
+        <button
+          onClick={() => setShowEndConfirm(true)}
+          style={{
+            marginRight: 8,
+            padding: '4px 14px',
+            borderRadius: 8,
+            background: 'rgba(100,0,0,0.75)',
+            border: '1px solid rgba(220,0,0,0.6)',
+            color: '#FF9999',
+            fontFamily: 'var(--font-cairo)',
+            fontWeight: 800,
+            fontSize: 13,
+            cursor: 'pointer',
+            letterSpacing: 0.3,
+          }}
+        >
+          إنهاء اللعبة
+        </button>
       </div>
 
       <div
@@ -740,6 +763,63 @@ export default function Game() {
           readyTiles={readyTiles}
         />
       </div>
+
+      {/* End Game confirmation overlay */}
+      {showEndConfirm && createPortal(
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 99999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(6px)',
+        }}>
+          <div style={{
+            background: 'linear-gradient(160deg, #1a0000 0%, #0d0000 100%)',
+            border: '1.5px solid rgba(200,0,0,0.5)',
+            borderRadius: 16, padding: '32px 36px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20,
+            boxShadow: '0 0 40px rgba(180,0,0,0.3)',
+            minWidth: 280,
+          }}>
+            <span style={{ fontSize: 40 }}>⚠️</span>
+            <p style={{
+              fontFamily: 'var(--font-cairo)', fontWeight: 800, fontSize: 20,
+              color: '#FFE0E0', textAlign: 'center', margin: 0, direction: 'rtl',
+            }}>
+              إنهاء اللعبة؟
+            </p>
+            <p style={{
+              fontFamily: 'var(--font-cairo)', fontWeight: 600, fontSize: 14,
+              color: 'rgba(255,180,180,0.7)', textAlign: 'center', margin: 0, direction: 'rtl',
+            }}>
+              سيتم حذف الجلسة الحالية ولا يمكن التراجع
+            </p>
+            <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
+              <button
+                onClick={() => { setShowEndConfirm(false); handlePlayAgain(); }}
+                style={{
+                  padding: '10px 28px', borderRadius: 10,
+                  background: 'rgba(180,0,0,0.85)', border: '1px solid rgba(255,60,60,0.6)',
+                  color: '#FFE0E0', fontFamily: 'var(--font-cairo)', fontWeight: 800,
+                  fontSize: 15, cursor: 'pointer',
+                }}
+              >
+                نعم، أنهِ اللعبة
+              </button>
+              <button
+                onClick={() => setShowEndConfirm(false)}
+                style={{
+                  padding: '10px 22px', borderRadius: 10,
+                  background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)',
+                  color: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-cairo)', fontWeight: 700,
+                  fontSize: 15, cursor: 'pointer',
+                }}
+              >
+                رجوع
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Modal rendered via portal to document.body to escape the zoom transform stacking context */}
       {modalOpen && createPortal(
