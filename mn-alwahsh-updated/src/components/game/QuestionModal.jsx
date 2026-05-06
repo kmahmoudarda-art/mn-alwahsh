@@ -569,11 +569,11 @@ export default function QuestionModal({
                           if (answered) {
                             bg = '#f5f5f5'; bdr = '1px solid #e0e0e0'; color = '#888';
                             if (isCorrectAnswer) { bg=ANS_CORRECT_BG; bdr=ANS_CORRECT_BDR; color=ANS_CORRECT_CLR; }
-                            else if (isSelected) { bg=ANS_WRONG_BG; bdr=ANS_WRONG_BDR; color=ANS_WRONG_CLR; }
-                            else if (isFirstWrong) { bg='rgba(239,68,68,0.05)'; bdr='1px solid rgba(239,68,68,0.2)'; color='rgba(153,27,27,0.45)'; }
+                            else if (isSelected || isFirstWrong) { bg=ANS_WRONG_BG; bdr=ANS_WRONG_BDR; color=ANS_WRONG_CLR; }
                           }
                           if (!answered && isFirstWrong) { bg='rgba(239,68,68,0.18)'; bdr='1.5px solid rgba(239,68,68,0.65)'; color='rgb(185,28,28)'; }
                           if (isEliminated) { bg=ANS_DIM_BG; bdr=ANS_DIM_BDR; color=ANS_DIM_CLR; }
+                          const showRedCross = isFirstWrong || (answered && isSelected && !isCorrectAnswer);
                           const Tag = answered ? 'div' : 'button';
                           return (
                             <Tag key={key}
@@ -591,7 +591,7 @@ export default function QuestionModal({
                                 fontFamily: 'var(--font-cairo)', transition: 'background 0.15s',
                                 width: '100%', boxSizing: 'border-box',
                               }}>
-                              <span style={{ fontWeight:700, color: (!answered && isFirstWrong) ? 'rgb(185,28,28)' : ANS_KEY_CLR, flexShrink:0 }}>{key}. {!answered && isFirstWrong ? '✗' : ''}</span>
+                              <span style={{ fontWeight:700, color: showRedCross ? 'rgb(185,28,28)' : ANS_KEY_CLR, flexShrink:0 }}>{key}. {showRedCross ? '✗' : ''}</span>
                               {value}
                             </Tag>
                           );
@@ -712,11 +712,11 @@ export default function QuestionModal({
                           if (answered) {
                             bg = '#f5f5f5'; bdr = '1px solid #e0e0e0'; color = '#888';
                             if (isCorrectAnswer) { bg=ANS_CORRECT_BG; bdr=ANS_CORRECT_BDR; color=ANS_CORRECT_CLR; }
-                            else if (isSelected) { bg=ANS_WRONG_BG; bdr=ANS_WRONG_BDR; color=ANS_WRONG_CLR; }
-                            else if (isFirstWrong) { bg='rgba(239,68,68,0.05)'; bdr='1px solid rgba(239,68,68,0.2)'; color='rgba(153,27,27,0.45)'; }
+                            else if (isSelected || isFirstWrong) { bg=ANS_WRONG_BG; bdr=ANS_WRONG_BDR; color=ANS_WRONG_CLR; }
                           }
                           if (!answered && isFirstWrong) { bg='rgba(239,68,68,0.18)'; bdr='1.5px solid rgba(239,68,68,0.65)'; color='rgb(185,28,28)'; }
                           if (isEliminated) { bg=ANS_DIM_BG; bdr=ANS_DIM_BDR; color=ANS_DIM_CLR; }
+                          const showRedCross = isFirstWrong || (answered && isSelected && !isCorrectAnswer);
                           const Tag = answered ? 'div' : 'button';
                           return (
                             <Tag key={key}
@@ -734,7 +734,7 @@ export default function QuestionModal({
                                 fontFamily: 'var(--font-cairo)', transition: 'background 0.15s',
                                 width: '100%', boxSizing: 'border-box',
                               }}>
-                              <span style={{ fontWeight:700, color: (!answered && isFirstWrong) ? 'rgb(185,28,28)' : ANS_KEY_CLR, flexShrink:0 }}>{key}. {!answered && isFirstWrong ? '✗' : ''}</span>
+                              <span style={{ fontWeight:700, color: showRedCross ? 'rgb(185,28,28)' : ANS_KEY_CLR, flexShrink:0 }}>{key}. {showRedCross ? '✗' : ''}</span>
                               {value}
                             </Tag>
                           );
@@ -932,8 +932,8 @@ export default function QuestionModal({
                         const isFirstWrong = firstWrongAnswer === key;
                         let bg = '#f5f5f5', border = '1px solid #e0e0e0', color = '#888';
                         if (isCorrectAnswer) { bg=ANS_CORRECT_BG; border=ANS_CORRECT_BDR; color=ANS_CORRECT_CLR; }
-                        else if (isSelected) { bg=ANS_WRONG_BG; border=ANS_WRONG_BDR; color=ANS_WRONG_CLR; }
-                        else if (isFirstWrong) { bg='rgba(239,68,68,0.05)'; border='1px solid rgba(239,68,68,0.2)'; color='rgba(153,27,27,0.4)'; }
+                        else if (isSelected || isFirstWrong) { bg=ANS_WRONG_BG; border=ANS_WRONG_BDR; color=ANS_WRONG_CLR; }
+                        const showRedCross = (isSelected || isFirstWrong) && !isCorrectAnswer;
                         return (
                           <div key={key} style={{ minHeight:48, borderRadius:10, padding:'6px 10px',
                             fontSize:16, fontWeight:700, lineHeight:1.3, wordBreak:'break-word',
@@ -941,7 +941,7 @@ export default function QuestionModal({
                             direction:'rtl', textAlign:'right', background:bg, border, color,
                             fontFamily:'var(--font-cairo)',
                           }}>
-                            <span style={{ fontWeight:700, color:ANS_KEY_CLR, flexShrink:0 }}>{key}.</span>
+                            <span style={{ fontWeight:700, color: showRedCross ? 'rgb(185,28,28)' : ANS_KEY_CLR, flexShrink:0 }}>{key}. {showRedCross ? '✗' : ''}</span>
                             {value}
                           </div>
                         );
