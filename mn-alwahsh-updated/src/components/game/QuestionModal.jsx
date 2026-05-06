@@ -572,6 +572,7 @@ export default function QuestionModal({
                             else if (isSelected) { bg=ANS_WRONG_BG; bdr=ANS_WRONG_BDR; color=ANS_WRONG_CLR; }
                             else if (isFirstWrong) { bg='rgba(239,68,68,0.05)'; bdr='1px solid rgba(239,68,68,0.2)'; color='rgba(153,27,27,0.45)'; }
                           }
+                          if (!answered && isFirstWrong) { bg='rgba(239,68,68,0.18)'; bdr='1.5px solid rgba(239,68,68,0.65)'; color='rgb(185,28,28)'; }
                           if (isEliminated) { bg=ANS_DIM_BG; bdr=ANS_DIM_BDR; color=ANS_DIM_CLR; }
                           const Tag = answered ? 'div' : 'button';
                           return (
@@ -590,7 +591,7 @@ export default function QuestionModal({
                                 fontFamily: 'var(--font-cairo)', transition: 'background 0.15s',
                                 width: '100%', boxSizing: 'border-box',
                               }}>
-                              <span style={{ fontWeight:700, color:ANS_KEY_CLR, flexShrink:0 }}>{key}.</span>
+                              <span style={{ fontWeight:700, color: (!answered && isFirstWrong) ? 'rgb(185,28,28)' : ANS_KEY_CLR, flexShrink:0 }}>{key}. {!answered && isFirstWrong ? '✗' : ''}</span>
                               {value}
                             </Tag>
                           );
@@ -714,6 +715,7 @@ export default function QuestionModal({
                             else if (isSelected) { bg=ANS_WRONG_BG; bdr=ANS_WRONG_BDR; color=ANS_WRONG_CLR; }
                             else if (isFirstWrong) { bg='rgba(239,68,68,0.05)'; bdr='1px solid rgba(239,68,68,0.2)'; color='rgba(153,27,27,0.45)'; }
                           }
+                          if (!answered && isFirstWrong) { bg='rgba(239,68,68,0.18)'; bdr='1.5px solid rgba(239,68,68,0.65)'; color='rgb(185,28,28)'; }
                           if (isEliminated) { bg=ANS_DIM_BG; bdr=ANS_DIM_BDR; color=ANS_DIM_CLR; }
                           const Tag = answered ? 'div' : 'button';
                           return (
@@ -732,7 +734,7 @@ export default function QuestionModal({
                                 fontFamily: 'var(--font-cairo)', transition: 'background 0.15s',
                                 width: '100%', boxSizing: 'border-box',
                               }}>
-                              <span style={{ fontWeight:700, color:ANS_KEY_CLR, flexShrink:0 }}>{key}.</span>
+                              <span style={{ fontWeight:700, color: (!answered && isFirstWrong) ? 'rgb(185,28,28)' : ANS_KEY_CLR, flexShrink:0 }}>{key}. {!answered && isFirstWrong ? '✗' : ''}</span>
                               {value}
                             </Tag>
                           );
@@ -895,22 +897,25 @@ export default function QuestionModal({
                     <div style={{ flexShrink:0, display:'grid', gridTemplateColumns:'1fr 1fr', gap:6, padding:'0 12px 10px' }}>
                       {Object.entries(question.options).map(([key, value]) => {
                         const isEliminated = friendHint === key;
-                        const isDisabled = isEliminated || (twoAnswersMode && firstWrongAnswer === key);
+                        const isFirstWrong = firstWrongAnswer === key;
+                        const isDisabled = isEliminated || (twoAnswersMode && isFirstWrong);
+                        let bg = isEliminated ? ANS_DIM_BG : ANS_DEFAULT_BG;
+                        let bdr = isEliminated ? ANS_DIM_BDR : ANS_DEFAULT_BDR;
+                        let clr = isEliminated ? ANS_DIM_CLR : ANS_DEFAULT_CLR;
+                        if (isFirstWrong) { bg='rgba(239,68,68,0.18)'; bdr='1.5px solid rgba(239,68,68,0.65)'; clr='rgb(185,28,28)'; }
                         return (
                           <button key={key} onClick={() => !isDisabled && onAnswer(key)} disabled={isDisabled}
                             style={{ minHeight:48, borderRadius:10, padding:'6px 10px',
                               fontSize:16, fontWeight:700, lineHeight:1.3, wordBreak:'break-word',
                               display:'flex', alignItems:'center', justifyContent:'flex-end', gap:8,
                               direction:'rtl', textAlign:'right',
-                              background: isEliminated ? ANS_DIM_BG : ANS_DEFAULT_BG,
-                              border: isEliminated ? ANS_DIM_BDR : ANS_DEFAULT_BDR,
-                              color: isEliminated ? ANS_DIM_CLR : ANS_DEFAULT_CLR,
+                              background: bg, border: bdr, color: clr,
                               opacity: isEliminated ? 0.3 : 1,
                               textDecoration: isEliminated ? 'line-through' : 'none',
                               cursor: isDisabled ? 'not-allowed' : 'pointer',
                               fontFamily:'var(--font-cairo)', transition:'background 0.15s',
                             }}>
-                            <span style={{ fontWeight:700, color:GOLD, flexShrink:0 }}>{key}.</span>
+                            <span style={{ fontWeight:700, color: isFirstWrong ? 'rgb(185,28,28)' : GOLD, flexShrink:0 }}>{key}. {isFirstWrong ? '✗' : ''}</span>
                             {value}
                           </button>
                         );
