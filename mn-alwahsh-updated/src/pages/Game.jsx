@@ -298,8 +298,9 @@ export default function Game() {
     setStealMode(false);
     stopTimer();
 
-    // Check if this is the lucky cell for the losing team
-    const isLucky = !luckyUsed && luckyCell &&
+    // Check if this is the lucky cell for the losing team — not allowed on bonus tiles
+    const isBonusTile = !!bonusTiles[`${colIndex}-${rowIndex}`];
+    const isLucky = !isBonusTile && !luckyUsed && luckyCell &&
       luckyCell.col === colIndex && luckyCell.row === rowIndex &&
       luckyCell.losingTeam === currentTeam;
     setLuckyDoubleActive(isLucky);
@@ -411,8 +412,8 @@ export default function Game() {
     if (bonusCfg && correct) rawPts = Math.round(rawPts * bonusCfg.mult);
 
     const scoringTeam = stealMode ? (currentTeam === 1 ? 2 : 1) : currentTeam;
-    // Apply lucky double only when the losing team (non-steal) answers correctly
-    const isLuckyScore = luckyDoubleActive && !stealMode && correct;
+    // Apply lucky double only when the losing team (non-steal) answers correctly — never on bonus tiles
+    const isLuckyScore = luckyDoubleActive && !stealMode && correct && !bonusCfg;
     const pts = isLuckyScore ? rawPts * 2 : rawPts;
 
     if (isLuckyScore) {
