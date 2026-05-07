@@ -751,8 +751,8 @@ export default function QuestionModal({
                           src={resolvedHeroUrl}
                           alt=""
                           style={{
-                            width: '100%', maxWidth: 240,
-                            height: 'auto', maxHeight: 200,
+                            width: '100%', maxWidth: 180,
+                            height: 'auto', maxHeight: 150,
                             objectFit: 'contain',
                             objectPosition: 'center',
                             borderRadius: 8,
