@@ -117,8 +117,8 @@ const unique = [...new Set(allRows.map(r => r.category).filter(Boolean))].filter
 async function fetchRowsFromTable(table, category, points) {
   const intPoints = parseInt(points, 10);
   const encodedCategory = encodeURIComponent(category);
-  // Use neq.true to catch both used=false AND used=NULL (default state in Sin-Jim1)
-  const usedFilter = table === TABLE_FAM ? '' : '&used=neq.true';
+  // Use not.is.true to catch both used=false AND used=NULL (neq.true misses NULLs in PostgreSQL)
+  const usedFilter = table === TABLE_FAM ? '' : '&used=not.is.true';
   const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}&limit=1000`;
   const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
 
