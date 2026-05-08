@@ -128,16 +128,40 @@ export async function fetchCategories() {
   return unique;
 }
 
-// Get count via Content-Range header — uses select=* so it works for all tables (no id assumption)
-async function getRowCount(table, category, points, usedFilter) {
+// Per-table cache of the working "used" filter string — resolved once, reused forever
+// Values: '&used=not.is.true' | '&used=neq.true' | '' (no filter)
+const tableUsedFilterCache = new Map();
+
+// Resolve the correct "used" filter for a table, trying not.is.true then neq.true
+async function resolveUsedFilter(table, encodedCategory, intPoints) {
+  if (tableUsedFilterCache.has(table)) return tableUsedFilterCache.get(table);
+
+  for (const candidate of ['&used=not.is.true', '&used=neq.true']) {
+    const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${candidate}&limit=1`;
+    const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } });
+    if (res.ok) {
+      tableUsedFilterCache.set(table, candidate);
+      return candidate;
+    }
+    // 400 = bad filter syntax for this column type — try next candidate
+  }
+  // Table has no usable used filter
+  tableUsedFilterCache.set(table, '');
+  return '';
+}
+
+// Get count via Content-Range header — returns { total, usedFilter }
+async function getRowCount(table, category, points) {
   const intPoints = parseInt(points, 10);
   const encodedCategory = encodeURIComponent(category);
+  const usedFilter = await resolveUsedFilter(table, encodedCategory, intPoints);
+
   const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}&limit=1`;
   const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } });
-  if (!res.ok) return 0;
+  if (!res.ok) return { total: 0, usedFilter };
   const cr = res.headers.get('content-range');
   const total = cr ? parseInt(cr.split('/')[1], 10) : 0;
-  return isNaN(total) ? 0 : total;
+  return { total: isNaN(total) ? 0 : total, usedFilter };
 }
 
 // Fetch exactly 1 random unused row from a specific table
@@ -145,7 +169,7 @@ async function fetchOneRandom(table, category, points) {
   const intPoints = parseInt(points, 10);
   const encodedCategory = encodeURIComponent(category);
 
-  // FAM/KIDS: no server-side used filter (unreliable) — fetch a batch and filter client-side
+  // FAM/KIDS: server-side used filter unreliable — fetch batch and filter client-side
   if (table === TABLE_FAM || table === TABLE_KIDS) {
     const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}&limit=50`;
     const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
@@ -157,16 +181,19 @@ async function fetchOneRandom(table, category, points) {
     return unused[Math.floor(Math.random() * unused.length)];
   }
 
-  // All other tables: count then fetch 1 row at a random offset (2 tiny requests)
-  const usedFilter = '&used=not.is.true';
-  let total = await getRowCount(table, category, points, usedFilter);
+  // All other tables: resolve the correct used filter, then count + fetch 1 row at random offset
+  const { total, usedFilter } = await getRowCount(table, category, points);
 
   if (total === 0) {
-    // Table may not support the used filter — try without it to check for absence vs exhaustion
-    const noFilterTotal = await getRowCount(table, category, points, '');
-    if (noFilterTotal === 0) return null; // category truly absent from this table
-    // Exhausted — caller will handle reset
-    return null;
+    // Check if category is truly absent or just exhausted
+    const noFilterUrl = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}&limit=1`;
+    const noFilterRes = await fetch(noFilterUrl, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } });
+    if (noFilterRes.ok) {
+      const cr = noFilterRes.headers.get('content-range');
+      const noFilterTotal = cr ? parseInt(cr.split('/')[1], 10) : 0;
+      if (noFilterTotal === 0) return null; // truly absent
+    }
+    return null; // exhausted — caller handles reset
   }
 
   const offset = Math.floor(Math.random() * total);
@@ -182,12 +209,15 @@ async function fetchOneRandom(table, category, points) {
 async function fetchRowsFromTable(table, category, points) {
   const intPoints = parseInt(points, 10);
   const encodedCategory = encodeURIComponent(category);
-  const usedFilter = table === TABLE_FAM ? '' : '&used=not.is.true';
+  // Use the same resolved filter as fetchOneRandom so text-column tables work too
+  const usedFilter = (table === TABLE_FAM || table === TABLE_KIDS)
+    ? ''
+    : await resolveUsedFilter(table, encodedCategory, intPoints);
   const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}&limit=20`;
   const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
   if (!res.ok) return [];
   const data = await res.json();
-  if (table === TABLE_FAM) return data.filter(r => r.used !== true);
+  if (table === TABLE_FAM || table === TABLE_KIDS) return data.filter(r => r.used !== true);
   return data;
 }
 
