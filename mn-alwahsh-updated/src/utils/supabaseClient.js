@@ -128,34 +128,66 @@ export async function fetchCategories() {
   return unique;
 }
 
-// Fetch rows from a table by category+points (unused only)
-// Category is filtered server-side via eq (URL-encoded) for accuracy across large tables
+// Get count of matching unused rows — returns total via Content-Range header (no row data)
+async function getRowCount(table, category, points, usedFilter) {
+  const intPoints = parseInt(points, 10);
+  const encodedCategory = encodeURIComponent(category);
+  const url = `${SUPABASE_URL}/rest/v1/${table}?select=id&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}&limit=1`;
+  const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } });
+  if (!res.ok) return 0;
+  const cr = res.headers.get('content-range');
+  const total = cr ? parseInt(cr.split('/')[1], 10) : 0;
+  return isNaN(total) ? 0 : total;
+}
+
+// Fetch exactly 1 random unused row from a specific table — 2 tiny requests instead of limit=1000
+async function fetchOneRandom(table, category, points) {
+  const intPoints = parseInt(points, 10);
+  const encodedCategory = encodeURIComponent(category);
+  const usedFilter = table === TABLE_FAM ? '' : '&used=not.is.true';
+  const base = `${SUPABASE_URL}/rest/v1/${table}?points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}`;
+
+  // Step 1: count (header only, no body data)
+  let total = await getRowCount(table, category, points, usedFilter);
+
+  if (total === 0 && usedFilter) {
+    // Table may not support the used filter — retry without it
+    const fallbackBase = `${SUPABASE_URL}/rest/v1/${table}?select=id&points=eq.${intPoints}&category=eq.${encodedCategory}&limit=1`;
+    const fbRes = await fetch(fallbackBase, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } });
+    if (fbRes.ok) {
+      const cr = fbRes.headers.get('content-range');
+      total = cr ? parseInt(cr.split('/')[1], 10) : 0;
+      if (isNaN(total)) total = 0;
+    }
+  }
+
+  if (total === 0) return null;
+
+  // Step 2: fetch 1 row at a random offset (tiny payload)
+  const offset = Math.floor(Math.random() * total);
+  const rowUrl = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}&limit=1&offset=${offset}`;
+  const res = await fetch(rowUrl, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (!Array.isArray(data) || data.length === 0) return null;
+
+  const row = data[0];
+  // For FAM: double-check client-side since API filter is skipped
+  if (table === TABLE_FAM && row.used === true) return null;
+  return row;
+}
+
+// Kept only for fetchSwapQuestion (needs a small set to exclude one id)
 async function fetchRowsFromTable(table, category, points) {
   const intPoints = parseInt(points, 10);
   const encodedCategory = encodeURIComponent(category);
-  // Use not.is.true to catch both used=false AND used=NULL (neq.true misses NULLs in PostgreSQL)
   const usedFilter = table === TABLE_FAM ? '' : '&used=not.is.true';
-  const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}&limit=1000`;
+  const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}&limit=20`;
   const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
-
-  // If the query failed (e.g. table has no 'used' column), retry without the used filter
-  if (!res.ok) {
-    if (usedFilter) {
-      const fallbackUrl = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}&limit=1000`;
-      const fallbackRes = await fetch(fallbackUrl, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
-      if (!fallbackRes.ok) return [];
-      return await fallbackRes.json();
-    }
-    return [];
-  }
-
-  const allData = await res.json();
-
-  // For Fam: also filter out used=true rows client-side (in case encoding slips through)
-  if (table === TABLE_FAM) {
-    return allData.filter(r => r.used !== true);
-  }
-  return allData;
+  if (!res.ok) return [];
+  const data = await res.json();
+  if (table === TABLE_FAM) return data.filter(r => r.used !== true);
+  return data;
 }
 
 // Mark a question as used in the correct table
@@ -201,31 +233,29 @@ async function tableHasCategory(table, category, points) {
   return Array.isArray(data) && data.length > 0;
 }
 
-// Fetch question — goes directly to the owning table via categoryTableMap (1 request),
-// falls back to sequential search only if the map doesn't have the category yet.
+// Fetch question — 2 tiny requests (count + 1 row) instead of fetching limit=1000
 export async function fetchQuestion(category, points) {
   const ALL_TABLES = [TABLE_MAIN, TABLE_FLAGS, TABLE_FANAN, TABLE_FAM, TABLE_FALSAFA, TABLE_LOGO1, TABLE_LOGOO, TABLE_KIDS];
 
-  // Fast path: look up owning table directly
+  // Fast path: go directly to the owning table via categoryTableMap
   const ownerTable = categoryTableMap.get(category.toLowerCase().trim());
   const tablesToTry = ownerTable ? [ownerTable] : ALL_TABLES;
 
   for (const table of tablesToTry) {
-    let rows = await fetchRowsFromTable(table, category, points);
+    let row = await fetchOneRandom(table, category, points);
 
-    if (rows.length === 0) {
-      // Exhausted — reset this table and retry
+    if (!row) {
+      // Could be exhausted or absent — only reset if the table owns this category
       const hasIt = ownerTable ? true : await tableHasCategory(table, category, points);
       if (hasIt) {
         await resetTable(table);
-        rows = await fetchRowsFromTable(table, category, points);
+        row = await fetchOneRandom(table, category, points);
       } else {
         continue;
       }
     }
 
-    if (rows.length > 0) {
-      const row = rows[Math.floor(Math.random() * rows.length)];
+    if (row) {
       markQuestionUsed(row, table).catch(() => {});
       return normalizeRow(row, table);
     }

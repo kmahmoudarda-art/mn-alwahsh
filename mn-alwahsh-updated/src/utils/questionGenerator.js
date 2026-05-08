@@ -46,17 +46,19 @@ export async function pregenerateAllTiles(categories, pointValues, onTileReady) 
   const tasks = categories.flatMap(cat =>
     pointValues.map(pts =>
       fetchQuestion(cat, pts)
-        .then(async q => {
+        .then(q => {
           if (q) {
             const key = cacheKey(cat, pts);
             const list = questionCache.get(key) || [];
             list.push(q);
             questionCache.set(key, list);
-            if (q.image_url) await fetchAndCacheImage(q.image_url);
+            // Fire image download in background — don't block tile becoming ready
+            if (q.image_url) fetchAndCacheImage(q.image_url).catch(() => {});
           }
+          // Mark tile ready as soon as question is in cache
+          onTileReady?.(cat, pts);
         })
-        .catch(() => {})
-        .finally(() => onTileReady?.(cat, pts))
+        .catch(() => onTileReady?.(cat, pts))
     )
   );
   await Promise.all(tasks);
