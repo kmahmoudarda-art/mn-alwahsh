@@ -128,11 +128,11 @@ export async function fetchCategories() {
   return unique;
 }
 
-// Get count of matching unused rows — returns total via Content-Range header (no row data)
+// Get count via Content-Range header — uses select=* so it works for all tables (no id assumption)
 async function getRowCount(table, category, points, usedFilter) {
   const intPoints = parseInt(points, 10);
   const encodedCategory = encodeURIComponent(category);
-  const url = `${SUPABASE_URL}/rest/v1/${table}?select=id&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}&limit=1`;
+  const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}&limit=1`;
   const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } });
   if (!res.ok) return 0;
   const cr = res.headers.get('content-range');
@@ -140,41 +140,42 @@ async function getRowCount(table, category, points, usedFilter) {
   return isNaN(total) ? 0 : total;
 }
 
-// Fetch exactly 1 random unused row from a specific table — 2 tiny requests instead of limit=1000
+// Fetch exactly 1 random unused row from a specific table
 async function fetchOneRandom(table, category, points) {
   const intPoints = parseInt(points, 10);
   const encodedCategory = encodeURIComponent(category);
-  const usedFilter = table === TABLE_FAM ? '' : '&used=not.is.true';
-  const base = `${SUPABASE_URL}/rest/v1/${table}?points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}`;
 
-  // Step 1: count (header only, no body data)
-  let total = await getRowCount(table, category, points, usedFilter);
-
-  if (total === 0 && usedFilter) {
-    // Table may not support the used filter — retry without it
-    const fallbackBase = `${SUPABASE_URL}/rest/v1/${table}?select=id&points=eq.${intPoints}&category=eq.${encodedCategory}&limit=1`;
-    const fbRes = await fetch(fallbackBase, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } });
-    if (fbRes.ok) {
-      const cr = fbRes.headers.get('content-range');
-      total = cr ? parseInt(cr.split('/')[1], 10) : 0;
-      if (isNaN(total)) total = 0;
-    }
+  // FAM/KIDS: no server-side used filter (unreliable) — fetch a batch and filter client-side
+  if (table === TABLE_FAM || table === TABLE_KIDS) {
+    const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}&limit=50`;
+    const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!Array.isArray(data)) return null;
+    const unused = data.filter(r => r.used !== true);
+    if (unused.length === 0) return null;
+    return unused[Math.floor(Math.random() * unused.length)];
   }
 
-  if (total === 0) return null;
+  // All other tables: count then fetch 1 row at a random offset (2 tiny requests)
+  const usedFilter = '&used=not.is.true';
+  let total = await getRowCount(table, category, points, usedFilter);
 
-  // Step 2: fetch 1 row at a random offset (tiny payload)
+  if (total === 0) {
+    // Table may not support the used filter — try without it to check for absence vs exhaustion
+    const noFilterTotal = await getRowCount(table, category, points, '');
+    if (noFilterTotal === 0) return null; // category truly absent from this table
+    // Exhausted — caller will handle reset
+    return null;
+  }
+
   const offset = Math.floor(Math.random() * total);
   const rowUrl = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}&limit=1&offset=${offset}`;
   const res = await fetch(rowUrl, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
   if (!res.ok) return null;
   const data = await res.json();
   if (!Array.isArray(data) || data.length === 0) return null;
-
-  const row = data[0];
-  // For FAM: double-check client-side since API filter is skipped
-  if (table === TABLE_FAM && row.used === true) return null;
-  return row;
+  return data[0];
 }
 
 // Kept only for fetchSwapQuestion (needs a small set to exclude one id)
