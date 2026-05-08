@@ -6,6 +6,7 @@ import { X } from 'lucide-react';
 import LoadingSpinner from './LoadingSpinner';
 import FlagQuestion from './FlagQuestion';
 import { fetchSwapQuestion } from '../../utils/supabaseClient';
+import { getCachedImageUrl, fetchAndCacheImage } from '../../utils/questionGenerator';
 import { LIFELINES } from './LifelinePanel';
 
 const GOLD = 'hsl(45 90% 42%)';
@@ -139,6 +140,9 @@ const FULL_NAME_TO_STAGE = {
   'مصطفى عبد العزيز مصطفى كامل':        'مصطفى كامل',
   'مصطفى مصطفى عبد العزيز كامل':        'مصطفى كامل',
 };
+
+// Preload all singer photos into blob cache the moment this module is imported
+Object.values(SINGER_PHOTOS).forEach(url => fetchAndCacheImage(url));
 
 function cleanSingerName(fullName) {
   if (!fullName) return null;
@@ -537,9 +541,10 @@ export default function QuestionModal({
               const isFanan = question.source_table === 'Fanan';
               const isLogo = question.source_table === 'logo1';
               const hasImage = question.image_url && question.image_url !== '';
-              const resolvedHeroUrl = hasImage
+              const rawHeroUrl = hasImage
                 ? isFanan ? (singerPhotoUrl || question.image_url) : question.image_url
                 : null;
+              const resolvedHeroUrl = rawHeroUrl ? getCachedImageUrl(rawHeroUrl) : null;
 
               // ── PORTRAIT WITH IMAGE: split layout ──
               // RIGHT: image + question | LEFT: answers stacked
@@ -617,7 +622,7 @@ export default function QuestionModal({
                             display: 'block',
                           }}
                           onError={(e) => { e.target.style.display = 'none'; }}
-                          onLoad={() => console.log('Image loaded:', resolvedHeroUrl)}
+                          fetchPriority="high"
                         />
                         <p style={{
                           fontFamily: 'var(--font-cairo)', fontWeight: 800,
