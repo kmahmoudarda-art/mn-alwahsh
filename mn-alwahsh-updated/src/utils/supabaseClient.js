@@ -91,23 +91,39 @@ async function fetchAllRows(table, select = 'category') {
   return allRows;
 }
 
-// Fetch distinct categories from ALL 4 tables merged — always fresh, no cache
+// category (lowercase) → owning table — built once at fetchCategories time
+const categoryTableMap = new Map();
+
+// Fetch distinct categories from ALL tables merged — always fresh, no cache
 export async function fetchCategories() {
-  const [mainRows, flagRows, fananRows, famRows, falsafaRows, logo1Rows, logooRows, kidsRows] = await Promise.all([
-    fetchAllRows(TABLE_MAIN, 'category'),
-    fetchAllRows(TABLE_FLAGS, 'category'),
-    fetchAllRows(TABLE_FANAN, 'category'),
-    fetchAllRows(TABLE_FAM, 'category'),
-    fetchAllRows(TABLE_FALSAFA, 'category'),
-    fetchAllRows(TABLE_LOGO1, 'category'),
-    fetchAllRows(TABLE_LOGOO, 'category'),
-    fetchAllRows(TABLE_KIDS, 'category'),
-  ]);
-  const allRows = [...mainRows, ...flagRows, ...fananRows, ...famRows, ...falsafaRows, ...logo1Rows, ...logooRows, ...kidsRows];
-const unique = [...new Set(allRows.map(r => r.category).filter(Boolean))].filter(c => !c.startsWith('_hidden_'));
+  const tableSets = [
+    [TABLE_MAIN, 'category'],
+    [TABLE_FLAGS, 'category'],
+    [TABLE_FANAN, 'category'],
+    [TABLE_FAM, 'category'],
+    [TABLE_FALSAFA, 'category'],
+    [TABLE_LOGO1, 'category'],
+    [TABLE_LOGOO, 'category'],
+    [TABLE_KIDS, 'category'],
+  ];
+  const results = await Promise.all(tableSets.map(([table, col]) => fetchAllRows(table, col).then(rows => ({ table, rows }))));
+
+  categoryTableMap.clear();
+  const seen = new Set();
+  const unique = [];
+  for (const { table, rows } of results) {
+    for (const r of rows) {
+      const cat = r.category;
+      if (!cat || cat.startsWith('_hidden_')) continue;
+      // Map category → first table that owns it (priority order)
+      const key = cat.toLowerCase().trim();
+      if (!categoryTableMap.has(key)) categoryTableMap.set(key, table);
+      if (!seen.has(cat)) { seen.add(cat); unique.push(cat); }
+    }
+  }
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('Total categories loaded:', unique.length);
-  console.log('All categories:', unique);
+  console.log('Category→Table map built:', categoryTableMap.size, 'entries');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   return unique;
 }
@@ -185,38 +201,37 @@ async function tableHasCategory(table, category, points) {
   return Array.isArray(data) && data.length > 0;
 }
 
-// Fetch question — tries all tables in order, returns first match
-// Only resets a table when it actually owns the category but is exhausted
+// Fetch question — goes directly to the owning table via categoryTableMap (1 request),
+// falls back to sequential search only if the map doesn't have the category yet.
 export async function fetchQuestion(category, points) {
-  const tables = [TABLE_MAIN, TABLE_FLAGS, TABLE_FANAN, TABLE_FAM, TABLE_FALSAFA, TABLE_LOGO1, TABLE_LOGOO, TABLE_KIDS];
+  const ALL_TABLES = [TABLE_MAIN, TABLE_FLAGS, TABLE_FANAN, TABLE_FAM, TABLE_FALSAFA, TABLE_LOGO1, TABLE_LOGOO, TABLE_KIDS];
 
-  for (const table of tables) {
-    console.log(`[fetchQuestion] Trying ${table} for "${category}" ${parseInt(points, 10)}pts`);
+  // Fast path: look up owning table directly
+  const ownerTable = categoryTableMap.get(category.toLowerCase().trim());
+  const tablesToTry = ownerTable ? [ownerTable] : ALL_TABLES;
+
+  for (const table of tablesToTry) {
     let rows = await fetchRowsFromTable(table, category, points);
-    console.log(`[fetchQuestion] ${table} → ${rows.length} rows`);
 
     if (rows.length === 0) {
-      // Only reset if this table actually has the category (i.e. it's exhausted, not absent)
-      const hasIt = await tableHasCategory(table, category, points);
+      // Exhausted — reset this table and retry
+      const hasIt = ownerTable ? true : await tableHasCategory(table, category, points);
       if (hasIt) {
         await resetTable(table);
         rows = await fetchRowsFromTable(table, category, points);
-        console.log(`[fetchQuestion] ${table} after reset → ${rows.length} rows`);
       } else {
-        console.log(`[fetchQuestion] ${table} doesn't own "${category}" — skipping`);
         continue;
       }
     }
 
     if (rows.length > 0) {
       const row = rows[Math.floor(Math.random() * rows.length)];
-      markQuestionUsed(row, table).catch(e => console.warn('[Supabase] markUsed failed:', e));
-      console.log(`[fetchQuestion] Found in: ${table}`);
+      markQuestionUsed(row, table).catch(() => {});
       return normalizeRow(row, table);
     }
   }
 
-  console.warn(`[fetchQuestion] No questions found for "${category}" at ${parseInt(points, 10)}pts in any table`);
+  console.warn(`[fetchQuestion] No questions found for "${category}" at ${parseInt(points, 10)}pts`);
   return null;
 }
 
