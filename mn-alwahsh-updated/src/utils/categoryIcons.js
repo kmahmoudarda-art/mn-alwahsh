@@ -116,6 +116,10 @@ const CATEGORY_ICONS = {
   'Baby Shark':        '🦈',
   'سبونج بوب':         '🧽',
   'SpongeBob':         '🧽',
+  'Dubai Bling':       '💎',
+  'حشرات':             '🦟',
+  'لمن الاغنية':       '🎤',
+  'من الشخصية ؟':      '🎭',
 };
 
 export function getIcon(name) {

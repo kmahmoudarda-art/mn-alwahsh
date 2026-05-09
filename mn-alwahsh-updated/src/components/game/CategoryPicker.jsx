@@ -5,16 +5,16 @@ import { fetchCategories } from '../../utils/supabaseClient';
 import CATEGORY_ICONS, { getIcon } from '../../utils/categoryIcons';
 
 const CATEGORY_GROUPS = {
-  '⚽ رياضة': ['football logo', 'رياضة', 'CR7', 'ميسي', 'كأس العرب', 'كأس آسيا', 'Champions League', 'المنتخب الأردني', 'League of Legends', 'Real Madrid', 'Barcelona', 'WildRift', 'ريال مدريد', 'برشلونة', 'برشلونه', 'وايلد ريفت', 'محترف كرة'],
+  '⚽ رياضة': ['football logo', 'football Logo', 'Football Logo', 'FOOTBALL LOGO', 'رياضة', 'CR7', 'ميسي', 'كأس العرب', 'كأس آسيا', 'Champions League', 'المنتخب الأردني', 'League of Legends', 'Real Madrid', 'Barcelona', 'WildRift', 'ريال مدريد', 'برشلونة', 'برشلونه', 'وايلد ريفت', 'محترف كرة'],
   '🎬 ترفيه': ['جيم اوف ثرونز', 'جميل وهناء', 'جميل و هناء', 'أفلام عربية', 'أفلام إنجليزية', 'نتفليكس', 'بريكينج باد', 'بيكي بلايندرز', 'بريزون بريك', 'مسلسلات تركية', 'أفلام رعب', 'Friends', 'Arab Idol', 'Arab Got Talent', 'مسرحيات عربية', 'Game of Thrones', 'باب الحارة', 'أفلام احمد حلمي', 'Who Said GOT'],
-  '🎵 موسيقى وفنانون': ['أم كلثوم', 'عبد الحليم', 'حمو بيكا', 'تامر حسني', 'عمرو دياب', 'أغاني', 'أغاني قديمة', 'فنانون عرب', 'من غنى ؟'],
-  '🌍 جغرافيا وثقافة': ['أعلام العالم', 'علوم', 'جغرافيا', 'الإمارات', 'الأردن', 'دبي', 'تاريخ', 'براندات', 'English Lang', 'English Questions', 'أسئلة إنجليزية'],
+  '🎵 موسيقى وفنانون': ['أم كلثوم', 'عبد الحليم', 'حمو بيكا', 'تامر حسني', 'عمرو دياب', 'أغاني', 'أغاني قديمة', 'فنانون عرب', 'من غنى ؟', 'لمن الاغنية'],
+  '🌍 جغرافيا وثقافة': ['أعلام العالم', 'علوم', 'جغرافيا', 'الإمارات', 'الأردن', 'دبي', 'تاريخ', 'براندات', 'English Lang', 'English Questions', 'أسئلة إنجليزية', 'دول'],
   '💻 تكنولوجيا': ['هواتف ذكية', 'تكنولوجيا', 'سيارات'],
-  '👑 بنات': ['بنات فقط', 'سبيستون', 'Sephora', 'سيفورا', 'guess fashion', 'Guess Fashion', 'GUESS FASHION', 'Guess fashion'],
-  '🧒 أطفال': ['kids', 'Kids', 'KIDS', 'kids guess', 'Kids Guess', 'Kids guess', 'KIDS GUESS', 'Kids guess ', 'Kids Guess ', 'kids easy', 'Kids Easy', 'Kids easy', 'KIDS EASY', 'guess fashion easy', 'Guess Fashion Easy', 'Guess fashion easy', 'GUESS FASHION EASY', 'أطفال', 'عالم الأطفال', 'رسوم متحركة', 'كرتون', 'ديزني', 'Disney', 'بيبي شارك', 'Baby Shark', 'سبونج بوب', 'SpongeBob'],
-  '🧠 تحديات': ['IQ', 'رياضيات', 'الغاز محيرة', 'عادات غريبة', 'Logos'],
+  '👑 بنات': ['بنات فقط', 'سبيستون', 'Sephora', 'سيفورا', 'guess fashion', 'Guess Fashion', 'GUESS FASHION', 'Guess fashion', 'Dubai Bling'],
+  '🧒 أطفال': ['kids', 'Kids', 'KIDS', 'kids guess', 'Kids Guess', 'Kids guess', 'KIDS GUESS', 'Kids guess ', 'Kids Guess ', 'kids easy', 'Kids Easy', 'Kids easy', 'KIDS EASY', 'guess fashion easy', 'Guess Fashion Easy', 'Guess fashion easy', 'GUESS FASHION EASY', 'أطفال', 'عالم الأطفال', 'رسوم متحركة', 'كرتون', 'ديزني', 'Disney', 'بيبي شارك', 'Baby Shark', 'سبونج بوب', 'SpongeBob', 'حشرات', 'من الشخصية ؟'],
+  '🧠 تحديات': ['IQ', 'رياضيات', 'الغاز محيرة', 'عادات غريبة', 'Logos', 'فلسفة', 'محاسبة'],
   '☪️ ديني': ['إسلامي', 'سيرة نبوية', 'فتوحات إسلامية'],
-  '🎲 متفرقات': ['أكل عربي', 'حيوانات', 'Dangerous Animals', 'حيوانات خطرة'],
+  '🎲 متفرقات': ['أكل عربي', 'حيوانات', 'Dangerous Animals', 'حيوانات خطرة', 'حيوانات خطيرة', 'معلومات عامة'],
 };
 
 const CAT_TO_GROUP = {};
