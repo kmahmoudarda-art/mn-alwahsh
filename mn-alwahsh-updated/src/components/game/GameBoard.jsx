@@ -151,7 +151,7 @@ const BONUS_BADGE = {
   600: { label: '×1.2', color: '#7c3aed', glow: 'rgba(124,58,237,0.7)' },
 };
 
-export default function GameBoard({ categories, answeredTiles, onTileClick, teamNames, readyTiles = new Set(), bonusTiles = {} }) {
+export default function GameBoard({ categories, answeredTiles, onTileClick, teamNames, readyTiles = new Set(), bonusTiles = {}, trapTile = null }) {
   const [popupType, setPopupType] = useState(null);
   const [popupMessage, setPopupMessage] = useState(null);
   const [pendingTile, setPendingTile] = useState(null);
@@ -286,6 +286,7 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
                                   disabled={isAnswered || !!popupType}
                                 style={(() => {
                                   const bonus = !isAnswered && bonusTiles[tileKey];
+                                  const isTrap = !isAnswered && trapTile === tileKey;
                                   const base = isAnswered
                                     ? {
                                         background: 'rgba(255,255,255,0.04)',
@@ -301,6 +302,9 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
                                   if (bonus) {
                                     const b = BONUS_BADGE[bonus];
                                     return { ...base, border: `2px solid ${b.color}`, boxShadow: `0 0 10px ${b.glow}, 0 3px 12px ${b.glow}` };
+                                  }
+                                  if (isTrap) {
+                                    return { ...base, border: '2px solid #ef4444', boxShadow: '0 0 10px rgba(239,68,68,0.7), 0 3px 12px rgba(239,68,68,0.5)' };
                                   }
                                   return base;
                                 })()}
@@ -323,6 +327,20 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
                                       }}>⭐{b.label}</span>
                                     );
                                   })()}
+                                  {!isAnswered && trapTile === tileKey && (
+                                    <span style={{
+                                      position: 'absolute', top: 2, left: 2,
+                                      background: '#ef4444',
+                                      color: '#fff',
+                                      fontSize: '8px', fontWeight: 900,
+                                      padding: '1px 4px', borderRadius: 4,
+                                      fontFamily: 'var(--font-cairo)',
+                                      lineHeight: 1.4,
+                                      boxShadow: '0 0 6px rgba(239,68,68,0.8)',
+                                      letterSpacing: '0.02em',
+                                      animation: 'starPulse 1.8s ease-in-out infinite',
+                                    }}>☠️ فخ</span>
+                                  )}
                                   {!isAnswered && <div className="shine-overlay" />}
                                 </motion.button>
                               );

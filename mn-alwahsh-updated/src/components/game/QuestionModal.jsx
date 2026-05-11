@@ -262,6 +262,7 @@ export default function QuestionModal({
   onResetTimer,
   bonusTier,
   bonusConf,
+  isTrapTile = false,
 }) {
   const [restInput, setRestInput] = useState('');
   const [closeClickCount, setCloseClickCount] = useState(0);
@@ -491,6 +492,56 @@ export default function QuestionModal({
             }}>
               <p style={{ margin: 0, fontFamily: 'var(--font-cairo)', fontWeight: 900, fontSize: 13, color: '#fff', lineHeight: 1.1 }}>
                 خطأ ← <span style={{ color: '#fca5a5' }}>-{bonusConf[bonusTier].penalty}</span>
+              </p>
+              <p style={{ margin: 0, fontFamily: 'var(--font-cairo)', fontWeight: 600, fontSize: 10, color: 'rgba(255,255,255,0.75)', lineHeight: 1.1 }}>
+                تُخصم من فريقك
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ── Trap tile banner ── */}
+        {isTrapTile && (
+          <div className="trap-banner" style={{
+            flexShrink: 0,
+            background: 'linear-gradient(90deg, #7f1d1d 0%, #ef4444 50%, #7f1d1d 100%)',
+            padding: '10px 16px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            gap: 8, direction: 'rtl',
+            borderBottom: '2px solid rgba(239,68,68,0.5)',
+            boxShadow: '0 2px 12px rgba(239,68,68,0.4)',
+            animation: 'trapPulse 1.4s ease-in-out infinite',
+          }}>
+            <style>{`
+              @keyframes trapPulse {
+                0%,100% { box-shadow: 0 2px 12px rgba(239,68,68,0.4); }
+                50%      { box-shadow: 0 2px 28px rgba(239,68,68,0.9); }
+              }
+              @media (orientation: landscape) and (max-height: 500px) {
+                .trap-banner { padding: 4px 10px !important; gap: 6px !important; }
+                .trap-banner .trap-icon { font-size: 14px !important; }
+                .trap-banner .trap-title { font-size: 10px !important; }
+                .trap-banner .trap-sub   { font-size: 9px !important; }
+              }
+            `}</style>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span className="trap-icon" style={{ fontSize: 22 }}>☠️</span>
+              <div>
+                <p className="trap-title" style={{ margin: 0, fontFamily: 'var(--font-cairo)', fontWeight: 900, fontSize: 14, color: '#fff', lineHeight: 1.2 }}>
+                  سؤال فخ!
+                </p>
+                <p className="trap-sub" style={{ margin: 0, fontFamily: 'var(--font-cairo)', fontWeight: 700, fontSize: 11, color: 'rgba(255,255,255,0.85)', lineHeight: 1.2 }}>
+                  إجابة صحيحة → <span style={{ color: '#fde68a', fontWeight: 900 }}>+600 نقطة</span>
+                </p>
+              </div>
+            </div>
+            <div style={{
+              background: 'rgba(0,0,0,0.5)', borderRadius: 8,
+              padding: '5px 10px', textAlign: 'center',
+              border: '1px solid rgba(255,100,100,0.5)',
+            }}>
+              <p style={{ margin: 0, fontFamily: 'var(--font-cairo)', fontWeight: 900, fontSize: 13, color: '#fff', lineHeight: 1.1 }}>
+                خطأ ← <span style={{ color: '#fca5a5' }}>-600</span>
               </p>
               <p style={{ margin: 0, fontFamily: 'var(--font-cairo)', fontWeight: 600, fontSize: 10, color: 'rgba(255,255,255,0.75)', lineHeight: 1.1 }}>
                 تُخصم من فريقك
