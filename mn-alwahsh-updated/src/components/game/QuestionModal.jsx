@@ -586,8 +586,8 @@ export default function QuestionModal({
                   })}
                 </div>
                 {activeLifeline === 'trap' && (
-                  <div style={{ background:'rgba(234,179,8,0.15)', border:'1px solid rgba(234,179,8,0.3)', borderRadius:12, padding:'10px 14px', textAlign:'center' }}>
-                    <p style={{ color:'#fef08a', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:13, margin:0 }}>💰 دبل يا كبير مفعّل! إجابة صح = خصم من الخصم</p>
+                  <div style={{ background:'rgba(234,179,8,0.85)', border:'1px solid rgba(180,130,0,0.6)', borderRadius:12, padding:'10px 14px', textAlign:'center' }}>
+                    <p style={{ color:'#000000', fontFamily:'var(--font-cairo)', fontWeight:800, fontSize:13, margin:0 }}>💰 دبل يا كبير مفعّل! إجابة صح = خصم من الخصم</p>
                   </div>
                 )}
                 <Button onClick={onShowQuestion} className="w-full font-cairo font-bold bg-primary text-primary-foreground">أظهر السؤال</Button>
@@ -709,7 +709,7 @@ export default function QuestionModal({
 
                     {/* Status bar */}
                     <div style={{ flexShrink:0, padding:'0 12px 4px' }}>
-                      {!isTrapTile && !stealMode && !answered && (
+                      {!isTrapTile && activeLifeline !== 'trap' && !stealMode && !answered && (
                         <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
                           width:'100%', padding:'4px 10px', borderRadius:10, fontSize:11,
                           background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(160,0,0,0.85)',
@@ -850,7 +850,7 @@ export default function QuestionModal({
 
                     {/* Status bar */}
                     <div style={{ flexShrink:0, padding:'0 12px 2px' }}>
-                      {!isTrapTile && !stealMode && !answered && (
+                      {!isTrapTile && activeLifeline !== 'trap' && !stealMode && !answered && (
                         <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
                           width:'100%', padding:'3px 10px', borderRadius:10, fontSize:10,
                           background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(160,0,0,0.85)',
@@ -919,7 +919,7 @@ export default function QuestionModal({
 
                   {/* Status bar */}
                   <div style={{ flexShrink:0, padding:'0 12px 4px' }}>
-                    {!isTrapTile && !stealMode && !answered && (
+                    {!isTrapTile && activeLifeline !== 'trap' && !stealMode && !answered && (
                       <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
                         width:'100%', padding:'4px 10px', borderRadius:10, fontSize:11,
                         background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(160,0,0,0.85)',
