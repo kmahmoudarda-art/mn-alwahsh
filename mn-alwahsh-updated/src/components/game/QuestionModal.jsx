@@ -556,7 +556,7 @@ export default function QuestionModal({
             {isTrapTile ? (
               <>
                 <div style={{ background:'rgba(239,68,68,0.12)', border:'1px solid rgba(239,68,68,0.35)', borderRadius:12, padding:'14px 18px', textAlign:'center', display:'flex', flexDirection:'column', gap:10 }}>
-                  <p style={{ color:'#fca5a5', fontFamily:'var(--font-cairo)', fontWeight:800, fontSize:14, margin:0 }}>
+                  <p style={{ color:'#000', fontFamily:'var(--font-cairo)', fontWeight:900, fontSize:14, margin:0 }}>
                     ☠️ سؤال فخ — لا يمكن استخدام أي وسيلة مساعدة
                   </p>
                   <div style={{ borderTop:'1px solid rgba(239,68,68,0.3)', paddingTop:10 }}>
