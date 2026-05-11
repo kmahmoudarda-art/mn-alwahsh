@@ -256,7 +256,7 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
                             style={{
                               color: '#1a0a00',
                               fontWeight: 900,
-                              fontSize: '15px',
+                              fontSize: '18px',
                               textShadow: 'none',
                               letterSpacing: '0.01em',
                               wordBreak: 'break-word',
