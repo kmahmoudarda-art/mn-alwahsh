@@ -299,7 +299,14 @@ export default function Game() {
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-    setCurrentTile({ colIndex, rowIndex, category, points });
+    // Trap tile: pick a random category from ALL categories for a 600-pt question
+    const isTrapTileClick = trapTile === `${colIndex}-${rowIndex}`;
+    const effectiveCategory = isTrapTileClick
+      ? categories[Math.floor(Math.random() * categories.length)]
+      : category;
+    const effectivePoints = isTrapTileClick ? 600 : points;
+
+    setCurrentTile({ colIndex, rowIndex, category: effectiveCategory, points: effectivePoints });
     setCurrentQuestion(null);
     setAnswered(false);
     setSelectedAnswer(null);
@@ -317,7 +324,6 @@ export default function Game() {
 
     // Check if this is the lucky cell for the losing team — not allowed on bonus/trap tiles
     const isBonusTile = !!bonusTiles[`${colIndex}-${rowIndex}`];
-    const isTrapTileClick = trapTile === `${colIndex}-${rowIndex}`;
     const isLucky = !isBonusTile && !isTrapTileClick && !luckyUsed && luckyCell &&
       luckyCell.col === colIndex && luckyCell.row === rowIndex &&
       luckyCell.losingTeam === currentTeam;
