@@ -458,23 +458,39 @@ export default function Game() {
     }
   }, [currentQuestion, currentTile, currentTeam, activeLifeline, twoAnswersMode, firstWrongAnswer, stealMode, stopTimer, startTimer, luckyDoubleActive, bonusTiles]);
 
-  const handleLuckyResult = useCallback((teamNum, delta) => {
+  const handleLuckyResult = useCallback((teamNum, delta, effects = {}) => {
     sounds.lucky();
-    setUsedLucky(prev => ({ ...prev, [teamNum]: true }));
     const opponent = teamNum === 1 ? 2 : 1;
+
+    // Mark lucky used — extraLucky resets the button so they can spin again
+    setUsedLucky(prev => ({
+      ...prev,
+      [teamNum]: !effects.extraLucky,
+      ...(effects.cancelOpponentLucky ? { [opponent]: true } : {}),
+    }));
+
+    // Cancel opponent's quick timer
+    if (effects.cancelOpponentTimer) {
+      setUsedQuickTimer(prev => ({ ...prev, [opponent]: true }));
+    }
+
+    // Cancel own quick timer
+    if (effects.cancelSelfTimer) {
+      setUsedQuickTimer(prev => ({ ...prev, [teamNum]: true }));
+    }
+
+    // Points: positive = current team gains, opponent loses; negative = current team loses, opponent gains
     if (delta > 0) {
-      // steal from opponent
       setTeams(prev => ({
         ...prev,
-        [teamNum]: { ...prev[teamNum], score: prev[teamNum].score + delta, scoreKey: prev[teamNum].scoreKey + 1 },
+        [teamNum]:  { ...prev[teamNum],  score: prev[teamNum].score + delta,  scoreKey: prev[teamNum].scoreKey + 1 },
         [opponent]: { ...prev[opponent], score: prev[opponent].score - delta, scoreKey: prev[opponent].scoreKey + 1 },
       }));
-    } else {
-      // lose points to opponent
+    } else if (delta < 0) {
       const loss = Math.abs(delta);
       setTeams(prev => ({
         ...prev,
-        [teamNum]: { ...prev[teamNum], score: prev[teamNum].score - loss, scoreKey: prev[teamNum].scoreKey + 1 },
+        [teamNum]:  { ...prev[teamNum],  score: prev[teamNum].score - loss,  scoreKey: prev[teamNum].scoreKey + 1 },
         [opponent]: { ...prev[opponent], score: prev[opponent].score + loss, scoreKey: prev[opponent].scoreKey + 1 },
       }));
     }
