@@ -553,33 +553,46 @@ export default function QuestionModal({
         {/* Before question: lifelines */}
         {showLifelinesBefore && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 16, gap: 12 }}>
-            <p style={{ textAlign: 'center', fontFamily:'var(--font-cairo)', fontSize:15, color:'#1a1a1a', margin:0 }}>
-              هل تريد استخدام وسيلة مساعدة قبل السؤال؟
-            </p>
-            <div className="ll-scroll" style={{ display:'flex', flexDirection:'row', overflowX:'auto', gap:8, paddingBottom:4 }}>
-              {LIFELINES.filter(ll => ll.phase === 'before').map(ll => {
-                const isUsed = usedLifelines[ll.id];
-                const isBlockedOnBonus = ll.id === 'trap' && !!bonusTier;
-                const isDisabled = isUsed || isBlockedOnBonus;
-                return (
-                  <button key={ll.id} onClick={() => !isDisabled && onUseLifeline(ll.id)} disabled={isDisabled}
-                    title={isBlockedOnBonus ? 'لا يمكن استخدام هذه الميزة على أسئلة المكافأة' : undefined}
-                    style={{ whiteSpace:'nowrap', padding:'6px 12px', fontSize:13, borderRadius:20, flexShrink:0,
-                      background: isDisabled ? 'rgba(255,255,255,0.03)' : GOLD_BG,
-                      color: isDisabled ? 'rgba(255,255,255,0.3)' : '#000',
-                      border: `1px solid ${isDisabled ? 'rgba(255,255,255,0.1)' : GOLD_BORDER}`,
-                      fontFamily:'var(--font-cairo)', opacity: isDisabled ? 0.4 : 1,
-                      textDecoration: isUsed ? 'line-through' : 'none', cursor: isDisabled ? 'not-allowed' : 'pointer',
-                    }}>{ll.label}</button>
-                );
-              })}
-            </div>
-            {activeLifeline === 'trap' && (
-              <div style={{ background:'rgba(234,179,8,0.15)', border:'1px solid rgba(234,179,8,0.3)', borderRadius:12, padding:'10px 14px', textAlign:'center' }}>
-                <p style={{ color:'#fef08a', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:13, margin:0 }}>💰 دبل يا كبير مفعّل! إجابة صح = خصم من الخصم</p>
-              </div>
+            {isTrapTile ? (
+              <>
+                <div style={{ background:'rgba(239,68,68,0.12)', border:'1px solid rgba(239,68,68,0.35)', borderRadius:12, padding:'12px 16px', textAlign:'center' }}>
+                  <p style={{ color:'#fca5a5', fontFamily:'var(--font-cairo)', fontWeight:800, fontSize:14, margin:0 }}>
+                    ☠️ سؤال فخ — لا يمكن استخدام أي وسيلة مساعدة
+                  </p>
+                </div>
+                <Button onClick={onShowQuestion} className="w-full font-cairo font-bold bg-primary text-primary-foreground">أظهر السؤال</Button>
+              </>
+            ) : (
+              <>
+                <p style={{ textAlign: 'center', fontFamily:'var(--font-cairo)', fontSize:15, color:'#1a1a1a', margin:0 }}>
+                  هل تريد استخدام وسيلة مساعدة قبل السؤال؟
+                </p>
+                <div className="ll-scroll" style={{ display:'flex', flexDirection:'row', overflowX:'auto', gap:8, paddingBottom:4 }}>
+                  {LIFELINES.filter(ll => ll.phase === 'before').map(ll => {
+                    const isUsed = usedLifelines[ll.id];
+                    const isBlockedOnBonus = ll.id === 'trap' && !!bonusTier;
+                    const isDisabled = isUsed || isBlockedOnBonus;
+                    return (
+                      <button key={ll.id} onClick={() => !isDisabled && onUseLifeline(ll.id)} disabled={isDisabled}
+                        title={isBlockedOnBonus ? 'لا يمكن استخدام هذه الميزة على أسئلة المكافأة' : undefined}
+                        style={{ whiteSpace:'nowrap', padding:'6px 12px', fontSize:13, borderRadius:20, flexShrink:0,
+                          background: isDisabled ? 'rgba(255,255,255,0.03)' : GOLD_BG,
+                          color: isDisabled ? 'rgba(255,255,255,0.3)' : '#000',
+                          border: `1px solid ${isDisabled ? 'rgba(255,255,255,0.1)' : GOLD_BORDER}`,
+                          fontFamily:'var(--font-cairo)', opacity: isDisabled ? 0.4 : 1,
+                          textDecoration: isUsed ? 'line-through' : 'none', cursor: isDisabled ? 'not-allowed' : 'pointer',
+                        }}>{ll.label}</button>
+                    );
+                  })}
+                </div>
+                {activeLifeline === 'trap' && (
+                  <div style={{ background:'rgba(234,179,8,0.15)', border:'1px solid rgba(234,179,8,0.3)', borderRadius:12, padding:'10px 14px', textAlign:'center' }}>
+                    <p style={{ color:'#fef08a', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:13, margin:0 }}>💰 دبل يا كبير مفعّل! إجابة صح = خصم من الخصم</p>
+                  </div>
+                )}
+                <Button onClick={onShowQuestion} className="w-full font-cairo font-bold bg-primary text-primary-foreground">أظهر السؤال</Button>
+              </>
             )}
-            <Button onClick={onShowQuestion} className="w-full font-cairo font-bold bg-primary text-primary-foreground">أظهر السؤال</Button>
           </div>
         )}
 
@@ -696,7 +709,7 @@ export default function QuestionModal({
 
                     {/* Status bar */}
                     <div style={{ flexShrink:0, padding:'0 12px 4px' }}>
-                      {!stealMode && !answered && (
+                      {!isTrapTile && !stealMode && !answered && (
                         <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
                           width:'100%', padding:'4px 10px', borderRadius:10, fontSize:11,
                           background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(160,0,0,0.85)',
@@ -720,8 +733,8 @@ export default function QuestionModal({
                       )}
                     </div>
 
-                    {/* Lifelines — hidden during steal mode */}
-                    {!stealMode && !answered && (
+                    {/* Lifelines — hidden during steal mode and on trap tiles */}
+                    {!isTrapTile && !stealMode && !answered && (
                       <div className="ll-scroll" style={{ flexShrink:0, display:'flex', flexDirection:'row', overflowX:'auto', gap:8, padding:'0 12px 6px' }}>
                         {LIFELINES.filter(ll => ll.id !== 'trap').map(ll => {
                           const isUsed = usedLifelines[ll.id];
@@ -837,7 +850,7 @@ export default function QuestionModal({
 
                     {/* Status bar */}
                     <div style={{ flexShrink:0, padding:'0 12px 2px' }}>
-                      {!stealMode && !answered && (
+                      {!isTrapTile && !stealMode && !answered && (
                         <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
                           width:'100%', padding:'3px 10px', borderRadius:10, fontSize:10,
                           background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(160,0,0,0.85)',
@@ -861,8 +874,8 @@ export default function QuestionModal({
                       )}
                     </div>
 
-                    {/* Lifelines — hidden during steal mode */}
-                    {!stealMode && !answered && (
+                    {/* Lifelines — hidden during steal mode and on trap tiles */}
+                    {!isTrapTile && !stealMode && !answered && (
                       <div className="ll-scroll" style={{ flexShrink:0, display:'flex', flexDirection:'row', overflowX:'auto', gap:6, padding:'0 12px 4px' }}>
                         {LIFELINES.filter(ll => ll.id !== 'trap').map(ll => {
                           const isUsed = usedLifelines[ll.id];
@@ -906,7 +919,7 @@ export default function QuestionModal({
 
                   {/* Status bar */}
                   <div style={{ flexShrink:0, padding:'0 12px 4px' }}>
-                    {!stealMode && !answered && (
+                    {!isTrapTile && !stealMode && !answered && (
                       <button onClick={!passToOtherUsed ? onPassToOther : undefined} disabled={passToOtherUsed} style={{
                         width:'100%', padding:'4px 10px', borderRadius:10, fontSize:11,
                         background: passToOtherUsed ? 'rgba(255,255,255,0.03)' : 'rgba(160,0,0,0.85)',
@@ -930,8 +943,8 @@ export default function QuestionModal({
                     )}
                   </div>
 
-                  {/* Lifelines — hidden during steal mode */}
-                  {!stealMode && !answered && (
+                  {/* Lifelines — hidden during steal mode and on trap tiles */}
+                  {!isTrapTile && !stealMode && !answered && (
                     <div className="ll-scroll" style={{ flexShrink:0, display:'flex', flexDirection:'row', overflowX:'auto', gap:8, padding:'0 12px 6px' }}>
                       {LIFELINES.filter(ll => ll.id !== 'trap').map(ll => {
                         const isUsed = usedLifelines[ll.id];
