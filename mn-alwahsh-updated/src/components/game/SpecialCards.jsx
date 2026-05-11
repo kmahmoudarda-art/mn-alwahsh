@@ -105,9 +105,9 @@ export default function SpecialCards({
       setShowSpinner(false);
       const opponent = teamNum === 1 ? 2 : 1;
 
-      // 100% jackpot for testing (change back to 0.01 for production)
+      // 1% jackpot chance
       let base;
-      if (Math.random() < 1) {
+      if (Math.random() < 0.01) {
         base = { delta: 500, label: '🏆 جاكبوت! ربحت 500 نقطة!' };
         const teamName = teamNum === 1 ? team1?.name : team2?.name;
         setJackpot({ teamName });
