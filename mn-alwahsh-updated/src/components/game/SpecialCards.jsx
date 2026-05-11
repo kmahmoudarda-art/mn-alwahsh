@@ -102,8 +102,15 @@ export default function SpecialCards({
     setTimeout(() => {
       setShowSpinner(false);
       const opponent = teamNum === 1 ? 2 : 1;
-      const idx = Math.floor(Math.random() * 10);
-      let base = { ...LUCKY_OUTCOMES[idx] };
+
+      // 1% jackpot chance
+      let base;
+      if (Math.random() < 0.01) {
+        base = { delta: 500, label: '🏆 جاكبوت! ربحت 500 نقطة!' };
+      } else {
+        const idx = Math.floor(Math.random() * 10);
+        base = { ...LUCKY_OUTCOMES[idx] };
+      }
 
       // If cancelOpponentLucky but opponent already used theirs → strip the effect
       if (base.cancelOpponentLucky && usedLucky[opponent]) {
