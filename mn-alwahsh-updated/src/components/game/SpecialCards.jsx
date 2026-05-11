@@ -52,11 +52,13 @@ export default function SpecialCards({
   onQuickTimer,
 }) {
   const [luckyResult, setLuckyResult] = useState(null);
-  const [luckyPending, setLuckyPending] = useState(false); // true from first tap until all popups finish
+  const [luckyPending, setLuckyPending] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
   const [showDoubleLuckPopup, setShowDoubleLuckPopup] = useState(false);
   const [specialAnnouncement, setSpecialAnnouncement] = useState(null);
+  const [jackpot, setJackpot] = useState(null); // { teamName }
   const doubleLuckBtnRef = useRef(null);
+  const confettiIntervalRef = useRef(null);
 
   const team1UsedLucky = usedLucky[1];
   const team2UsedLucky = usedLucky[2];
@@ -103,10 +105,25 @@ export default function SpecialCards({
       setShowSpinner(false);
       const opponent = teamNum === 1 ? 2 : 1;
 
-      // 1% jackpot chance
+      // 100% jackpot for testing (change back to 0.01 for production)
       let base;
-      if (Math.random() < 0.01) {
+      if (Math.random() < 1) {
         base = { delta: 500, label: '🏆 جاكبوت! ربحت 500 نقطة!' };
+        const teamName = teamNum === 1 ? team1?.name : team2?.name;
+        setJackpot({ teamName });
+        // Rapid multi-cannon confetti bursts
+        const colors = ['#FFD700','#FF6600','#FF0066','#00FFAA','#FF00FF','#00CCFF','#FFFF00'];
+        const burst = () => {
+          confetti({ particleCount: 60, angle: 60,  spread: 80, origin: { x: 0,    y: 0.6 }, colors });
+          confetti({ particleCount: 60, angle: 120, spread: 80, origin: { x: 1,    y: 0.6 }, colors });
+          confetti({ particleCount: 40, angle: 90,  spread: 120, origin: { x: 0.5, y: 0.3 }, colors });
+        };
+        burst();
+        confettiIntervalRef.current = setInterval(burst, 900);
+        setTimeout(() => {
+          clearInterval(confettiIntervalRef.current);
+          setJackpot(null);
+        }, 5000);
       } else {
         const idx = Math.floor(Math.random() * 10);
         base = { ...LUCKY_OUTCOMES[idx] };
@@ -328,6 +345,127 @@ export default function SpecialCards({
                 </>
               ) : null}
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── JACKPOT Celebration ── */}
+      <AnimatePresence>
+        {jackpot && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.6 } }}
+            className="fixed inset-0 z-[90] flex items-center justify-center overflow-hidden"
+            style={{ background: 'radial-gradient(ellipse at 50% 40%, #1a0a00 0%, #000 100%)' }}
+          >
+            <style>{`
+              @keyframes jpFlare {
+                0%   { transform: translateX(-120%) skewX(-15deg); opacity: 0; }
+                20%  { opacity: 0.9; }
+                80%  { opacity: 0.9; }
+                100% { transform: translateX(120%) skewX(-15deg); opacity: 0; }
+              }
+              @keyframes jpStar {
+                0%   { transform: scale(0) rotate(0deg);   opacity: 0; }
+                30%  { transform: scale(1.4) rotate(180deg); opacity: 1; }
+                70%  { transform: scale(1) rotate(360deg); opacity: 1; }
+                100% { transform: scale(0) rotate(540deg); opacity: 0; }
+              }
+              @keyframes jpPulse {
+                0%,100% { text-shadow: 0 0 20px #FFD700, 0 0 60px #FF6600; }
+                50%     { text-shadow: 0 0 60px #FFD700, 0 0 120px #FF0066, 0 0 200px #FFD700; }
+              }
+              @keyframes jpBounce {
+                0%,100% { transform: scale(1) rotate(-2deg); }
+                50%     { transform: scale(1.08) rotate(2deg); }
+              }
+              @keyframes jpRainbow {
+                0%   { color: #FFD700; }
+                20%  { color: #FF6600; }
+                40%  { color: #FF0066; }
+                60%  { color: #00FFAA; }
+                80%  { color: #00CCFF; }
+                100% { color: #FFD700; }
+              }
+            `}</style>
+
+            {/* Horizontal light flares */}
+            {[...Array(6)].map((_, i) => (
+              <div key={i} style={{
+                position: 'absolute',
+                top: `${10 + i * 16}%`,
+                left: 0, right: 0,
+                height: `${4 + (i % 3) * 6}px`,
+                background: `linear-gradient(90deg, transparent, ${['#FFD700','#FF6600','#FF0066','#00FFAA','#00CCFF','#FF00FF'][i]}, transparent)`,
+                animation: `jpFlare ${1.2 + i * 0.3}s ease-in-out ${i * 0.18}s infinite`,
+                pointerEvents: 'none',
+              }} />
+            ))}
+
+            {/* Floating emoji stars */}
+            {['⭐','🌟','💫','✨','🏆','💰','🎊','🎉'].map((em, i) => (
+              <div key={i} style={{
+                position: 'absolute',
+                left: `${8 + i * 11}%`,
+                top: `${15 + (i % 3) * 25}%`,
+                fontSize: `${28 + (i % 3) * 16}px`,
+                animation: `jpStar ${1.5 + i * 0.2}s ease-in-out ${i * 0.15}s infinite`,
+                pointerEvents: 'none',
+              }}>{em}</div>
+            ))}
+
+            {/* Main card */}
+            <motion.div
+              initial={{ scale: 0.3, rotate: -8, opacity: 0 }}
+              animate={{ scale: 1, rotate: 0, opacity: 1 }}
+              exit={{ scale: 0.3, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 220, damping: 14 }}
+              style={{
+                background: 'linear-gradient(135deg, #1a0d00, #0d0800)',
+                border: '3px solid #FFD700',
+                borderRadius: 28,
+                padding: '44px 56px',
+                textAlign: 'center',
+                maxWidth: 460,
+                position: 'relative',
+                zIndex: 1,
+                boxShadow: '0 0 60px rgba(255,215,0,0.5), 0 0 120px rgba(255,100,0,0.3)',
+                animation: 'jpBounce 1s ease-in-out infinite',
+              }}
+            >
+              <div style={{ fontSize: 64, lineHeight: 1, marginBottom: 8 }}>🏆</div>
+              <div style={{
+                fontFamily: 'var(--font-tajawal)',
+                fontWeight: 900,
+                fontSize: 48,
+                animation: 'jpPulse 0.8s ease-in-out infinite, jpRainbow 1.2s linear infinite',
+                marginBottom: 10,
+                letterSpacing: 2,
+              }}>
+                JACKPOT!
+              </div>
+              <div style={{
+                fontFamily: 'var(--font-cairo)',
+                fontWeight: 900,
+                fontSize: 28,
+                color: '#FFD700',
+                textShadow: '0 0 20px rgba(255,215,0,0.8)',
+                marginBottom: 14,
+                animation: 'jpPulse 1s ease-in-out infinite 0.4s',
+              }}>
+                🎊 500 نقطة! 🎊
+              </div>
+              <div style={{
+                fontFamily: 'var(--font-cairo)',
+                fontWeight: 700,
+                fontSize: 20,
+                color: '#fff',
+                textShadow: '0 0 10px rgba(255,255,255,0.5)',
+              }}>
+                {jackpot.teamName}
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
