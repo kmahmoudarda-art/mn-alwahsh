@@ -560,10 +560,10 @@ export default function QuestionModal({
                     ☠️ سؤال فخ — لا يمكن استخدام أي وسيلة مساعدة
                   </p>
                   <div style={{ borderTop:'1px solid rgba(239,68,68,0.3)', paddingTop:10 }}>
-                    <p style={{ color:'#fff', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:13, margin:0 }}>
+                    <p style={{ color:'#000', fontFamily:'var(--font-cairo)', fontWeight:900, fontSize:13, margin:0 }}>
                       🎲 السؤال من فئة عشوائية
                     </p>
-                    <p style={{ color:'rgba(255,255,255,0.6)', fontFamily:'var(--font-cairo)', fontWeight:500, fontSize:11, margin:'4px 0 0' }}>
+                    <p style={{ color:'#000', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:11, margin:'4px 0 0' }}>
                       لا تعرف الفئة حتى تظهر السؤال!
                     </p>
                   </div>
