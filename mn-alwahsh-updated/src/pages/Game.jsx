@@ -473,17 +473,19 @@ export default function Game() {
           },
         }));
       }
-      // Trap tile penalty — lose full 600 pts
-      if (tileKey === trapTile) {
-        setTeams(prev => ({
-          ...prev,
-          [currentTeam]: {
-            ...prev[currentTeam],
-            score: prev[currentTeam].score - 600,
-            scoreKey: prev[currentTeam].scoreKey + 1,
-          },
-        }));
-      }
+    }
+
+    // Trap tile penalty: the team that picked the tile always loses 600
+    // UNLESS they answered it correctly themselves (correct + not steal mode)
+    if (tileKey === trapTile && !(correct && !stealMode)) {
+      setTeams(prev => ({
+        ...prev,
+        [currentTeam]: {
+          ...prev[currentTeam],
+          score: prev[currentTeam].score - 600,
+          scoreKey: prev[currentTeam].scoreKey + 1,
+        },
+      }));
     }
   }, [currentQuestion, currentTile, currentTeam, activeLifeline, twoAnswersMode, firstWrongAnswer, stealMode, stopTimer, startTimer, luckyDoubleActive, bonusTiles, trapTile]);
 
