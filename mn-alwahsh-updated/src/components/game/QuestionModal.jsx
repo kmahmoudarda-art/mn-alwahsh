@@ -555,10 +555,18 @@ export default function QuestionModal({
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 16, gap: 12 }}>
             {isTrapTile ? (
               <>
-                <div style={{ background:'rgba(239,68,68,0.12)', border:'1px solid rgba(239,68,68,0.35)', borderRadius:12, padding:'12px 16px', textAlign:'center' }}>
+                <div style={{ background:'rgba(239,68,68,0.12)', border:'1px solid rgba(239,68,68,0.35)', borderRadius:12, padding:'14px 18px', textAlign:'center', display:'flex', flexDirection:'column', gap:10 }}>
                   <p style={{ color:'#fca5a5', fontFamily:'var(--font-cairo)', fontWeight:800, fontSize:14, margin:0 }}>
                     ☠️ سؤال فخ — لا يمكن استخدام أي وسيلة مساعدة
                   </p>
+                  <div style={{ borderTop:'1px solid rgba(239,68,68,0.3)', paddingTop:10 }}>
+                    <p style={{ color:'#fff', fontFamily:'var(--font-cairo)', fontWeight:700, fontSize:13, margin:0 }}>
+                      🎲 السؤال من فئة عشوائية
+                    </p>
+                    <p style={{ color:'rgba(255,255,255,0.6)', fontFamily:'var(--font-cairo)', fontWeight:500, fontSize:11, margin:'4px 0 0' }}>
+                      لا تعرف الفئة حتى تظهر السؤال!
+                    </p>
+                  </div>
                 </div>
                 <Button onClick={onShowQuestion} className="w-full font-cairo font-bold bg-primary text-primary-foreground">أظهر السؤال</Button>
               </>
