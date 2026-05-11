@@ -267,7 +267,8 @@ html, body {
   .gb-zoom-controls { padding-top: 1px !important; padding-bottom: 1px !important; gap: 4px !important; }
   .gb-zoom-controls .gb-zoom-slider { width: 50px !important; }
   .gb-zoom-controls span { font-size: 8px !important; width: 24px !important; }
-  .gb-zoom-controls button { width: 20px !important; height: 20px !important; }
+  .gb-zoom-controls .gb-zoom-btn { width: 20px !important; height: 20px !important; }
+  .gb-zoom-controls .gb-action-btn { padding: 3px 8px !important; font-size: 10px !important; border-radius: 5px !important; }
 
   .gb-board-wrapper { padding-top: 1px !important; padding-bottom: 1px !important; }
 }

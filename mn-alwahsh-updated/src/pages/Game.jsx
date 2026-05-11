@@ -784,7 +784,7 @@ export default function Game() {
       >
         <button
           onClick={() => setZoom(z => Math.max(0.5, +(z - 0.1).toFixed(1)))}
-          className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+          className="gb-zoom-btn w-8 h-8 rounded-full flex items-center justify-center transition-colors"
           style={{ background: 'rgba(139,0,0,0.3)', color: '#FF6666', border: '1px solid #4a0000' }}
         >
           <ZoomOut className="w-4 h-4" />
@@ -796,7 +796,7 @@ export default function Game() {
         />
         <button
           onClick={() => setZoom(z => Math.min(1.5, +(z + 0.1).toFixed(1)))}
-          className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+          className="gb-zoom-btn w-8 h-8 rounded-full flex items-center justify-center transition-colors"
           style={{ background: 'rgba(139,0,0,0.3)', color: '#FF6666', border: '1px solid #4a0000' }}
         >
           <ZoomIn className="w-4 h-4" />
@@ -806,6 +806,7 @@ export default function Game() {
         {/* Restart Game button */}
         <button
           onClick={() => setShowRestartConfirm(true)}
+          className="gb-action-btn"
           style={{
             marginLeft: 8,
             padding: '4px 14px',
@@ -826,6 +827,7 @@ export default function Game() {
         {/* End Game button */}
         <button
           onClick={() => setShowEndConfirm(true)}
+          className="gb-action-btn"
           style={{
             marginRight: 8,
             padding: '4px 14px',
