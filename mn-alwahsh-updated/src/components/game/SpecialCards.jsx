@@ -52,7 +52,8 @@ export default function SpecialCards({
   onQuickTimer,
 }) {
   const [luckyResult, setLuckyResult] = useState(null);
-  const [spinning, setSpinning] = useState(false);
+  const [luckyPending, setLuckyPending] = useState(false); // true from first tap until all popups finish
+  const [showSpinner, setShowSpinner] = useState(false);
   const [showDoubleLuckPopup, setShowDoubleLuckPopup] = useState(false);
   const [specialAnnouncement, setSpecialAnnouncement] = useState(null);
   const doubleLuckBtnRef = useRef(null);
@@ -63,7 +64,9 @@ export default function SpecialCards({
   const team2UsedQuick = usedQuickTimer[2];
 
   const handleLucky = (teamNum) => {
-    if (spinning) return;
+    if (luckyPending) return;
+    setLuckyPending(true); // lock immediately — prevents double-tap during any delay
+
     const isDoubleLuck = Math.random() < 0.05;
 
     if (isDoubleLuck) {
@@ -95,8 +98,9 @@ export default function SpecialCards({
   };
 
   const spinLucky = (teamNum, isDouble) => {
-    setSpinning(true);
+    setShowSpinner(true);
     setTimeout(() => {
+      setShowSpinner(false);
       const opponent = teamNum === 1 ? 2 : 1;
       const idx = Math.floor(Math.random() * 10);
       let base = { ...LUCKY_OUTCOMES[idx] };
@@ -127,31 +131,32 @@ export default function SpecialCards({
         wasDouble:            isDouble,
       };
 
-      // Build the result label to show
-      let resultLabel = displayLabel;
       const extraLines = [];
       if (base.cancelOpponentLucky && !usedLucky[opponent]) extraLines.push('🚫 بطاقة حظ الخصم أُلغيت!');
       if (base.cancelOpponentTimer)                          extraLines.push('🚫 ضغط الوقت للخصم أُلغي!');
       if (base.extraLucky)                                   extraLines.push('🔄 حصلت على فرصة حظ إضافية!');
       if (base.cancelSelfTimer)                              extraLines.push('⏱️ فقدت خيار ضغط الوقت!');
 
-      setLuckyResult({ teamNum, label: resultLabel, delta: finalDelta, extraLines });
+      setLuckyResult({ teamNum, label: displayLabel, delta: finalDelta, extraLines });
       onLuckyResult(teamNum, finalDelta, effects);
-      setSpinning(false);
 
-      // Show full-screen special announcement for impactful effects
+      // Special full-screen announcement for impactful effects
       if (extraLines.length > 0) {
-        const isPositive = finalDelta > 0;
         setSpecialAnnouncement({
           lines: extraLines,
           teamNum,
           teamName: teamNum === 1 ? team1.name : team2.name,
-          isPositive,
+          isPositive: finalDelta > 0,
         });
-        setTimeout(() => setSpecialAnnouncement(null), 4000);
       }
 
-      setTimeout(() => setLuckyResult(null), 3500);
+      // Clear everything together, then unlock the button
+      const displayDuration = extraLines.length > 0 ? 4000 : 3000;
+      setTimeout(() => {
+        setLuckyResult(null);
+        setSpecialAnnouncement(null);
+        setLuckyPending(false); // unlock AFTER all popups are gone
+      }, displayDuration);
     }, 800);
   };
 
@@ -203,9 +208,9 @@ export default function SpecialCards({
           <button
             ref={doubleLuckBtnRef}
             onClick={() => handleLucky(1)}
-            disabled={team1UsedLucky || spinning}
+            disabled={team1UsedLucky || luckyPending}
             className="special-btn font-cairo px-3 py-1.5 rounded-xl"
-            style={team1UsedLucky ? btnUsed : btnActive(true)}
+            style={(team1UsedLucky || luckyPending) ? btnUsed : btnActive(true)}
             title="بطاقة الحظ"
           >
             🃏 حظ
@@ -227,9 +232,9 @@ export default function SpecialCards({
         <div className="flex gap-2">
           <button
             onClick={() => handleLucky(2)}
-            disabled={team2UsedLucky || spinning}
+            disabled={team2UsedLucky || luckyPending}
             className="special-btn font-cairo px-3 py-1.5 rounded-xl"
-            style={team2UsedLucky ? btnUsed : btnActive(false)}
+            style={(team2UsedLucky || luckyPending) ? btnUsed : btnActive(false)}
             title="بطاقة الحظ"
           >
             🃏 حظ
@@ -284,7 +289,7 @@ export default function SpecialCards({
 
       {/* Spin / Result popup */}
       <AnimatePresence>
-        {(spinning || luckyResult) && (
+        {(showSpinner || luckyResult) && (
           <motion.div
             initial={{ opacity: 0, scale: 0.7, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -295,7 +300,7 @@ export default function SpecialCards({
               className="rounded-2xl px-8 py-6 shadow-2xl text-center"
               style={{ background: '#1a0000', border: '2px solid #CC0000', boxShadow: '0 0 30px rgba(204,0,0,0.5)', maxWidth: 340 }}
             >
-              {spinning ? (
+              {showSpinner ? (
                 <p className="text-2xl font-cairo font-black animate-pulse" style={{ color: '#CC0000', textShadow: '0 0 10px rgba(255,0,0,0.8)' }}>🎲 يتم السحب...</p>
               ) : luckyResult ? (
                 <>
