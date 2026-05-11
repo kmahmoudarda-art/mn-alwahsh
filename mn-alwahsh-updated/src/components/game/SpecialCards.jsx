@@ -76,10 +76,10 @@ export default function SpecialCards({
         spawnStarBurst(rect.left + rect.width / 2, rect.top + rect.height / 2);
         btn.animate(
           [
-            { boxShadow: '0 0 0 0 rgba(204,0,0,0.8)', opacity: '1' },
-            { boxShadow: '0 0 0 30px rgba(204,0,0,0)', opacity: '0' },
+            { boxShadow: '0 0 0 0 rgba(204,0,0,0.8)' },
+            { boxShadow: '0 0 0 30px rgba(204,0,0,0)' },
           ],
-          { duration: 500, easing: 'ease-out', fill: 'forwards' }
+          { duration: 500, easing: 'ease-out', fill: 'none' }
         );
         const flash = document.createElement('div');
         flash.style.cssText = 'position:fixed;inset:0;background:rgba(139,0,0,0.18);pointer-events:none;z-index:99998;';
