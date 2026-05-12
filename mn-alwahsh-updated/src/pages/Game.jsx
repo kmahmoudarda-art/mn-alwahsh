@@ -341,7 +341,7 @@ export default function Game() {
       sounds.modalOpen();
       setModalOpen(true);
     }
-  }, [stopTimer, luckyCell, luckyUsed, currentTeam]);
+  }, [stopTimer, luckyCell, luckyUsed, currentTeam, categories, trapTile, bonusTiles]);
 
   const loadQuestion = useCallback(async () => {
     if (!currentTile) return;
