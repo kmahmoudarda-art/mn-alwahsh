@@ -344,9 +344,12 @@ export default function Game() {
     setModalPhase('loading');
     const tileKey = `${currentTile.colIndex}-${currentTile.rowIndex}`;
     const isTrap = tileKey === trapTile;
-    const fetchCategory = isTrap && categories.length > 0
-      ? categories[Math.floor(Math.random() * categories.length)]
-      : currentTile.category;
+    let fetchCategory = currentTile.category;
+    if (isTrap && categories.length > 0) {
+      const otherCats = categories.filter(c => c !== currentTile.category);
+      const pool = otherCats.length > 0 ? otherCats : categories;
+      fetchCategory = pool[Math.floor(Math.random() * pool.length)];
+    }
     const q = await getQuestion(fetchCategory, currentTile.points);
     setLoading(false);
     if (!q) {
