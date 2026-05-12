@@ -299,14 +299,9 @@ export default function Game() {
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-    // Trap tile: pick a random category from ALL categories for a 600-pt question
     const isTrapTileClick = trapTile === `${colIndex}-${rowIndex}`;
-    const effectiveCategory = isTrapTileClick
-      ? categories[Math.floor(Math.random() * categories.length)]
-      : category;
-    const effectivePoints = isTrapTileClick ? 600 : points;
 
-    setCurrentTile({ colIndex, rowIndex, category: effectiveCategory, points: effectivePoints });
+    setCurrentTile({ colIndex, rowIndex, category, points: isTrapTileClick ? 600 : points });
     setCurrentQuestion(null);
     setAnswered(false);
     setSelectedAnswer(null);
@@ -347,7 +342,12 @@ export default function Game() {
     if (!currentTile) return;
     setLoading(true);
     setModalPhase('loading');
-    const q = await getQuestion(currentTile.category, currentTile.points);
+    const tileKey = `${currentTile.colIndex}-${currentTile.rowIndex}`;
+    const isTrap = tileKey === trapTile;
+    const fetchCategory = isTrap && categories.length > 0
+      ? categories[Math.floor(Math.random() * categories.length)]
+      : currentTile.category;
+    const q = await getQuestion(fetchCategory, currentTile.points);
     setLoading(false);
     if (!q) {
       // No questions in bank for this category — skip tile without giving points
@@ -372,7 +372,7 @@ export default function Game() {
       }
       return prev;
     });
-  }, [currentTile, getQuestion, startTimer, quickTimerActiveFor]);
+  }, [currentTile, getQuestion, startTimer, quickTimerActiveFor, trapTile, categories]);
 
   const handleUseLifeline = useCallback((lifelineId) => {
     setTeamLifelines(prev => ({
