@@ -4,6 +4,7 @@ import { ZoomIn, ZoomOut } from 'lucide-react';
 
 import { AnimatePresence } from 'framer-motion';
 import { generateQuestion, resetQuestionCache, prefetchWikipedia, pregenerateAllTiles } from '../utils/questionGenerator';
+import { insertGameSession, updateGameSession } from '../utils/supabaseClient';
 import { saveSession, loadSession, clearSession } from '../utils/sessionStore';
 import { sounds } from '../utils/soundEffects';
 import SetupScreen from '../components/game/SetupScreen';
@@ -58,6 +59,7 @@ export default function Game() {
   const [quickTimerActiveFor, setQuickTimerActiveFor] = useState(null);
   const timerRef = useRef(null);
   const usedAnswersRef = useRef({});
+  const gameSessionIdRef = useRef(null);
 
   // Lucky Double state
   const [luckyCell, setLuckyCell] = useState(() => {
@@ -202,8 +204,20 @@ export default function Game() {
   useEffect(() => {
     if (gamePhase === 'finished' && gameName) {
       clearSession(gameName);
+      const t1 = teams[1]?.score ?? 0;
+      const t2 = teams[2]?.score ?? 0;
+      let winner = null;
+      if (t1 > t2) winner = teams[1]?.name;
+      else if (t2 > t1) winner = teams[2]?.name;
+      else winner = 'تعادل';
+      updateGameSession(gameSessionIdRef.current, {
+        status: 'finished',
+        winner,
+        team1_score: t1,
+        team2_score: t2,
+      });
     }
-  }, [gamePhase, gameName]);
+  }, [gamePhase, gameName, teams]);
 
   // Pre-generate all questions silently in background
   const startPregeneration = useCallback((allCategories) => {
@@ -270,6 +284,12 @@ export default function Game() {
     setTrapTile(generateTrapTile(allCategories.length, bonusTilesVal));
     setGamePhase('playing');
     startPregeneration(allCategories);
+    insertGameSession({
+      game_name: setup.gameName || null,
+      team1_name: setup.team1.name,
+      team2_name: setup.team2.name,
+      categories: allCategories,
+    }).then(id => { gameSessionIdRef.current = id; });
   }, [startPregeneration, generateBonusTiles, generateTrapTile]);
 
   const getQuestion = useCallback(async (category, points) => {

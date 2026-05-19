@@ -355,3 +355,61 @@ function normalizeRow(row, sourceTable) {
     image_url: row.image_url || null,
   };
 }
+
+// ─── Game Session Analytics ───────────────────────────────────────────────────
+
+let _ipInfoCache = null;
+async function getIpInfo() {
+  if (_ipInfoCache) return _ipInfoCache;
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    if (!res.ok) return null;
+    const data = await res.json();
+    _ipInfoCache = {
+      ip: data.ip || null,
+      city: data.city || null,
+      region: data.region || null,
+      country: data.country_name || null,
+    };
+    return _ipInfoCache;
+  } catch { return null; }
+}
+
+export async function insertGameSession({ game_name, team1_name, team2_name, categories }) {
+  const ipInfo = await getIpInfo();
+  const payload = {
+    game_name,
+    team1_name,
+    team2_name,
+    categories,
+    status: 'started',
+    team1_score: 0,
+    team2_score: 0,
+    ip_address: ipInfo?.ip ?? null,
+    city: ipInfo?.city ?? null,
+    region: ipInfo?.region ?? null,
+    country: ipInfo?.country ?? null,
+    started_at: new Date().toISOString(),
+  };
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/game_sessions`, {
+      method: 'POST',
+      headers: { ...BASE_HEADERS, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) return null;
+    const rows = await res.json();
+    return rows?.[0]?.id ?? null;
+  } catch { return null; }
+}
+
+export async function updateGameSession(id, { status, winner, team1_score, team2_score }) {
+  if (!id) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/game_sessions?id=eq.${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { ...BASE_HEADERS, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ status, winner, team1_score, team2_score, ended_at: new Date().toISOString() }),
+    });
+  } catch {}
+}
