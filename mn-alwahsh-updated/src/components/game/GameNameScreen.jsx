@@ -234,6 +234,34 @@ export default function GameNameScreen({ onEnter }) {
       <AnimatePresence>{showIOSModal && <IOSInstallModal onClose={() => setShowIOSModal(false)} />}</AnimatePresence>
       <ScreenMirrorButton />
 
+      {/* Games counter — fixed top center */}
+      <motion.div
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        style={{
+          position: 'fixed', top: 14, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 9000,
+          display: 'inline-flex', alignItems: 'center', gap: 8,
+          background: 'rgba(8,0,0,0.72)',
+          border: '1px solid rgba(204,0,0,0.4)',
+          borderRadius: 99,
+          padding: '6px 18px',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 2px 16px rgba(139,0,0,0.35)',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        <span style={{ fontSize: 15 }}>🎮</span>
+        <span style={{
+          fontFamily: 'var(--font-cairo)', fontWeight: 700,
+          fontSize: 'clamp(12px, 1.5vw, 14px)',
+          color: 'rgba(255,200,200,0.9)',
+        }}>
+          {gameCount.toLocaleString('ar-SA')} لعبة تم لعبها
+        </span>
+      </motion.div>
+
       <AnimatePresence>
         {showInstall && installPrompt && (
           <InstallBanner prompt={installPrompt} onDismiss={() => setShowInstall(false)} />
@@ -346,33 +374,6 @@ export default function GameNameScreen({ onEnter }) {
             لعبة المعرفة والتحدي
           </p>
 
-          <motion.div
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                gap: 8, marginBottom: 12,
-              }}
-            >
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8,
-                background: 'rgba(139,0,0,0.18)',
-                border: '1px solid rgba(204,0,0,0.35)',
-                borderRadius: 99,
-                padding: '5px 16px',
-                backdropFilter: 'blur(8px)',
-              }}>
-                <span style={{ fontSize: 16 }}>🎮</span>
-                <span style={{
-                  fontFamily: 'var(--font-cairo)', fontWeight: 700,
-                  fontSize: 'clamp(12px, 1.6vw, 14px)',
-                  color: 'rgba(255,200,200,0.85)',
-                }}>
-                  {gameCount.toLocaleString('ar-SA')} لعبة تم لعبها
-                </span>
-              </div>
-            </motion.div>
 
           {/* Game name form */}
           <div className="gns-form-card" style={{
