@@ -413,3 +413,19 @@ export async function updateGameSession(id, { status, winner, team1_score, team2
     });
   } catch {}
 }
+
+export async function fetchGameCount() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/game_sessions?select=id`, {
+      headers: { ...BASE_HEADERS, Prefer: 'count=exact', 'Range-Unit': 'items', Range: '0-0' },
+    });
+    const contentRange = res.headers.get('Content-Range');
+    if (contentRange) {
+      const total = contentRange.split('/')[1];
+      if (total && total !== '*') return parseInt(total, 10);
+    }
+    if (!res.ok) return null;
+    const data = await res.json();
+    return Array.isArray(data) ? data.length : null;
+  } catch { return null; }
+}

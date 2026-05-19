@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import InstructionManual from './InstructionManual';
 import ScreenMirrorButton from './ScreenMirrorButton';
+import { fetchGameCount } from '@/utils/supabaseClient';
 
 const checkIsIOS = () =>
   /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -139,6 +140,7 @@ export default function GameNameScreen({ onEnter }) {
   const [installPrompt, setInstallPrompt] = useState(null);
   const [showInstall, setShowInstall] = useState(false);
   const [showIOSModal, setShowIOSModal] = useState(false);
+  const [gameCount, setGameCount] = useState(null);
 
   const isIOS = checkIsIOS();
   const isStandalone = checkIsStandalone();
@@ -151,6 +153,10 @@ export default function GameNameScreen({ onEnter }) {
     };
     window.addEventListener('beforeinstallprompt', handler);
     return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  useEffect(() => {
+    fetchGameCount().then(count => { if (count !== null) setGameCount(count); });
   }, []);
 
   const handleInstallClick = () => {
@@ -337,6 +343,36 @@ export default function GameNameScreen({ onEnter }) {
           }}>
             لعبة المعرفة والتحدي
           </p>
+
+          {gameCount !== null && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: 8, marginBottom: 12,
+              }}
+            >
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                background: 'rgba(139,0,0,0.18)',
+                border: '1px solid rgba(204,0,0,0.35)',
+                borderRadius: 99,
+                padding: '5px 16px',
+                backdropFilter: 'blur(8px)',
+              }}>
+                <span style={{ fontSize: 16 }}>🎮</span>
+                <span style={{
+                  fontFamily: 'var(--font-cairo)', fontWeight: 700,
+                  fontSize: 'clamp(12px, 1.6vw, 14px)',
+                  color: 'rgba(255,200,200,0.85)',
+                }}>
+                  {gameCount.toLocaleString('ar-SA')} لعبة تم لعبها
+                </span>
+              </div>
+            </motion.div>
+          )}
 
           {/* Game name form */}
           <div className="gns-form-card" style={{
