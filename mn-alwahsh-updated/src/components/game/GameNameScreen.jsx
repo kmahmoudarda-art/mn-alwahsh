@@ -140,7 +140,8 @@ export default function GameNameScreen({ onEnter }) {
   const [installPrompt, setInstallPrompt] = useState(null);
   const [showInstall, setShowInstall] = useState(false);
   const [showIOSModal, setShowIOSModal] = useState(false);
-  const [gameCount, setGameCount] = useState(null);
+  const [gameCount, setGameCount] = useState(0);
+  const [countLoaded, setCountLoaded] = useState(false);
 
   const isIOS = checkIsIOS();
   const isStandalone = checkIsStandalone();
@@ -156,7 +157,10 @@ export default function GameNameScreen({ onEnter }) {
   }, []);
 
   useEffect(() => {
-    fetchGameCount().then(count => { if (count !== null) setGameCount(count); });
+    fetchGameCount().then(count => {
+      setGameCount(count ?? 0);
+      setCountLoaded(true);
+    });
   }, []);
 
   const handleInstallClick = () => {
@@ -344,7 +348,7 @@ export default function GameNameScreen({ onEnter }) {
             لعبة المعرفة والتحدي
           </p>
 
-          {gameCount !== null && (
+          {countLoaded && (
             <motion.div
               initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
