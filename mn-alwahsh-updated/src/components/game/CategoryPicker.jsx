@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Lock } from 'lucide-react';
 import { fetchCategories } from '../../utils/supabaseClient';
 import CATEGORY_ICONS, { getIcon } from '../../utils/categoryIcons';
-import { isPremiumCategory, getPremiumPriceLabel, isTestAccount, ALL_CATEGORIES_PRICE, TRIAL_PRICE } from '../../utils/premiumConfig';
+import { isPremiumCategory, getPremiumPriceLabel, isTestAccount, ALL_CATEGORIES_PRICE, TRIAL_PRICE_WEB } from '../../utils/premiumConfig';
 import { isSignedIn, getCurrentUser } from '../../utils/authClient';
 import { fetchUnlockedCategories } from '../../utils/entitlements';
 import { startZiinaCheckout } from '../../utils/ziinaClient';
@@ -59,7 +59,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   const [unlockError, setUnlockError] = useState(null);
   // One-game-only unlocks from the 1 AED trial — never written to Supabase,
   // never persisted, so it naturally resets whenever CategoryPicker remounts
-  // for a new game. See TRIAL_PRICE note in premiumConfig.js.
+  // for a new game. See TRIAL_PRICE_WEB note in premiumConfig.js.
   const [trialCategories, setTrialCategories] = useState([]);
 
   const loadEntitlements = () => {
@@ -400,7 +400,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                     className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
                     style={{ background: 'rgba(255,215,0,0.12)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.4)' }}
                   >
-                    {`جرّبها لهذه اللعبة فقط — ${TRIAL_PRICE} AED`}
+                    {`جرّبها لهذه اللعبة فقط — ${TRIAL_PRICE_WEB} AED`}
                   </button>
                   <p className="font-tajawal text-xs mb-2" style={{ color: 'rgba(255,150,150,0.7)' }}>
                     التجربة تفتح الفئة لهذه اللعبة فقط، وتُقفل مرة أخرى بعدها

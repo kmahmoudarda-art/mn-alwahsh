@@ -23,7 +23,7 @@
 //   SUPABASE_URL, SUPABASE_ANON_KEY — same values already hardcoded as
 //   fallbacks in src/utils/supabaseClient.js; fine to reuse those here.
 
-import { PREMIUM_CATEGORIES, ALL_CATEGORIES_PRICE, TRIAL_PRICE, isPremiumCategory } from '../../src/utils/premiumConfig.js';
+import { PREMIUM_CATEGORIES, ALL_CATEGORIES_PRICE, TRIAL_PRICE_WEB, isPremiumCategory } from '../../src/utils/premiumConfig.js';
 
 const ZIINA_API = 'https://api-v2.ziina.com/api/payment_intent';
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://cqqeyvhofbnvjemoihca.supabase.co';
@@ -31,7 +31,7 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIs
 
 function expectedFilsFor(kind, category) {
   if (kind === 'all') return ALL_CATEGORIES_PRICE * 100;
-  if (kind === 'trial') return TRIAL_PRICE * 100;
+  if (kind === 'trial') return TRIAL_PRICE_WEB * 100;
   if (kind === 'category') {
     if (!isPremiumCategory(category)) return null;
     return PREMIUM_CATEGORIES[category] * 100;

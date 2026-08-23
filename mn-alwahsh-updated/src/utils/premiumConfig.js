@@ -135,7 +135,7 @@ export function isTestAccount(user) {
 // exactly like a single-category buy, just for every key in
 // PREMIUM_CATEGORIES at once (see entitlements.js's grantAllCategoriesToCurrentUser).
 //
-// TRIAL_PRICE — deliberately NOT written to the purchases table. It's a
+// TRIAL_PRICE_WEB — deliberately NOT written to the purchases table. It's a
 // one-game-only unlock: local React state in CategoryPicker, reset the
 // moment a new game starts. Nothing to unwind server-side, nothing that
 // persists across devices — that's the point, it's a taste, not a purchase.
@@ -146,4 +146,10 @@ export function isTestAccount(user) {
 // still reads as a clear discount against the 7-15 AED full-category
 // prices, while leaving a real margin after fees.
 export const ALL_CATEGORIES_PRICE = 100;
-export const TRIAL_PRICE = 5;
+export const TRIAL_PRICE_WEB = 5;
+
+// TRIAL_PRICE_ANDROID — for when Google Play Billing gets wired in (not
+// built yet). Same one-game-only design as the web trial. Google Play
+// Billing's ~15% cut (vs. Ziina's ~2.6% + flat 1 AED) and no hard minimum
+// make a 1 AED one-shot viable there in a way it wasn't on Ziina.
+export const TRIAL_PRICE_ANDROID = 1;

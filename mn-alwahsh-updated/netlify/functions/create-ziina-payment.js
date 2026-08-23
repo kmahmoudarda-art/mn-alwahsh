@@ -13,13 +13,13 @@
 //   SITE_URL — e.g. https://mnalwahsh.com (no trailing slash). Used to
 //     build the success/cancel/failure redirect URLs.
 
-import { PREMIUM_CATEGORIES, ALL_CATEGORIES_PRICE, TRIAL_PRICE, isPremiumCategory } from '../../src/utils/premiumConfig.js';
+import { PREMIUM_CATEGORIES, ALL_CATEGORIES_PRICE, TRIAL_PRICE_WEB, isPremiumCategory } from '../../src/utils/premiumConfig.js';
 
 const ZIINA_API = 'https://api-v2.ziina.com/api/payment_intent';
 
 function priceInFilsFor(kind, category) {
   if (kind === 'all') return ALL_CATEGORIES_PRICE * 100;
-  if (kind === 'trial') return TRIAL_PRICE * 100;
+  if (kind === 'trial') return TRIAL_PRICE_WEB * 100;
   if (kind === 'category') {
     if (!isPremiumCategory(category)) return null;
     return PREMIUM_CATEGORIES[category] * 100;
