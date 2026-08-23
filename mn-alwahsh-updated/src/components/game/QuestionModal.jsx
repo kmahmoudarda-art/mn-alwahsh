@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { X } from 'lucide-react';
 import LoadingSpinner from './LoadingSpinner';
 import FlagQuestion from './FlagQuestion';
-import { fetchSwapQuestion } from '../../utils/supabaseClient';
+import { fetchSwapQuestion, reportQuestion } from '../../utils/supabaseClient';
 import { getCachedImageUrl, fetchAndCacheImage } from '../../utils/questionGenerator';
 import { LIFELINES } from './LifelinePanel';
 
@@ -270,6 +270,11 @@ export default function QuestionModal({
   const [toastMessage, setToastMessage] = useState('');
   const [swapCount, setSwapCount] = useState(0);
   const [swapAnimating, setSwapAnimating] = useState(false);
+  const [reportedIds, setReportedIds] = useState(() => {
+    try { return new Set(JSON.parse(localStorage.getItem('mn_alwahsh_reported_qs') || '[]')); }
+    catch { return new Set(); }
+  });
+  const [reporting, setReporting] = useState(false);
   const [singerPhotoUrl, setSingerPhotoUrl] = useState(null);
   const closeTimeoutRef = useRef(null);
   const lastTapRef = useRef(0);
@@ -329,6 +334,25 @@ export default function QuestionModal({
       setSwapAnimating(false);
       if (onResetTimer) onResetTimer();
     }, 250);
+  };
+
+  const handleReport = async () => {
+    if (!question || question.id == null || reporting) return;
+    const key = `${question.source_table}:${question.id}`;
+    if (reportedIds.has(key)) { toast('تم الإبلاغ عن هذا السؤال من قبل'); return; }
+
+    setReporting(true);
+    const result = await reportQuestion(question);
+    setReporting(false);
+
+    if (!result.ok) { toast('تعذّر إرسال البلاغ، حاول لاحقاً'); return; }
+
+    const next = new Set(reportedIds);
+    next.add(key);
+    setReportedIds(next);
+    try { localStorage.setItem('mn_alwahsh_reported_qs', JSON.stringify([...next])); } catch {}
+
+    toast(result.deleted ? 'تم حذف السؤال بعد وصوله لعدد كافٍ من البلاغات' : 'شكراً، تم استلام بلاغك');
   };
 
   const handleCloseClick = () => {
@@ -764,6 +788,11 @@ export default function QuestionModal({
                             background: GOLD_BG, color: '#000', border: `1px solid ${GOLD_BORDER}`,
                             fontFamily:'var(--font-cairo)', cursor: 'pointer',
                           }}>🔄 تغيير سؤال مكرر</button>
+                        <button onClick={handleReport} disabled={reporting}
+                          style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
+                            background: 'rgba(80,0,0,0.5)', color: '#FF9999', border: '1px solid rgba(255,60,60,0.35)',
+                            fontFamily:'var(--font-cairo)', cursor: 'pointer',
+                          }}>🚩 إبلاغ عن خطأ</button>
                       </div>
                     )}
                   </>
@@ -905,6 +934,11 @@ export default function QuestionModal({
                             background: GOLD_BG, color: '#000', border: `1px solid ${GOLD_BORDER}`,
                             fontFamily:'var(--font-cairo)', cursor: 'pointer',
                           }}>🔄 تغيير سؤال مكرر</button>
+                        <button onClick={handleReport} disabled={reporting}
+                          style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
+                            background: 'rgba(80,0,0,0.5)', color: '#FF9999', border: '1px solid rgba(255,60,60,0.35)',
+                            fontFamily:'var(--font-cairo)', cursor: 'pointer',
+                          }}>🚩 إبلاغ عن خطأ</button>
                       </div>
                     )}
                   </>
@@ -974,6 +1008,11 @@ export default function QuestionModal({
                           background: GOLD_BG, color: '#000', border: `1px solid ${GOLD_BORDER}`,
                           fontFamily:'var(--font-cairo)', cursor: 'pointer',
                         }}>🔄 تغيير سؤال مكرر</button>
+                        <button onClick={handleReport} disabled={reporting}
+                          style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
+                            background: 'rgba(80,0,0,0.5)', color: '#FF9999', border: '1px solid rgba(255,60,60,0.35)',
+                            fontFamily:'var(--font-cairo)', cursor: 'pointer',
+                          }}>🚩 إبلاغ عن خطأ</button>
                     </div>
                   )}
 

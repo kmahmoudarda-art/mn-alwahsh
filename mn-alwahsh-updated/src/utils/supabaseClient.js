@@ -415,6 +415,59 @@ export async function updateGameSession(id, { status, winner, team1_score, team2
   } catch {}
 }
 
+// ─── Question reporting ────────────────────────────────────────────────────
+// A question gets a "report_count" column (added via SQL migration, see
+// /supabase-migrations/report_questions.sql). Once a question hits 50
+// reports it's deleted outright rather than just hidden — Khalid asked for
+// bad questions gone, not flagged.
+//
+// Fam's rows have no real primary key (see normalizeRow) — its "id" is a
+// composite "category|points|slot" string, so it needs its own filter
+// instead of the normal id=eq. lookup.
+const REPORT_THRESHOLD = 50;
+
+export async function reportQuestion(question) {
+  if (!question || question.id == null || !question.source_table) return { ok: false };
+  const { id, source_table } = question;
+
+  let filter;
+  if (source_table === TABLE_FAM && typeof id === 'string' && id.includes('|')) {
+    const [fCategory, fPoints, fSlot] = id.split('|');
+    filter = `category=eq.${encodeURIComponent(fCategory)}&points=eq.${encodeURIComponent(fPoints)}&slot=eq.${encodeURIComponent(fSlot)}`;
+  } else {
+    filter = `id=eq.${encodeURIComponent(id)}`;
+  }
+
+  try {
+    const getRes = await fetch(`${SUPABASE_URL}/rest/v1/${source_table}?select=report_count&${filter}&limit=1`, {
+      headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' },
+    });
+    if (!getRes.ok) return { ok: false };
+    const rows = await getRes.json();
+    if (!rows.length) return { ok: false };
+
+    const nextCount = (rows[0].report_count || 0) + 1;
+
+    if (nextCount >= REPORT_THRESHOLD) {
+      const delRes = await fetch(`${SUPABASE_URL}/rest/v1/${source_table}?${filter}`, {
+        method: 'DELETE',
+        headers: { ...BASE_HEADERS, Prefer: 'return=minimal' },
+      });
+      return { ok: delRes.ok, deleted: delRes.ok, count: nextCount };
+    }
+
+    const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/${source_table}?${filter}`, {
+      method: 'PATCH',
+      headers: { ...BASE_HEADERS, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ report_count: nextCount }),
+    });
+    return { ok: patchRes.ok, deleted: false, count: nextCount };
+  } catch (e) {
+    console.error('[reportQuestion] failed', e);
+    return { ok: false };
+  }
+}
+
 export async function fetchGameCount() {
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/game_sessions?select=id`, {
