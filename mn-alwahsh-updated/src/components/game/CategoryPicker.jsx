@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Lock } from 'lucide-react';
 import { fetchCategories } from '../../utils/supabaseClient';
 import CATEGORY_ICONS, { getIcon } from '../../utils/categoryIcons';
-import { isPremiumCategory, getPremiumPriceLabel } from '../../utils/premiumConfig';
-import { isSignedIn } from '../../utils/authClient';
+import { isPremiumCategory, getPremiumPriceLabel, isTestAccount } from '../../utils/premiumConfig';
+import { isSignedIn, getCurrentUser } from '../../utils/authClient';
 import { fetchUnlockedCategories, grantCategoryToCurrentUser } from '../../utils/entitlements';
 import { isHiddenCategory } from '../../utils/hiddenCategories';
 import AuthForm from './AuthForm';
@@ -73,7 +73,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
 
   useEffect(() => { load(); }, []);
 
-  const isUnlocked = (name) => !isPremiumCategory(name) || unlockedCategories.includes(name);
+  const isUnlocked = (name) => !isPremiumCategory(name) || unlockedCategories.includes(name) || isTestAccount(getCurrentUser());
 
   const toggleGroup = (g) => {
     setOpenGroups(prev => {

@@ -113,3 +113,15 @@ export function getPremiumPriceLabel(name) {
   const price = PREMIUM_CATEGORIES[name];
   return price ? `${price} AED` : 'فئة مميزة';
 }
+
+// ── Owner's personal test account ──
+// Signing in as this account unlocks every category, no purchase rows
+// needed. Doesn't touch entitlements.js/the `purchases` table at all —
+// this is purely a code-level override checked by email, so it works
+// even before any real payment gateway is wired in. Sign up for this
+// account once from the live site's normal signup form.
+export const TEST_ACCOUNT_EMAIL = 'test@mnalwahsh.com';
+
+export function isTestAccount(user) {
+  return !!user && user.email === TEST_ACCOUNT_EMAIL;
+}
