@@ -4,20 +4,27 @@
 // on both the website and the packaged app, unlike the old localStorage-only
 // version.
 //
-// ⚠️ SECURITY NOTE — read before relying on this for real money:
-// grantCategoryToCurrentUser() below inserts a row directly from the
-// browser once the person is signed in. RLS only checks "is this your own
-// row", not "did you actually pay" — so right now, any signed-in user could
-// call this for any premium category and get it for free (e.g. via browser
-// devtools). This is fine for testing the account/unlock flow, but before
-// this handles real payments:
-//   - Web: a Stripe webhook (running server-side, e.g. a Supabase Edge
-//     Function) should verify the payment, THEN insert the row — not the
-//     browser.
-//   - App: after a Google Play Billing purchase, verify the purchase token
-//     server-side (Google Play Developer API) before inserting.
-// Once that's in place, remove the client "insert" RLS policy (see the SQL
-// below) so only the server can write to this table.
+// STATUS — web purchases are now real, Android app purchases are not yet:
+// As of the Ziina integration (netlify/functions/create-ziina-payment.js +
+// confirm-ziina-payment.js), the website's unlock flow (CategoryPicker.jsx)
+// no longer calls the two grant functions below directly — it redirects to
+// Ziina's hosted checkout, and only inserts into `purchases` after
+// confirm-ziina-payment.js has independently verified the payment
+// server-side (via Ziina's API, checking both status AND amount). That
+// insert still uses the signed-in user's OWN access token against the same
+// RLS policy below — no service-role key needed, since the security fix
+// was "gate the insert on a verified payment", not "bypass RLS".
+//
+// grantCategoryToCurrentUser() and grantAllCategoriesToCurrentUser() below
+// are now unused by the main flow, kept only as a manual/admin-style
+// escape hatch. They still have NO payment check — calling either one
+// yourself instantly grants a category — so don't wire them back into any
+// unlock UI without the same payment-verification step confirm-ziina-payment
+// does.
+//
+// The Android app's Google Play Billing purchases still need the
+// equivalent of confirm-ziina-payment.js — verifying the purchase token
+// server-side via the Google Play Developer API before inserting.
 //
 // REQUIRED SETUP — run this once in the Supabase SQL editor:
 //

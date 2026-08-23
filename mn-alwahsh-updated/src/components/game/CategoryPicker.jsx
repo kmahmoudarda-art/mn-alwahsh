@@ -5,7 +5,8 @@ import { fetchCategories } from '../../utils/supabaseClient';
 import CATEGORY_ICONS, { getIcon } from '../../utils/categoryIcons';
 import { isPremiumCategory, getPremiumPriceLabel, isTestAccount, ALL_CATEGORIES_PRICE, TRIAL_PRICE } from '../../utils/premiumConfig';
 import { isSignedIn, getCurrentUser } from '../../utils/authClient';
-import { fetchUnlockedCategories, grantCategoryToCurrentUser, grantAllCategoriesToCurrentUser } from '../../utils/entitlements';
+import { fetchUnlockedCategories } from '../../utils/entitlements';
+import { startZiinaCheckout } from '../../utils/ziinaClient';
 import { isHiddenCategory } from '../../utils/hiddenCategories';
 import AuthForm from './AuthForm';
 
@@ -77,6 +78,18 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
 
   useEffect(() => { load(); }, []);
 
+  // Pick up a trial grant that PaymentResult.jsx stashed in sessionStorage
+  // after a successful 1 AED Ziina payment — consumed once, then cleared.
+  useEffect(() => {
+    try {
+      const pending = sessionStorage.getItem('mn_alwahsh_pending_trial');
+      if (pending) {
+        setTrialCategories(prev => prev.includes(pending) ? prev : [...prev, pending]);
+        sessionStorage.removeItem('mn_alwahsh_pending_trial');
+      }
+    } catch {}
+  }, []);
+
   const isUnlocked = (name) => !isPremiumCategory(name) || unlockedCategories.includes(name) || trialCategories.includes(name) || isTestAccount(getCurrentUser());
 
   const toggleGroup = (g) => {
@@ -99,12 +112,10 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
     setUnlockError(null);
     setUnlocking(true);
     try {
-      await grantCategoryToCurrentUser(name); // TEMPORARY — no payment yet, see entitlements.js
-      setUnlockedCategories(prev => prev.includes(name) ? prev : [...prev, name]);
-      setUnlockPromptFor(null);
+      await startZiinaCheckout({ kind: 'category', category: name });
+      // Browser navigates away to Ziina's hosted page — nothing more to do here.
     } catch (err) {
-      setUnlockError('تعذر فتح الفئة — حاول مرة أخرى');
-    } finally {
+      setUnlockError('تعذر بدء عملية الدفع — حاول مرة أخرى');
       setUnlocking(false);
     }
   };
@@ -113,20 +124,25 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
     setUnlockError(null);
     setUnlocking(true);
     try {
-      await grantAllCategoriesToCurrentUser(); // TEMPORARY — no payment yet, see entitlements.js
-      loadEntitlements();
-      setUnlockPromptFor(null);
+      await startZiinaCheckout({ kind: 'all' });
     } catch (err) {
-      setUnlockError('تعذر فتح جميع الفئات — حاول مرة أخرى');
-    } finally {
+      setUnlockError('تعذر بدء عملية الدفع — حاول مرة أخرى');
       setUnlocking(false);
     }
   };
 
-  // Trial: local-only, one game, never touches Supabase — see TRIAL_PRICE note.
-  const handleTrial = (name) => {
-    setTrialCategories(prev => prev.includes(name) ? prev : [...prev, name]);
-    setUnlockPromptFor(null);
+  // Trial also goes through real payment now — 1 AED via Ziina — but grants
+  // only a local, one-game unlock on return (see PaymentResult.jsx), never
+  // written to Supabase.
+  const handleTrial = async (name) => {
+    setUnlockError(null);
+    setUnlocking(true);
+    try {
+      await startZiinaCheckout({ kind: 'trial', category: name });
+    } catch (err) {
+      setUnlockError('تعذر بدء عملية الدفع — حاول مرة أخرى');
+      setUnlocking(false);
+    }
   };
 
   if (loading) return <p className="text-center font-tajawal text-sm py-4" style={{ color: '#FF6666' }}>جاري تحميل الفئات...</p>;
