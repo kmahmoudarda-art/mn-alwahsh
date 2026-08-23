@@ -37,9 +37,8 @@ export const HIDDEN_CATEGORIES = [
   // specific named singers were unhidden on request)
   'فنانون عرب',
 
-  // Fashion / lifestyle brands
-  'Sephora', 'سيفورا', 'guess fashion', 'Guess Fashion', 'GUESS FASHION', 'Guess fashion',
-  'Dubai Bling', 'سبيستون',
+  // Fashion / lifestyle brands — Guess Fashion stays hidden, rest unhidden on request
+  'guess fashion', 'Guess Fashion', 'GUESS FASHION', 'Guess fashion',
 
   // Kids — Disney/Nickelodeon/branded characters
   'ديزني', 'Disney', 'بيبي شارك', 'Baby Shark', 'سبونج بوب', 'SpongeBob',
@@ -47,9 +46,6 @@ export const HIDDEN_CATEGORIES = [
 
   // Brand/logo guessing — literally trademarked logos
   'براندات', 'Logos',
-
-  // Tech/products — likely shows real device/car brand photos
-  'هواتف ذكية', 'سيارات',
 ];
 
 export function isHiddenCategory(name) {
