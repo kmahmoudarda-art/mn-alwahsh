@@ -139,5 +139,11 @@ export function isTestAccount(user) {
 // one-game-only unlock: local React state in CategoryPicker, reset the
 // moment a new game starts. Nothing to unwind server-side, nothing that
 // persists across devices — that's the point, it's a taste, not a purchase.
+//
+// Was 1 AED originally — raised to 5 because Ziina's API has a hard 2 AED
+// minimum per payment (a 1 AED charge is simply rejected), and even at
+// 2 AED the ~1.05 AED fee (2.6% + 1 AED) would eat over half of it. 5 AED
+// still reads as a clear discount against the 7-15 AED full-category
+// prices, while leaving a real margin after fees.
 export const ALL_CATEGORIES_PRICE = 100;
-export const TRIAL_PRICE = 1;
+export const TRIAL_PRICE = 5;
