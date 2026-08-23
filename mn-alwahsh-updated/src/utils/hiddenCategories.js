@@ -28,17 +28,14 @@
 export const HIDDEN_CATEGORIES = [
   // Sports — real player photos / club badges (trademarked)
   'football logo', 'football Logo', 'Football Logo', 'FOOTBALL LOGO',
-  'CR7', 'ميسي', 'Champions League', 'المنتخب الأردني',
-  'Real Madrid', 'Barcelona', 'ريال مدريد', 'برشلونة', 'برشلونه',
-  'League of Legends', 'WildRift', 'وايلد ريفت',
+  'CR7', 'ميسي',
 
   // Entertainment — TV/movie studio IP, real actor/character photos
   'جيم اوف ثرونز', 'Game of Thrones', 'Who Said GOT',
-  'نتفليكس', 'بريكينج باد', 'بيكي بلايندرز', 'بريزون بريك',
-  'Friends', 'Arab Idol', 'Arab Got Talent', 'باب الحارة', 'أفلام احمد حلمي',
 
-  // Music — real artist photos
-  'أم كلثوم', 'عبد الحليم', 'حمو بيكا', 'تامر حسني', 'عمرو دياب', 'فنانون عرب',
+  // Music — real artist photos (generic "Arab artists" bucket only —
+  // specific named singers were unhidden on request)
+  'فنانون عرب',
 
   // Fashion / lifestyle brands
   'Sephora', 'سيفورا', 'guess fashion', 'Guess Fashion', 'GUESS FASHION', 'Guess fashion',
