@@ -7,6 +7,7 @@ import { isPremiumCategory, getPremiumPriceLabel, isTestAccount, ALL_CATEGORIES_
 import { isSignedIn, getCurrentUser } from '../../utils/authClient';
 import { fetchUnlockedCategories } from '../../utils/entitlements';
 import { startZiinaCheckout } from '../../utils/ziinaClient';
+import { isRunningInAndroidApp } from '../../utils/platform';
 import { isHiddenCategory } from '../../utils/hiddenCategories';
 import AuthForm from './AuthForm';
 
@@ -201,7 +202,9 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
           background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.3)',
           borderRadius: 10, padding: '8px 10px',
         }}>
-          🔒 سجّل الدخول لفتح المزيد من الفئات أو شرائها
+          {isRunningInAndroidApp()
+            ? '🔒 سجّل الدخول لفتح المزيد من الفئات'
+            : '🔒 سجّل الدخول لفتح المزيد من الفئات أو شرائها'}
         </p>
       )}
 
@@ -378,33 +381,46 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                   {unlockError && (
                     <p className="font-tajawal text-xs mb-2" style={{ color: '#FF6666' }}>{unlockError}</p>
                   )}
-                  <button
-                    onClick={() => handleUnlock(unlockPromptFor)}
-                    disabled={unlocking}
-                    className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
-                    style={{ background: '#FFD700', color: '#2a0000' }}
-                  >
-                    {unlocking ? '...' : `فتح هذه الفئة — ${getPremiumPriceLabel(unlockPromptFor)}`}
-                  </button>
-                  <button
-                    onClick={handleUnlockAll}
-                    disabled={unlocking}
-                    className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
-                    style={{ background: 'linear-gradient(135deg, #FFD700, #FFA500)', color: '#2a0000' }}
-                  >
-                    {unlocking ? '...' : `فتح جميع الفئات — ${ALL_CATEGORIES_PRICE} AED`}
-                  </button>
-                  <button
-                    onClick={() => handleTrial(unlockPromptFor)}
-                    disabled={unlocking}
-                    className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
-                    style={{ background: 'rgba(255,215,0,0.12)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.4)' }}
-                  >
-                    {`جرّبها لهذه اللعبة فقط — ${TRIAL_PRICE_WEB} AED`}
-                  </button>
-                  <p className="font-tajawal text-xs mb-2" style={{ color: 'rgba(255,150,150,0.7)' }}>
-                    التجربة تفتح الفئة لهذه اللعبة فقط، وتُقفل مرة أخرى بعدها
-                  </p>
+                  {isRunningInAndroidApp() ? (
+                    // Google Play policy: apps may not lead users to any payment
+                    // method other than Google Play Billing, including linking
+                    // out to a website checkout — so no Ziina buttons here.
+                    // Real purchasing on Android needs Play Billing wired in
+                    // separately; until then this is informational only.
+                    <p className="font-tajawal text-sm mb-2" style={{ color: 'rgba(255,150,150,0.85)' }}>
+                      الشراء داخل التطبيق غير متاح حالياً.
+                    </p>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => handleUnlock(unlockPromptFor)}
+                        disabled={unlocking}
+                        className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
+                        style={{ background: '#FFD700', color: '#2a0000' }}
+                      >
+                        {unlocking ? '...' : `فتح هذه الفئة — ${getPremiumPriceLabel(unlockPromptFor)}`}
+                      </button>
+                      <button
+                        onClick={handleUnlockAll}
+                        disabled={unlocking}
+                        className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
+                        style={{ background: 'linear-gradient(135deg, #FFD700, #FFA500)', color: '#2a0000' }}
+                      >
+                        {unlocking ? '...' : `فتح جميع الفئات — ${ALL_CATEGORIES_PRICE} AED`}
+                      </button>
+                      <button
+                        onClick={() => handleTrial(unlockPromptFor)}
+                        disabled={unlocking}
+                        className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
+                        style={{ background: 'rgba(255,215,0,0.12)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.4)' }}
+                      >
+                        {`جرّبها لهذه اللعبة فقط — ${TRIAL_PRICE_WEB} AED`}
+                      </button>
+                      <p className="font-tajawal text-xs mb-2" style={{ color: 'rgba(255,150,150,0.7)' }}>
+                        التجربة تفتح الفئة لهذه اللعبة فقط، وتُقفل مرة أخرى بعدها
+                      </p>
+                    </>
+                  )}
                   <button
                     onClick={() => setUnlockPromptFor(null)}
                     className="w-full font-cairo text-sm py-2"
