@@ -7,13 +7,14 @@ import { generateQuestion, resetQuestionCache, prefetchWikipedia, pregenerateAll
 import { insertGameSession, updateGameSession } from '../utils/supabaseClient';
 import { saveSession, loadSession, clearSession } from '../utils/sessionStore';
 import { sounds } from '../utils/soundEffects';
+import { getCurrentUser, signOut } from '../utils/authClient';
 import SetupScreen from '../components/game/SetupScreen';
 import ScoreBar from '../components/game/ScoreBar';
 import GameBoard from '../components/game/GameBoard';
 import QuestionModal from '../components/game/QuestionModal';
 import WinnerScreen from '../components/game/WinnerScreen';
 import SpecialCards from '../components/game/SpecialCards';
-import GameNameScreen from '../components/game/GameNameScreen';
+import LoginGate from '../components/game/LoginGate';
 import LuckyDoublePopup from '../components/game/LuckyDoublePopup';
 
 const TOTAL_TILES = 36;
@@ -26,7 +27,11 @@ const BONUS_CONF = {
 };
 
 export default function Game() {
-  const [gameName, setGameName] = useState(null);
+  const [currentUser, setCurrentUser] = useState(getCurrentUser());
+  const sessionLoadedForRef = useRef(null); // which user id we've already tried to resume, so we don't redo it every render
+  // Reuses the existing save/resume-game machinery, just keyed by the
+  // signed-in account's id instead of a name the player used to type in.
+  const gameName = currentUser?.id || null;
 
   const [gamePhase, setGamePhase] = useState('setup');
   const [categories, setCategories] = useState([]);
@@ -621,9 +626,11 @@ export default function Game() {
     setModalPhase('lifeline-before');
   }, [answered, currentTile, stopTimer]);
 
-  // Exit without ending — game stays saved, player can resume by name
+  // Exit without ending — game stays saved under this account, player can
+  // resume by signing back in (lets someone else use the device meanwhile)
   const handleExit = useCallback(() => {
-    setGameName(null);
+    signOut();
+    setCurrentUser(null);
   }, []);
 
   // Restart — keep same categories, reset scores/tiles/lifelines/questions
@@ -663,7 +670,6 @@ export default function Game() {
     setLuckyUsed(false);
     setLuckyDoubleActive(false);
     setShowLuckyPopup(false);
-    setGameName(null);
     setReadyTiles(new Set());
     setGamePhase('setup');
     setCategories([]);
@@ -685,39 +691,35 @@ export default function Game() {
   // End game confirmation
   const [showEndConfirm, setShowEndConfirm] = useState(false);
 
-  const handleEnterGameName = useCallback(async (name) => {
-    setGameName(name);
-    const existing = await loadSession(name);
-    if (existing?.gamePhase) {
-      // Resume saved game
-      setGamePhase(existing.gamePhase);
-      if (existing.categories) setCategories(existing.categories);
-      if (existing.teams) setTeams(existing.teams);
-      if (existing.currentTeam) setCurrentTeam(existing.currentTeam);
-      if (existing.answeredTiles) setAnsweredTiles(new Set(existing.answeredTiles));
-      if (existing.teamLifelines) setTeamLifelines(existing.teamLifelines);
-      if (existing.usedLucky) setUsedLucky(existing.usedLucky);
-      if (existing.usedQuickTimer) setUsedQuickTimer(existing.usedQuickTimer);
-      if (existing.bonusTiles) setBonusTiles(existing.bonusTiles);
-      if (existing.trapTile !== undefined) setTrapTile(existing.trapTile);
-      if (existing.gamePhase === 'playing' && existing.categories?.length > 0) {
-        startPregeneration(existing.categories);
+  // Runs once right after someone signs in — resumes their saved game if
+  // they have one in progress, same as the old "type your name" flow did,
+  // just triggered by authentication instead of a typed name.
+  useEffect(() => {
+    if (!gameName || sessionLoadedForRef.current === gameName) return;
+    sessionLoadedForRef.current = gameName;
+    (async () => {
+      const existing = await loadSession(gameName);
+      if (existing?.gamePhase) {
+        setGamePhase(existing.gamePhase);
+        if (existing.categories) setCategories(existing.categories);
+        if (existing.teams) setTeams(existing.teams);
+        if (existing.currentTeam) setCurrentTeam(existing.currentTeam);
+        if (existing.answeredTiles) setAnsweredTiles(new Set(existing.answeredTiles));
+        if (existing.teamLifelines) setTeamLifelines(existing.teamLifelines);
+        if (existing.usedLucky) setUsedLucky(existing.usedLucky);
+        if (existing.usedQuickTimer) setUsedQuickTimer(existing.usedQuickTimer);
+        if (existing.bonusTiles) setBonusTiles(existing.bonusTiles);
+        if (existing.trapTile !== undefined) setTrapTile(existing.trapTile);
+        if (existing.gamePhase === 'playing' && existing.categories?.length > 0) {
+          startPregeneration(existing.categories);
+        }
       }
-    } else {
-      // New game — reset all state to defaults
-      setGamePhase('setup');
-      setCategories([]);
-      setTeams({ 1: { name: '', score: 0, scoreKey: 0 }, 2: { name: '', score: 0, scoreKey: 0 } });
-      setCurrentTeam(1);
-      setAnsweredTiles(new Set());
-      setTeamLifelines({ 1: {}, 2: {} });
-      setUsedLucky({ 1: false, 2: false });
-      setUsedQuickTimer({ 1: false, 2: false });
-    }
-  }, [startPregeneration]);
+      // else: nothing saved for this account — defaults (gamePhase 'setup') are already fine
+    })();
+  }, [gameName, startPregeneration]);
 
-  if (!gameName) {
-    return <GameNameScreen onEnter={handleEnterGameName} />;
+  if (!currentUser) {
+    return <LoginGate onSignedIn={() => setCurrentUser(getCurrentUser())} />;
   }
 
   if (gamePhase === 'setup') {
