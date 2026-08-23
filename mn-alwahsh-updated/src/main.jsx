@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from '@/App.jsx'
 import '@/index.css'
+import { handleAuthRedirect } from '@/utils/authClient'
 
 // Block pull-to-refresh on all screens (home, setup, game).
 // Must be a non-passive listener registered before React mounts —
@@ -17,6 +18,11 @@ import '@/index.css'
   }, { passive: false });
 })();
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <App />
-)
+// Pick up the access token from an email-confirmation redirect (if any)
+// BEFORE the app renders, so any component reading getCurrentUser() on
+// its very first render already sees the person as signed in.
+handleAuthRedirect().finally(() => {
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    <App />
+  )
+});
