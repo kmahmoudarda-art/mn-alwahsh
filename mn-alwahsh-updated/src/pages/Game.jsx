@@ -46,6 +46,7 @@ export default function Game() {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isCorrect, setIsCorrect] = useState(false);
   const [activeLifeline, setActiveLifeline] = useState(null);
+  const [trapActiveForTile, setTrapActiveForTile] = useState(false); // "دبل يا كبير" stays active even if another help button is used after it
   const [friendHint, setFriendHint] = useState(null);
   const [friendHintLoading, setFriendHintLoading] = useState(false);
   const [restTarget, setRestTarget] = useState(null);
@@ -327,6 +328,7 @@ export default function Game() {
     setSelectedAnswer(null);
     setIsCorrect(false);
     setActiveLifeline(null);
+    setTrapActiveForTile(false);
     setFriendHint(null);
     setFriendHintLoading(false);
     setRestTarget(null);
@@ -403,6 +405,9 @@ export default function Game() {
       [currentTeam]: { ...prev[currentTeam], [lifelineId]: true },
     }));
     setActiveLifeline(lifelineId);
+    if (lifelineId === 'trap') {
+      setTrapActiveForTile(true);
+    }
 
     if (lifelineId === 'callFriend') {
       if (currentQuestion) {
@@ -479,7 +484,7 @@ export default function Game() {
         },
       }));
 
-      if (activeLifeline === 'trap' && !stealMode) {
+      if (trapActiveForTile && !stealMode) {
         const opponent = currentTeam === 1 ? 2 : 1;
         setTeams(prev => ({
           ...prev,
@@ -516,7 +521,7 @@ export default function Game() {
         },
       }));
     }
-  }, [currentQuestion, currentTile, currentTeam, activeLifeline, twoAnswersMode, firstWrongAnswer, stealMode, stopTimer, startTimer, luckyDoubleActive, bonusTiles, trapTile]);
+  }, [currentQuestion, currentTile, currentTeam, activeLifeline, trapActiveForTile, twoAnswersMode, firstWrongAnswer, stealMode, stopTimer, startTimer, luckyDoubleActive, bonusTiles, trapTile]);
 
   const handleLuckyResult = useCallback((teamNum, delta, effects = {}) => {
     sounds.lucky();
