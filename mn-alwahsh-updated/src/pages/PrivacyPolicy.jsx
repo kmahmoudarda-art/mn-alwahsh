@@ -55,7 +55,7 @@ export default function PrivacyPolicy() {
         </Section>
 
         <Section title="تواصل معنا">
-          <p>لأي استفسار حول الخصوصية أو لطلب حذف بياناتك: <a href="mailto:support@mnalwahsh.com" style={{ color: '#FFD700' }}>support@mnalwahsh.com</a></p>
+          <p>لأي استفسار حول الخصوصية أو لطلب حذف بياناتك: <a href="mailto:Khalidarda.111@hotmail.com" style={{ color: '#FFD700' }}>Khalidarda.111@hotmail.com</a></p>
         </Section>
 
         <Link to="/" style={{ display: 'inline-block', marginTop: 16, color: '#FF9999', fontSize: 13 }}>
