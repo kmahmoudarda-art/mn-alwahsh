@@ -28,7 +28,6 @@
 export const HIDDEN_CATEGORIES = [
   // Sports — real player photos / club badges (trademarked)
   'football logo', 'football Logo', 'Football Logo', 'FOOTBALL LOGO',
-  'CR7', 'ميسي',
 
   // Music — real artist photos (generic "Arab artists" bucket only —
   // specific named singers were unhidden on request)
@@ -39,7 +38,7 @@ export const HIDDEN_CATEGORIES = [
 
   // Kids — Disney/Nickelodeon/branded characters
   'ديزني', 'Disney', 'بيبي شارك', 'Baby Shark', 'سبونج بوب', 'SpongeBob',
-  'رسوم متحركة', 'كرتون', 'من الشخصية ؟',
+  'رسوم متحركة', 'كرتون',
 
   // Brand/logo guessing — literally trademarked logos
   'براندات', 'Logos',

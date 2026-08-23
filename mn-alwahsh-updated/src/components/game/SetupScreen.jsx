@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Play } from 'lucide-react';
+import { Users, Play, UserCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import CategoryPicker from './CategoryPicker';
 import { getIcon } from '../../utils/categoryIcons';
+import { getCurrentUser } from '../../utils/authClient';
 
 function SelectedCategoryColumn({ categories, teamName, side, onRemove }) {
   const isRed = side === 'right';
@@ -94,10 +96,12 @@ function SelectedCategoryColumn({ categories, teamName, side, onRemove }) {
 }
 
 export default function SetupScreen({ onStartGame }) {
+  const navigate = useNavigate();
   const [team1Name, setTeam1Name] = useState('Monster Red');
   const [team2Name, setTeam2Name] = useState('Monster Blue');
   const [team1Categories, setTeam1Categories] = useState([]);
   const [team2Categories, setTeam2Categories] = useState([]);
+  const currentUser = getCurrentUser();
 
   const toggleCategory = (team, name) => {
     const setter = team === 1 ? setTeam1Categories : setTeam2Categories;
@@ -129,6 +133,22 @@ export default function SetupScreen({ onStartGame }) {
       <div className="absolute inset-0 pointer-events-none" style={{
         background: 'radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.6) 100%)', zIndex: 0,
       }} />
+
+      {/* Account button — top center, above the side team columns */}
+      <button
+        onClick={() => navigate('/login')}
+        className="fixed top-3 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 rounded-full font-cairo text-xs font-bold"
+        style={{
+          padding: '6px 14px',
+          background: 'rgba(20,0,0,0.75)',
+          border: '1px solid rgba(204,0,0,0.5)',
+          color: '#FFE4E4',
+          backdropFilter: 'blur(4px)',
+        }}
+      >
+        <UserCircle2 className="w-4 h-4" style={{ color: '#FFD700' }} />
+        {currentUser ? currentUser.email : 'تسجيل الدخول'}
+      </button>
       <style>{`
         @keyframes titleGlow {
           0%, 100% { text-shadow: 0 0 10px rgba(204,0,0,0.8), 0 0 30px rgba(139,0,0,0.5); }

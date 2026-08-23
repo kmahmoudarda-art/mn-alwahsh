@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 // Add page imports here
 import Game from './pages/Game';
+import Login from './pages/Login';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -38,6 +39,7 @@ const AuthenticatedApp = () => {
       <Route path="/setup" element={<Game />} />
       <Route path="/game" element={<Game />} />
       <Route path="/winner" element={<Game />} />
+      <Route path="/login" element={<Login />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
