@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import InstructionManual from './InstructionManual';
 import ScreenMirrorButton from './ScreenMirrorButton';
+import AuthForm from './AuthForm';
+import { getCurrentUser, signOut } from '../../utils/authClient';
 import { fetchGameCount } from '@/utils/supabaseClient';
 
 const checkIsIOS = () =>
@@ -141,6 +143,9 @@ export default function GameNameScreen({ onEnter }) {
   const [showInstall, setShowInstall] = useState(false);
   const [showIOSModal, setShowIOSModal] = useState(false);
   const [gameCount, setGameCount] = useState(0);
+  const [user, setUser] = useState(getCurrentUser());
+  // 'account' = login/signup form, 'guest' = plain name entry, skipping account
+  const [entryMode, setEntryMode] = useState('account');
 
   const isIOS = checkIsIOS();
   const isStandalone = checkIsStandalone();
@@ -170,11 +175,29 @@ export default function GameNameScreen({ onEnter }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleGuestSubmit = (e) => {
     e.preventDefault();
     const trimmed = name.trim();
     if (!trimmed) return;
     onEnter(trimmed);
+  };
+
+  // Signed-in players skip naming the game entirely — their email/username
+  // identifies the session (also used to save/restore it, see Game.jsx).
+  const handleStartAsUser = () => {
+    if (!user) return;
+    onEnter(user.email || user.id);
+  };
+
+  const handleSignedIn = () => {
+    const signedInUser = getCurrentUser();
+    setUser(signedInUser);
+    if (signedInUser) onEnter(signedInUser.email || signedInUser.id);
+  };
+
+  const handleSignOut = () => {
+    signOut();
+    setUser(null);
   };
 
   return (
@@ -375,42 +398,106 @@ export default function GameNameScreen({ onEnter }) {
           </p>
 
 
-          {/* Game name form */}
+          {/* Entry card — login/signup, or guest name entry */}
           <div className="gns-form-card" style={{
             background: 'rgba(5,0,0,0.75)', borderRadius: 18,
             border: '1.5px solid rgba(139,0,0,0.4)', padding: 20,
             backdropFilter: 'blur(10px)',
           }}>
-            <p style={{ textAlign: 'center', fontSize: 14, fontWeight: 400, color: 'rgba(255,228,228,0.75)', fontFamily: 'var(--font-cairo)', marginBottom: 14 }}>
-              أدخل اسم اللعبة
-            </p>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <Input
-                placeholder="مثال: حبيبي يا غالي 🎉"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                className="horror-input text-center font-cairo rounded-xl"
-                style={{
-                  background: 'rgba(5,0,0,0.85)', border: '2px solid #8B0000',
-                  color: '#FFE4E4', backdropFilter: 'blur(8px)', fontSize: 15, height: 50,
-                }}
-              />
-              <motion.div whileHover={{ scale: name.trim() ? 1.02 : 1 }} whileTap={{ scale: name.trim() ? 0.97 : 1 }}>
-                <Button
-                  type="submit"
-                  disabled={!name.trim()}
-                  className="w-full font-cairo font-bold py-5 rounded-xl gap-2 disabled:opacity-40"
-                  style={{
-                    background: 'linear-gradient(135deg, #6B0000 0%, #CC0000 50%, #6B0000 100%)',
-                    color: '#FFE4E4', border: '1px solid rgba(255,60,60,0.4)', fontSize: 16,
-                    boxShadow: name.trim() ? '0 0 20px rgba(139,0,0,0.55)' : 'none',
-                  }}
+            {user ? (
+              /* Already signed in — one tap to start */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <p style={{ textAlign: 'center', fontSize: 13, fontWeight: 400, color: 'rgba(255,228,228,0.75)', fontFamily: 'var(--font-cairo)' }}>
+                  مسجّل الدخول باسم
+                </p>
+                <p style={{ textAlign: 'center', fontSize: 15, fontWeight: 700, color: '#FFD700', fontFamily: 'var(--font-cairo)' }}>
+                  {user.email}
+                </p>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+                  <Button
+                    onClick={handleStartAsUser}
+                    className="w-full font-cairo font-bold py-5 rounded-xl gap-2"
+                    style={{
+                      background: 'linear-gradient(135deg, #6B0000 0%, #CC0000 50%, #6B0000 100%)',
+                      color: '#FFE4E4', border: '1px solid rgba(255,60,60,0.4)', fontSize: 16,
+                      boxShadow: '0 0 20px rgba(139,0,0,0.55)',
+                    }}
+                  >
+                    <Gamepad2 className="w-5 h-5" />
+                    ابدأ اللعبة
+                  </Button>
+                </motion.div>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="w-full font-tajawal text-xs py-1"
+                  style={{ color: '#FF9999' }}
                 >
-                  <Gamepad2 className="w-5 h-5" />
-                  إنشاء لعبة
-                </Button>
-              </motion.div>
-            </form>
+                  تسجيل الخروج
+                </button>
+              </div>
+            ) : entryMode === 'account' ? (
+              /* Not signed in — login/signup up front; guest play still available below */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <AuthForm onSignedIn={handleSignedIn} />
+                <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,150,150,0.7)', fontFamily: 'var(--font-cairo)', margin: 0 }}>
+                  تسجيل الدخول يفتح المزيد من الفئات المميزة
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setEntryMode('guest')}
+                  className="w-full font-tajawal text-xs py-1"
+                  style={{ color: '#FF9999', textDecoration: 'underline' }}
+                >
+                  متابعة كضيف بدون تسجيل
+                </button>
+              </div>
+            ) : (
+              /* Guest mode — original quick name entry, fewer categories available */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <p style={{ textAlign: 'center', fontSize: 14, fontWeight: 400, color: 'rgba(255,228,228,0.75)', fontFamily: 'var(--font-cairo)', margin: 0 }}>
+                  أدخل اسم اللعبة
+                </p>
+                <form onSubmit={handleGuestSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <Input
+                    placeholder="مثال: حبيبي يا غالي 🎉"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    className="horror-input text-center font-cairo rounded-xl"
+                    style={{
+                      background: 'rgba(5,0,0,0.85)', border: '2px solid #8B0000',
+                      color: '#FFE4E4', backdropFilter: 'blur(8px)', fontSize: 15, height: 50,
+                    }}
+                  />
+                  <motion.div whileHover={{ scale: name.trim() ? 1.02 : 1 }} whileTap={{ scale: name.trim() ? 0.97 : 1 }}>
+                    <Button
+                      type="submit"
+                      disabled={!name.trim()}
+                      className="w-full font-cairo font-bold py-5 rounded-xl gap-2 disabled:opacity-40"
+                      style={{
+                        background: 'linear-gradient(135deg, #6B0000 0%, #CC0000 50%, #6B0000 100%)',
+                        color: '#FFE4E4', border: '1px solid rgba(255,60,60,0.4)', fontSize: 16,
+                        boxShadow: name.trim() ? '0 0 20px rgba(139,0,0,0.55)' : 'none',
+                      }}
+                    >
+                      <Gamepad2 className="w-5 h-5" />
+                      إنشاء لعبة
+                    </Button>
+                  </motion.div>
+                </form>
+                <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,150,150,0.7)', fontFamily: 'var(--font-cairo)', margin: 0 }}>
+                  🔒 بعض الفئات المميزة تحتاج تسجيل دخول لفتحها أو شراءها
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setEntryMode('account')}
+                  className="w-full font-tajawal text-xs py-1"
+                  style={{ color: '#FF9999', textDecoration: 'underline' }}
+                >
+                  لدي حساب — تسجيل الدخول
+                </button>
+              </div>
+            )}
           </div>
         </motion.div>
       </div>

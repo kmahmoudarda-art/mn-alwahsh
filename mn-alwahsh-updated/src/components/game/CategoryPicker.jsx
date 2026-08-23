@@ -115,6 +115,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   );
 
   const grouped = groupCategories(categories);
+  const hasLockedCategories = categories.some((c) => isPremiumCategory(c) && !isUnlocked(c));
 
   return (
     <>
@@ -153,6 +154,16 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
         <span style={{ fontSize: 18 }}>🎲</span>
         اختيار عشوائي
       </motion.button>
+
+      {hasLockedCategories && !isSignedIn() && (
+        <p dir="rtl" className="font-tajawal text-center" style={{
+          fontSize: 12, color: '#FFD700', marginBottom: 10,
+          background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.3)',
+          borderRadius: 10, padding: '8px 10px',
+        }}>
+          🔒 سجّل الدخول لفتح المزيد من الفئات أو شرائها
+        </p>
+      )}
 
       <div className="cat-scroll-area category-scroll overflow-y-auto overflow-x-hidden" style={{ height: '60vh', scrollBehavior: 'smooth' }}>
         {Object.entries(grouped).map(([groupName, cats]) => {
