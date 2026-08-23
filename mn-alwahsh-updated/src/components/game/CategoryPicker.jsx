@@ -4,6 +4,7 @@ import { Check, Lock } from 'lucide-react';
 import { fetchCategories } from '../../utils/supabaseClient';
 import CATEGORY_ICONS, { getIcon } from '../../utils/categoryIcons';
 import { isPremiumCategory, isCategoryUnlocked, unlockCategory, PREMIUM_PRICE_LABEL } from '../../utils/premiumConfig';
+import { isHiddenCategory } from '../../utils/hiddenCategories';
 
 const CATEGORY_GROUPS = {
   '⚽ رياضة': ['football logo', 'football Logo', 'Football Logo', 'FOOTBALL LOGO', 'رياضة', 'CR7', 'ميسي', 'كأس العرب', 'كأس آسيا', 'Champions League', 'المنتخب الأردني', 'League of Legends', 'Real Madrid', 'Barcelona', 'WildRift', 'ريال مدريد', 'برشلونة', 'برشلونه', 'وايلد ريفت', 'محترف كرة'],
@@ -30,6 +31,7 @@ function groupCategories(categories) {
   const groups = {};
   for (const g of Object.keys(CATEGORY_GROUPS)) groups[g] = [];
   for (const cat of categories) {
+    if (isHiddenCategory(cat)) continue; // hidden entirely — not shown, not selectable
     const normalizedCat = typeof cat === 'string' ? cat.toLowerCase().trim() : '';
     const g = CAT_TO_GROUP[normalizedCat];
     if (g) {
@@ -71,8 +73,8 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
 
   const pickRandom = () => {
     if (!categories.length) return;
-    const playable = categories.filter(c => isCategoryUnlocked(c));
-    const pool = playable.length ? playable : categories;
+    const eligible = categories.filter(c => !isHiddenCategory(c) && isCategoryUnlocked(c));
+    const pool = eligible.length ? eligible : categories.filter(c => !isHiddenCategory(c));
     const shuffled = [...pool].sort(() => Math.random() - 0.5);
     onSetSelected(shuffled.slice(0, Math.min(max, shuffled.length)));
   };
