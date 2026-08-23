@@ -30,9 +30,6 @@ export const HIDDEN_CATEGORIES = [
   'football logo', 'football Logo', 'Football Logo', 'FOOTBALL LOGO',
   'CR7', 'ميسي',
 
-  // Entertainment — TV/movie studio IP, real actor/character photos
-  'جيم اوف ثرونز', 'Game of Thrones', 'Who Said GOT',
-
   // Music — real artist photos (generic "Arab artists" bucket only —
   // specific named singers were unhidden on request)
   'فنانون عرب',
