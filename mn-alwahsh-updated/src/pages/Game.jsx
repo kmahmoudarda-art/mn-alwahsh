@@ -124,11 +124,14 @@ export default function Game() {
     }
   }, [timerSeconds, stealMode, modalOpen, answered, stopTimer]);
 
-  // Activate lucky double when 5 cells remain
+  // Activate lucky double once 5 or fewer cells remain. Re-runs (via the deps
+  // below) whenever luckyCell is cleared — including by the "waste" effect
+  // right after this one — so a fresh cell gets picked from what's left
+  // instead of the feature going permanently dark for the rest of the board.
   useEffect(() => {
     if (luckyUsed || luckyCell || gamePhase !== 'playing') return;
     const remaining = TOTAL_TILES - answeredTiles.size;
-    if (remaining !== 5) return;
+    if (remaining > 5 || remaining < 1) return;
     // Identify losing team
     const t1 = teams[1].score, t2 = teams[2].score;
     if (t1 === t2) return; // tied — no lucky double
@@ -147,7 +150,21 @@ export default function Game() {
     setLuckyCell(cell);
     try { sessionStorage.setItem('luckyCell', JSON.stringify(cell)); } catch {}
     console.log('[LuckyDouble] Assigned lucky cell:', cell);
-  }, [answeredTiles.size, gamePhase]);
+  }, [answeredTiles.size, gamePhase, luckyCell, luckyUsed, teams, categories]);
+
+  // If the assigned lucky cell gets answered without ever converting into a
+  // lucky score (picked by the wrong team, or the losing team gets it wrong
+  // and the steal doesn't count), clear it so the effect above can assign a
+  // new one from the tiles still left — otherwise the losing team's one shot
+  // at doubling points silently disappears for the rest of the game.
+  useEffect(() => {
+    if (!luckyCell || luckyUsed) return;
+    const key = `${luckyCell.col}-${luckyCell.row}`;
+    if (answeredTiles.has(key)) {
+      setLuckyCell(null);
+      try { sessionStorage.removeItem('luckyCell'); } catch {}
+    }
+  }, [answeredTiles, luckyCell, luckyUsed]);
 
   // Early game-end: impossible to win for the losing team
   useEffect(() => {
