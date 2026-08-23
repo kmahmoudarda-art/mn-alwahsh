@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Lock } from 'lucide-react';
 import { fetchCategories } from '../../utils/supabaseClient';
 import CATEGORY_ICONS, { getIcon } from '../../utils/categoryIcons';
-import { isPremiumCategory, PREMIUM_PRICE_LABEL } from '../../utils/premiumConfig';
+import { isPremiumCategory, getPremiumPriceLabel } from '../../utils/premiumConfig';
 import { isSignedIn } from '../../utils/authClient';
 import { fetchUnlockedCategories, grantCategoryToCurrentUser } from '../../utils/entitlements';
 import { isHiddenCategory } from '../../utils/hiddenCategories';
@@ -330,7 +330,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                 {unlockPromptFor}
               </h3>
               <p className="font-tajawal text-sm mb-4" style={{ color: '#FF9999' }}>
-                فئة مميزة — {PREMIUM_PRICE_LABEL}
+                فئة مميزة — {getPremiumPriceLabel(unlockPromptFor)}
               </p>
 
               {isSignedIn() ? (
