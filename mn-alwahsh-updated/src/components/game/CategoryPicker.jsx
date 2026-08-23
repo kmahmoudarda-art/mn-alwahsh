@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, Lock } from 'lucide-react';
 import { fetchCategories } from '../../utils/supabaseClient';
 import CATEGORY_ICONS, { getIcon } from '../../utils/categoryIcons';
+import { isPremiumCategory, isCategoryUnlocked, unlockCategory, PREMIUM_PRICE_LABEL } from '../../utils/premiumConfig';
 
 const CATEGORY_GROUPS = {
   '⚽ رياضة': ['football logo', 'football Logo', 'Football Logo', 'FOOTBALL LOGO', 'رياضة', 'CR7', 'ميسي', 'كأس العرب', 'كأس آسيا', 'Champions League', 'المنتخب الأردني', 'League of Legends', 'Real Madrid', 'Barcelona', 'WildRift', 'ريال مدريد', 'برشلونة', 'برشلونه', 'وايلد ريفت', 'محترف كرة'],
@@ -46,6 +47,8 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openGroups, setOpenGroups] = useState(new Set());
+  const [unlockPromptFor, setUnlockPromptFor] = useState(null);
+  const [, forceRerender] = useState(0); // re-render after a localStorage unlock
 
   const load = () => {
     setLoading(true);
@@ -68,8 +71,16 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
 
   const pickRandom = () => {
     if (!categories.length) return;
-    const shuffled = [...categories].sort(() => Math.random() - 0.5);
+    const playable = categories.filter(c => isCategoryUnlocked(c));
+    const pool = playable.length ? playable : categories;
+    const shuffled = [...pool].sort(() => Math.random() - 0.5);
     onSetSelected(shuffled.slice(0, Math.min(max, shuffled.length)));
+  };
+
+  const handleUnlock = (name) => {
+    unlockCategory(name); // TEMPORARY — see premiumConfig.js for the real Play Billing seam
+    setUnlockPromptFor(null);
+    forceRerender(n => n + 1);
   };
 
   if (loading) return <p className="text-center font-tajawal text-sm py-4" style={{ color: '#FF6666' }}>جاري تحميل الفئات...</p>;
@@ -187,13 +198,18 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                         const isSelected = selected.includes(name);
                         const isDisabled = !isSelected && selected.length >= max;
                         const emoji = getIcon(name);
+                        const locked = isPremiumCategory(name) && !isCategoryUnlocked(name);
 
                         return (
                           <motion.button
                             key={name}
                             whileHover={!isDisabled ? { scale: 1.05 } : {}}
                             whileTap={!isDisabled ? { scale: 0.95 } : {}}
-                            onClick={() => !isDisabled && onToggle(name)}
+                            onClick={() => {
+                              if (isDisabled) return;
+                              if (locked) { setUnlockPromptFor(name); return; }
+                              onToggle(name);
+                            }}
                             disabled={isDisabled}
                             dir="rtl"
                             className="cat-btn relative rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center gap-1"
@@ -206,7 +222,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                                 ? '2px solid #CC0000'
                                 : isDisabled ? '2px solid #2a0000' : '2px solid #4a0000',
                               boxShadow: isSelected ? '0 0 15px rgba(204,0,0,0.5), inset 0 0 8px rgba(139,0,0,0.3)' : 'none',
-                              opacity: isDisabled ? 0.4 : 1,
+                              opacity: isDisabled ? 0.4 : locked ? 0.75 : 1,
                             }}
                           >
                             <span style={{ fontSize: 32, lineHeight: 1 }}>{emoji}</span>
@@ -224,6 +240,15 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                                 <Check className="w-2.5 h-2.5" style={{ color: '#FFE4E4' }} />
                               </div>
                             )}
+                            {locked && (
+                              <div
+                                className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center shadow"
+                                style={{ background: 'rgba(0,0,0,0.75)', border: '1px solid #FFD700' }}
+                                title="فئة مميزة — بحاجة لفتحها"
+                              >
+                                <Lock className="w-3 h-3" style={{ color: '#FFD700' }} />
+                              </div>
+                            )}
                           </motion.button>
                         );
                       })}
@@ -235,6 +260,63 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
           );
         })}
       </div>
+
+      {/* Unlock prompt — placeholder until Google Play Billing is wired in (see premiumConfig.js) */}
+      <AnimatePresence>
+        {unlockPromptFor && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setUnlockPromptFor(null)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 200,
+              background: 'rgba(0,0,0,0.7)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 20,
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              dir="rtl"
+              style={{
+                width: '100%', maxWidth: 340,
+                background: 'linear-gradient(135deg, #2a0000, #140000)',
+                border: '1.5px solid #FFD700',
+                borderRadius: 16,
+                padding: 24,
+                textAlign: 'center',
+                boxShadow: '0 0 30px rgba(255,215,0,0.25)',
+              }}
+            >
+              <Lock className="w-8 h-8 mx-auto mb-3" style={{ color: '#FFD700' }} />
+              <h3 className="font-cairo font-bold text-lg mb-1" style={{ color: '#FFE4E4' }}>
+                {unlockPromptFor}
+              </h3>
+              <p className="font-tajawal text-sm mb-4" style={{ color: '#FF9999' }}>
+                فئة مميزة — {PREMIUM_PRICE_LABEL}
+              </p>
+              <button
+                onClick={() => handleUnlock(unlockPromptFor)}
+                className="w-full font-cairo font-bold rounded-xl py-3 mb-2"
+                style={{ background: '#FFD700', color: '#2a0000' }}
+              >
+                فتح الفئة
+              </button>
+              <button
+                onClick={() => setUnlockPromptFor(null)}
+                className="w-full font-cairo text-sm py-2"
+                style={{ color: '#FF9999' }}
+              >
+                إلغاء
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
