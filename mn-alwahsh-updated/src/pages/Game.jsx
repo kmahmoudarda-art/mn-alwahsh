@@ -41,6 +41,11 @@ export default function Game() {
   const [modalPhase, setModalPhase] = useState('lifeline-before');
   const [currentTile, setCurrentTile] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(null);
+  // Net score change from the current question's resolution — {1: n, 2: n}.
+  // Recorded in handleAnswer so a report-after-answering can reverse the
+  // exact effect (correct-answer points, trap/bonus penalties, steal
+  // swings — whatever combination applied) without re-deriving it.
+  const lastAnswerDeltaRef = useRef({ 1: 0, 2: 0 });
   const [loading, setLoading] = useState(false);
   const [answered, setAnswered] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -491,7 +496,10 @@ export default function Game() {
       try { sessionStorage.removeItem('luckyCell'); } catch {}
     }
 
+    const delta = { 1: 0, 2: 0 }; // net score change this resolution — for report-reversal
+
     if (correct) {
+      delta[scoringTeam] += pts;
       setTeams(prev => ({
         ...prev,
         [scoringTeam]: {
@@ -503,6 +511,7 @@ export default function Game() {
 
       if (trapActiveForTile && !stealMode) {
         const opponent = currentTeam === 1 ? 2 : 1;
+        delta[opponent] -= currentTile.points;
         setTeams(prev => ({
           ...prev,
           [opponent]: {
@@ -515,6 +524,7 @@ export default function Game() {
     } else {
       // Wrong answer (both teams missed) — apply bonus penalty to the original team
       if (bonusCfg) {
+        delta[currentTeam] -= bonusCfg.penalty;
         setTeams(prev => ({
           ...prev,
           [currentTeam]: {
@@ -529,6 +539,7 @@ export default function Game() {
     // Trap tile penalty: the team that picked the tile always loses 600
     // UNLESS they answered it correctly themselves (correct + not steal mode)
     if (tileKey === trapTile && !(correct && !stealMode)) {
+      delta[currentTeam] -= 600;
       setTeams(prev => ({
         ...prev,
         [currentTeam]: {
@@ -538,7 +549,36 @@ export default function Game() {
         },
       }));
     }
+
+    lastAnswerDeltaRef.current = delta;
   }, [currentQuestion, currentTile, currentTeam, activeLifeline, trapActiveForTile, twoAnswersMode, firstWrongAnswer, stealMode, stopTimer, startTimer, luckyDoubleActive, bonusTiles, trapTile]);
+
+  // Called when a question gets reported — QuestionModal has already
+  // fetched the replacement (newQ) and reported it to Supabase. If it was
+  // already answered, reverse whatever that resolution changed and put the
+  // tile back into a fresh, unanswered state so the same team can try the
+  // new question fairly, no points lost or kept from the bad question.
+  const handleQuestionReported = useCallback((newQ, wasAnswered) => {
+    if (wasAnswered) {
+      const delta = lastAnswerDeltaRef.current || { 1: 0, 2: 0 };
+      setTeams(prev => {
+        const next = { ...prev };
+        if (delta[1]) next[1] = { ...prev[1], score: prev[1].score - delta[1], scoreKey: prev[1].scoreKey + 1 };
+        if (delta[2]) next[2] = { ...prev[2], score: prev[2].score - delta[2], scoreKey: prev[2].scoreKey + 1 };
+        return next;
+      });
+      lastAnswerDeltaRef.current = { 1: 0, 2: 0 };
+
+      stopTimer();
+      setStealMode(false);
+      setFirstWrongAnswer(null);
+      setAnswered(false);
+      setSelectedAnswer(null);
+      setIsCorrect(false);
+      if (newQ) startTimer(30);
+    }
+    if (newQ) setCurrentQuestion(newQ);
+  }, [stopTimer, startTimer]);
 
   const handleLuckyResult = useCallback((teamNum, delta, effects = {}) => {
     sounds.lucky();
@@ -1107,6 +1147,7 @@ export default function Game() {
             luckyDoubleActive={luckyDoubleActive}
             passToOtherUsed={usedPassToOther[currentTeam]}
             onQuestionSwapped={(newQ) => setCurrentQuestion(newQ)}
+            onReportHandled={handleQuestionReported}
             onResetTimer={() => startTimer(30)}
             bonusTier={bonusTiles[`${currentTile?.colIndex}-${currentTile?.rowIndex}`] || null}
             bonusConf={BONUS_CONF}

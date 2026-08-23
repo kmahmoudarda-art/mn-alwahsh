@@ -259,6 +259,7 @@ export default function QuestionModal({
   passToOtherUsed,
   luckyDoubleActive,
   onQuestionSwapped,
+  onReportHandled,
   onResetTimer,
   bonusTier,
   bonusConf,
@@ -343,16 +344,34 @@ export default function QuestionModal({
 
     setReporting(true);
     const result = await reportQuestion(question);
-    setReporting(false);
 
-    if (!result.ok) { toast('تعذّر إرسال البلاغ، حاول لاحقاً'); return; }
+    if (!result.ok) {
+      setReporting(false);
+      toast('تعذّر إرسال البلاغ، حاول لاحقاً');
+      return;
+    }
 
     const next = new Set(reportedIds);
     next.add(key);
     setReportedIds(next);
     try { localStorage.setItem('mn_alwahsh_reported_qs', JSON.stringify([...next])); } catch {}
 
-    toast(result.deleted ? 'تم حذف السؤال بعد وصوله لعدد كافٍ من البلاغات' : 'شكراً، تم استلام بلاغك');
+    // Always line up a replacement question for this tile, whether the
+    // report came before or after answering.
+    const newQ = await fetchSwapQuestion(category, points, question.id, question.source_table);
+    setReporting(false);
+
+    // wasAnswered tells the parent whether it needs to reverse a score —
+    // reported before answering is just a swap, same as the 🔄 button.
+    if (onReportHandled) {
+      onReportHandled(newQ, answered);
+    } else if (newQ && onQuestionSwapped) {
+      onQuestionSwapped(newQ);
+    }
+
+    toast(result.deleted
+      ? 'تم حذف السؤال بعد وصوله لعدد كافٍ من البلاغات، وتم تغييره بسؤال جديد'
+      : (answered ? 'شكراً، تم الإبلاغ وإلغاء النقاط وتغيير السؤال' : 'شكراً، تم استلام بلاغك وتغيير السؤال'));
   };
 
   const handleCloseClick = () => {
@@ -1090,7 +1109,14 @@ export default function QuestionModal({
                 {question.explanation && (
                   <p style={{ fontFamily:'var(--font-tajawal)', fontSize:12, color:'#555', margin:'0 0 8px' }}>{question.explanation}</p>
                 )}
-                <Button onClick={onClose} className="font-cairo bg-primary text-primary-foreground hover:bg-primary/90">متابعة</Button>
+                <div style={{ display:'flex', gap:8, justifyContent:'center', flexWrap:'wrap' }}>
+                  <Button onClick={onClose} className="font-cairo bg-primary text-primary-foreground hover:bg-primary/90">متابعة</Button>
+                  <button onClick={handleReport} disabled={reporting}
+                    style={{ padding:'8px 14px', fontSize:12, borderRadius:20,
+                      background: 'rgba(204,0,0,0.08)', color: '#CC0000', border: '1px solid rgba(204,0,0,0.3)',
+                      fontFamily:'var(--font-cairo)', cursor: 'pointer',
+                    }}>🚩 إبلاغ عن خطأ في السؤال</button>
+                </div>
               </motion.div>
             )}
           </>
