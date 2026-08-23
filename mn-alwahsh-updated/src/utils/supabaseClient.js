@@ -133,6 +133,40 @@ export async function fetchCategories() {
 // Values: '&used=not.is.true' | '&used=neq.true' | '' (no filter)
 const tableUsedFilterCache = new Map();
 
+// Questions this device has reported (see reportQuestion below) never get
+// served again to it — same localStorage list QuestionModal.jsx uses to
+// stop someone reporting the same question twice, reused here to actually
+// exclude those ids from selection. Keyed "table:id" per entry.
+const REPORTED_KEY = 'mn_alwahsh_reported_qs';
+
+function getReportedIdsForTable(table) {
+  try {
+    const all = JSON.parse(localStorage.getItem(REPORTED_KEY) || '[]');
+    return all.filter(e => e.startsWith(`${table}:`)).map(e => e.slice(table.length + 1));
+  } catch {
+    return [];
+  }
+}
+
+// PostgREST id=not.in.(...) fragment excluding this device's reported ids
+// for the table. Empty for Fam, whose rows have no real id column (see
+// normalizeRow/reportQuestion) — Fam is excluded via client-side filtering
+// instead, in fetchOneRandom/fetchRowsFromTable below.
+function reportedIdFilter(table) {
+  if (table === TABLE_FAM) return '';
+  const ids = getReportedIdsForTable(table);
+  if (!ids.length) return '';
+  return `&id=not.in.(${ids.map(encodeURIComponent).join(',')})`;
+}
+
+// Composite key for a Fam/Kids row, matching how reportQuestion() and
+// QuestionModal's reportedIds set identify a question — used to filter
+// reported rows out of the client-side batch these two tables fetch.
+function rowReportKey(table, row) {
+  if (table === TABLE_FAM) return `${row.category}|${row.points}|${row.slot}`;
+  return String(row.id ?? row.question_id ?? row.ID ?? row.rowid ?? '');
+}
+
 // Resolve the correct "used" filter for a table, trying not.is.true then neq.true
 async function resolveUsedFilter(table, encodedCategory, intPoints) {
   if (tableUsedFilterCache.has(table)) return tableUsedFilterCache.get(table);
@@ -152,12 +186,12 @@ async function resolveUsedFilter(table, encodedCategory, intPoints) {
 }
 
 // Get count via Content-Range header — returns { total, usedFilter }
-async function getRowCount(table, category, points) {
+async function getRowCount(table, category, points, idFilter = '') {
   const intPoints = parseInt(points, 10);
   const encodedCategory = encodeURIComponent(category);
   const usedFilter = await resolveUsedFilter(table, encodedCategory, intPoints);
 
-  const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}&limit=1`;
+  const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}${idFilter}&limit=1`;
   const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } });
   if (!res.ok) return { total: 0, usedFilter };
   const cr = res.headers.get('content-range');
@@ -177,13 +211,15 @@ async function fetchOneRandom(table, category, points) {
     if (!res.ok) return null;
     const data = await res.json();
     if (!Array.isArray(data)) return null;
-    const unused = data.filter(r => r.used !== true);
+    const reportedIds = new Set(getReportedIdsForTable(table));
+    const unused = data.filter(r => r.used !== true && !reportedIds.has(rowReportKey(table, r)));
     if (unused.length === 0) return null;
     return unused[Math.floor(Math.random() * unused.length)];
   }
 
   // All other tables: resolve the correct used filter, then count + fetch 1 row at random offset
-  const { total, usedFilter } = await getRowCount(table, category, points);
+  const idFilter = reportedIdFilter(table);
+  const { total, usedFilter } = await getRowCount(table, category, points, idFilter);
 
   if (total === 0) {
     // Check if category is truly absent or just exhausted
@@ -198,7 +234,7 @@ async function fetchOneRandom(table, category, points) {
   }
 
   const offset = Math.floor(Math.random() * total);
-  const rowUrl = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}&limit=1&offset=${offset}`;
+  const rowUrl = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}${idFilter}&limit=1&offset=${offset}`;
   const res = await fetch(rowUrl, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
   if (!res.ok) return null;
   const data = await res.json();
@@ -214,11 +250,15 @@ async function fetchRowsFromTable(table, category, points) {
   const usedFilter = (table === TABLE_FAM || table === TABLE_KIDS)
     ? ''
     : await resolveUsedFilter(table, encodedCategory, intPoints);
-  const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}&limit=20`;
+  const idFilter = reportedIdFilter(table);
+  const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}${idFilter}&limit=20`;
   const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
   if (!res.ok) return [];
   const data = await res.json();
-  if (table === TABLE_FAM || table === TABLE_KIDS) return data.filter(r => r.used !== true);
+  if (table === TABLE_FAM || table === TABLE_KIDS) {
+    const reportedIds = new Set(getReportedIdsForTable(table));
+    return data.filter(r => r.used !== true && !reportedIds.has(rowReportKey(table, r)));
+  }
   return data;
 }
 
