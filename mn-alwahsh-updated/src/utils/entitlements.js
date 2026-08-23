@@ -42,6 +42,7 @@
 //
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabaseClient';
 import { getValidSession } from './authClient';
+import { PREMIUM_CATEGORIES } from './premiumConfig';
 
 // Returns the list of premium category names this signed-in user owns.
 // Empty array if not signed in, table doesn't exist yet, or on any error —
@@ -79,5 +80,30 @@ export async function grantCategoryToCurrentUser(category) {
   if (!res.ok) {
     const txt = await res.text();
     throw new Error(txt || 'unlock-failed');
+  }
+}
+
+// TEMPORARY — same caveat as above, no payment verification yet. Grants
+// every category currently in PREMIUM_CATEGORIES (premiumConfig.js) to
+// this account in one batch insert, for the ALL_CATEGORIES_PRICE bundle.
+export async function grantAllCategoriesToCurrentUser() {
+  const session = await getValidSession();
+  if (!session?.access_token || !session?.user?.id) throw new Error('not-signed-in');
+  const rows = Object.keys(PREMIUM_CATEGORIES).map((category) => ({
+    user_id: session.user.id, category, platform: 'web',
+  }));
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${session.access_token}`,
+      'Content-Type': 'application/json',
+      Prefer: 'resolution=merge-duplicates,return=minimal',
+    },
+    body: JSON.stringify(rows),
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(txt || 'unlock-all-failed');
   }
 }

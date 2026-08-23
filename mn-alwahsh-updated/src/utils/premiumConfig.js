@@ -125,3 +125,19 @@ export const TEST_ACCOUNT_EMAIL = 'test@mnalwahsh.com';
 export function isTestAccount(user) {
   return !!user && user.email === TEST_ACCOUNT_EMAIL;
 }
+
+// ── Bundle & trial pricing ──
+// Shown as extra options alongside the single-category price whenever the
+// unlock prompt appears (see CategoryPicker.jsx's unlock modal).
+//
+// ALL_CATEGORIES_PRICE — permanent unlock of every current and future
+// premium category for this account. Recorded in the `purchases` table
+// exactly like a single-category buy, just for every key in
+// PREMIUM_CATEGORIES at once (see entitlements.js's grantAllCategoriesToCurrentUser).
+//
+// TRIAL_PRICE — deliberately NOT written to the purchases table. It's a
+// one-game-only unlock: local React state in CategoryPicker, reset the
+// moment a new game starts. Nothing to unwind server-side, nothing that
+// persists across devices — that's the point, it's a taste, not a purchase.
+export const ALL_CATEGORIES_PRICE = 100;
+export const TRIAL_PRICE = 1;

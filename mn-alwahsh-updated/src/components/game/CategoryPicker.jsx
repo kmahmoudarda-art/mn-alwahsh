@@ -3,9 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Lock } from 'lucide-react';
 import { fetchCategories } from '../../utils/supabaseClient';
 import CATEGORY_ICONS, { getIcon } from '../../utils/categoryIcons';
-import { isPremiumCategory, getPremiumPriceLabel, isTestAccount } from '../../utils/premiumConfig';
+import { isPremiumCategory, getPremiumPriceLabel, isTestAccount, ALL_CATEGORIES_PRICE, TRIAL_PRICE } from '../../utils/premiumConfig';
 import { isSignedIn, getCurrentUser } from '../../utils/authClient';
-import { fetchUnlockedCategories, grantCategoryToCurrentUser } from '../../utils/entitlements';
+import { fetchUnlockedCategories, grantCategoryToCurrentUser, grantAllCategoriesToCurrentUser } from '../../utils/entitlements';
 import { isHiddenCategory } from '../../utils/hiddenCategories';
 import AuthForm from './AuthForm';
 
@@ -56,6 +56,10 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   const [unlockedCategories, setUnlockedCategories] = useState([]);
   const [unlocking, setUnlocking] = useState(false);
   const [unlockError, setUnlockError] = useState(null);
+  // One-game-only unlocks from the 1 AED trial — never written to Supabase,
+  // never persisted, so it naturally resets whenever CategoryPicker remounts
+  // for a new game. See TRIAL_PRICE note in premiumConfig.js.
+  const [trialCategories, setTrialCategories] = useState([]);
 
   const loadEntitlements = () => {
     fetchUnlockedCategories().then(setUnlockedCategories);
@@ -73,7 +77,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
 
   useEffect(() => { load(); }, []);
 
-  const isUnlocked = (name) => !isPremiumCategory(name) || unlockedCategories.includes(name) || isTestAccount(getCurrentUser());
+  const isUnlocked = (name) => !isPremiumCategory(name) || unlockedCategories.includes(name) || trialCategories.includes(name) || isTestAccount(getCurrentUser());
 
   const toggleGroup = (g) => {
     setOpenGroups(prev => {
@@ -103,6 +107,26 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
     } finally {
       setUnlocking(false);
     }
+  };
+
+  const handleUnlockAll = async () => {
+    setUnlockError(null);
+    setUnlocking(true);
+    try {
+      await grantAllCategoriesToCurrentUser(); // TEMPORARY — no payment yet, see entitlements.js
+      loadEntitlements();
+      setUnlockPromptFor(null);
+    } catch (err) {
+      setUnlockError('تعذر فتح جميع الفئات — حاول مرة أخرى');
+    } finally {
+      setUnlocking(false);
+    }
+  };
+
+  // Trial: local-only, one game, never touches Supabase — see TRIAL_PRICE note.
+  const handleTrial = (name) => {
+    setTrialCategories(prev => prev.includes(name) ? prev : [...prev, name]);
+    setUnlockPromptFor(null);
   };
 
   if (loading) return <p className="text-center font-tajawal text-sm py-4" style={{ color: '#FF6666' }}>جاري تحميل الفئات...</p>;
@@ -344,8 +368,27 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                     className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
                     style={{ background: '#FFD700', color: '#2a0000' }}
                   >
-                    {unlocking ? '...' : 'فتح الفئة'}
+                    {unlocking ? '...' : `فتح هذه الفئة — ${getPremiumPriceLabel(unlockPromptFor)}`}
                   </button>
+                  <button
+                    onClick={handleUnlockAll}
+                    disabled={unlocking}
+                    className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
+                    style={{ background: 'linear-gradient(135deg, #FFD700, #FFA500)', color: '#2a0000' }}
+                  >
+                    {unlocking ? '...' : `فتح جميع الفئات — ${ALL_CATEGORIES_PRICE} AED`}
+                  </button>
+                  <button
+                    onClick={() => handleTrial(unlockPromptFor)}
+                    disabled={unlocking}
+                    className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
+                    style={{ background: 'rgba(255,215,0,0.12)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.4)' }}
+                  >
+                    {`جرّبها لهذه اللعبة فقط — ${TRIAL_PRICE} AED`}
+                  </button>
+                  <p className="font-tajawal text-xs mb-2" style={{ color: 'rgba(255,150,150,0.7)' }}>
+                    التجربة تفتح الفئة لهذه اللعبة فقط، وتُقفل مرة أخرى بعدها
+                  </p>
                   <button
                     onClick={() => setUnlockPromptFor(null)}
                     className="w-full font-cairo text-sm py-2"
