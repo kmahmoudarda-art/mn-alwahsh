@@ -41,13 +41,13 @@
 //     with check (auth.uid() = user_id);
 //
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabaseClient';
-import { getSession } from './authClient';
+import { getValidSession } from './authClient';
 
 // Returns the list of premium category names this signed-in user owns.
 // Empty array if not signed in, table doesn't exist yet, or on any error —
 // callers should treat that as "nothing unlocked", not throw up an error screen.
 export async function fetchUnlockedCategories() {
-  const session = getSession();
+  const session = await getValidSession(); // refreshes the token first if it's gone stale
   if (!session?.access_token || !session?.user?.id) return [];
   try {
     const res = await fetch(
@@ -64,7 +64,7 @@ export async function fetchUnlockedCategories() {
 
 // TEMPORARY — see the security note above. Grants immediately, no payment.
 export async function grantCategoryToCurrentUser(category) {
-  const session = getSession();
+  const session = await getValidSession();
   if (!session?.access_token || !session?.user?.id) throw new Error('not-signed-in');
   const res = await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
     method: 'POST',

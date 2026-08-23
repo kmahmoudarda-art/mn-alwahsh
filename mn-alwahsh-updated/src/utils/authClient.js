@@ -9,8 +9,12 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabaseClient';
 
 const SESSION_KEY = 'mn_alwahsh_v3_auth_session';
 
+// Access tokens expire in ~1 hour — refresh a bit before that so a signed-in
+// person never sees a category lock itself back up just because their token
+// went stale. _savedAt is when we stored this session, not a field GoTrue sends.
 function saveSession(session) {
-  try { localStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch {}
+  const enriched = { ...session, _savedAt: Date.now() };
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify(enriched)); } catch {}
 }
 
 export function getSession() {
@@ -30,6 +34,12 @@ export function isSignedIn() {
   return !!getSession()?.access_token;
 }
 
+function isExpiringSoon(session) {
+  if (!session?.expires_in || !session?._savedAt) return false; // unknown shape — let the API be the judge
+  const expiresAtMs = session._savedAt + session.expires_in * 1000;
+  return Date.now() > expiresAtMs - 60_000; // refresh a minute early
+}
+
 async function authRequest(path, body) {
   const res = await fetch(`${SUPABASE_URL}/auth/v1/${path}`, {
     method: 'POST',
@@ -41,6 +51,32 @@ async function authRequest(path, body) {
     throw new Error(data.error_description || data.msg || data.error || 'Authentication failed');
   }
   return data;
+}
+
+export async function refreshSession() {
+  const session = getSession();
+  if (!session?.refresh_token) return null;
+  try {
+    const data = await authRequest('token?grant_type=refresh_token', { refresh_token: session.refresh_token });
+    saveSession(data);
+    return getSession();
+  } catch {
+    signOut(); // refresh token itself expired/invalid (e.g. unused for a long time) — nothing to do but sign out
+    return null;
+  }
+}
+
+// What entitlements.js (and anything else hitting the Supabase REST API)
+// should call instead of getSession() directly — refreshes first if the
+// current access token is stale, so a genuinely signed-in person never gets
+// treated as logged out just because an hour passed.
+export async function getValidSession() {
+  let session = getSession();
+  if (!session?.access_token) return null;
+  if (isExpiringSoon(session)) {
+    session = await refreshSession();
+  }
+  return session;
 }
 
 // Returns { needsEmailConfirmation: true } if the Supabase project has
@@ -64,3 +100,4 @@ export async function signIn(email, password) {
 export function signOut() {
   try { localStorage.removeItem(SESSION_KEY); } catch {}
 }
+
