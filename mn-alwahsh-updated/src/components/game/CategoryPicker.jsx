@@ -3,8 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Lock } from 'lucide-react';
 import { fetchCategories } from '../../utils/supabaseClient';
 import CATEGORY_ICONS, { getIcon } from '../../utils/categoryIcons';
-import { isPremiumCategory, isCategoryUnlocked, unlockCategory, PREMIUM_PRICE_LABEL } from '../../utils/premiumConfig';
+import { isPremiumCategory, PREMIUM_PRICE_LABEL } from '../../utils/premiumConfig';
+import { isSignedIn } from '../../utils/authClient';
+import { fetchUnlockedCategories, grantCategoryToCurrentUser } from '../../utils/entitlements';
 import { isHiddenCategory } from '../../utils/hiddenCategories';
+import AuthForm from './AuthForm';
 
 const CATEGORY_GROUPS = {
   '⚽ رياضة': ['football logo', 'football Logo', 'Football Logo', 'FOOTBALL LOGO', 'رياضة', 'CR7', 'ميسي', 'كأس العرب', 'كأس آسيا', 'Champions League', 'المنتخب الأردني', 'League of Legends', 'Real Madrid', 'Barcelona', 'WildRift', 'ريال مدريد', 'برشلونة', 'برشلونه', 'وايلد ريفت', 'محترف كرة'],
@@ -50,7 +53,13 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   const [error, setError] = useState(null);
   const [openGroups, setOpenGroups] = useState(new Set());
   const [unlockPromptFor, setUnlockPromptFor] = useState(null);
-  const [, forceRerender] = useState(0); // re-render after a localStorage unlock
+  const [unlockedCategories, setUnlockedCategories] = useState([]);
+  const [unlocking, setUnlocking] = useState(false);
+  const [unlockError, setUnlockError] = useState(null);
+
+  const loadEntitlements = () => {
+    fetchUnlockedCategories().then(setUnlockedCategories);
+  };
 
   const load = () => {
     setLoading(true);
@@ -59,9 +68,12 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
       .then(setCategories)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
+    loadEntitlements();
   };
 
   useEffect(() => { load(); }, []);
+
+  const isUnlocked = (name) => !isPremiumCategory(name) || unlockedCategories.includes(name);
 
   const toggleGroup = (g) => {
     setOpenGroups(prev => {
@@ -73,16 +85,24 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
 
   const pickRandom = () => {
     if (!categories.length) return;
-    const eligible = categories.filter(c => !isHiddenCategory(c) && isCategoryUnlocked(c));
+    const eligible = categories.filter(c => !isHiddenCategory(c) && isUnlocked(c));
     const pool = eligible.length ? eligible : categories.filter(c => !isHiddenCategory(c));
     const shuffled = [...pool].sort(() => Math.random() - 0.5);
     onSetSelected(shuffled.slice(0, Math.min(max, shuffled.length)));
   };
 
-  const handleUnlock = (name) => {
-    unlockCategory(name); // TEMPORARY — see premiumConfig.js for the real Play Billing seam
-    setUnlockPromptFor(null);
-    forceRerender(n => n + 1);
+  const handleUnlock = async (name) => {
+    setUnlockError(null);
+    setUnlocking(true);
+    try {
+      await grantCategoryToCurrentUser(name); // TEMPORARY — no payment yet, see entitlements.js
+      setUnlockedCategories(prev => prev.includes(name) ? prev : [...prev, name]);
+      setUnlockPromptFor(null);
+    } catch (err) {
+      setUnlockError('تعذر فتح الفئة — حاول مرة أخرى');
+    } finally {
+      setUnlocking(false);
+    }
   };
 
   if (loading) return <p className="text-center font-tajawal text-sm py-4" style={{ color: '#FF6666' }}>جاري تحميل الفئات...</p>;
@@ -200,7 +220,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                         const isSelected = selected.includes(name);
                         const isDisabled = !isSelected && selected.length >= max;
                         const emoji = getIcon(name);
-                        const locked = isPremiumCategory(name) && !isCategoryUnlocked(name);
+                        const locked = isPremiumCategory(name) && !isUnlocked(name);
 
                         return (
                           <motion.button
@@ -301,20 +321,40 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
               <p className="font-tajawal text-sm mb-4" style={{ color: '#FF9999' }}>
                 فئة مميزة — {PREMIUM_PRICE_LABEL}
               </p>
-              <button
-                onClick={() => handleUnlock(unlockPromptFor)}
-                className="w-full font-cairo font-bold rounded-xl py-3 mb-2"
-                style={{ background: '#FFD700', color: '#2a0000' }}
-              >
-                فتح الفئة
-              </button>
-              <button
-                onClick={() => setUnlockPromptFor(null)}
-                className="w-full font-cairo text-sm py-2"
-                style={{ color: '#FF9999' }}
-              >
-                إلغاء
-              </button>
+
+              {isSignedIn() ? (
+                <>
+                  {unlockError && (
+                    <p className="font-tajawal text-xs mb-2" style={{ color: '#FF6666' }}>{unlockError}</p>
+                  )}
+                  <button
+                    onClick={() => handleUnlock(unlockPromptFor)}
+                    disabled={unlocking}
+                    className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
+                    style={{ background: '#FFD700', color: '#2a0000' }}
+                  >
+                    {unlocking ? '...' : 'فتح الفئة'}
+                  </button>
+                  <button
+                    onClick={() => setUnlockPromptFor(null)}
+                    className="w-full font-cairo text-sm py-2"
+                    style={{ color: '#FF9999' }}
+                  >
+                    إلغاء
+                  </button>
+                </>
+              ) : (
+                <>
+                  <AuthForm onSignedIn={() => { loadEntitlements(); }} />
+                  <button
+                    onClick={() => setUnlockPromptFor(null)}
+                    className="w-full font-cairo text-sm py-2 mt-2"
+                    style={{ color: '#FF9999' }}
+                  >
+                    إلغاء
+                  </button>
+                </>
+              )}
             </motion.div>
           </motion.div>
         )}
