@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.mnalwahsh.twa",
+        "sha256_cert_fingerprints": ["55:A6:D8:C4:41:40:5E:DF:9B:6E:64:B1:F1:31:D7:EE:A2:21:D8:8F:6A:4B:93:AA:0B:C2:26:EA:DF:94:18:C7"]
+      }
+    }]
