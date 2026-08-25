@@ -5,3 +5,14 @@
 
 [functions]
   node_bundler = "esbuild"
+
+# SPA fallback — client-side routes (React Router) like /privacy, /login,
+# /payment-result aren't real files on disk, so a direct visit or refresh
+# on any of them 404s without this. Netlify still serves real files
+# (assets, /.netlify/functions/*) normally first; this only catches paths
+# that don't match an actual file, handing them to index.html so React
+# Router can take over client-side.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
