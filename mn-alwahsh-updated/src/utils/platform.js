@@ -2,13 +2,12 @@
 // (a Trusted Web Activity wrapping mnalwahsh.com) rather than a normal
 // mobile/desktop browser.
 //
-// Why this matters: Google Play's Payments policy forbids apps from
-// leading users to any payment method other than Google Play Billing —
-// including just linking out to a website checkout. Since the Android
-// app is a TWA showing this exact site, the Ziina unlock buttons that are
-// perfectly fine on the open web would be a policy violation the moment
-// they're reachable inside the app. See CategoryPicker.jsx's unlock modal,
-// which checks this before showing them.
+// Why this matters: purchasing only happens through Google Play Billing
+// (see playBillingClient.js), which is only reachable from inside the
+// packaged Android app — a normal browser tab has no Digital Goods API to
+// talk to Play with. CategoryPicker.jsx's unlock modal checks this (plus
+// isPlayBillingAvailable()) to decide whether to show real buy buttons or
+// point the visitor at the Play Store listing instead.
 //
 // TWAs launched via Bubblewrap/PWABuilder set document.referrer to
 // "android-app://<package-id>" — that's the standard, documented way to

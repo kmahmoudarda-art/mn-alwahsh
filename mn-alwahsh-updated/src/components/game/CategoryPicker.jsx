@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Lock } from 'lucide-react';
 import { fetchCategories } from '../../utils/supabaseClient';
 import CATEGORY_ICONS, { getIcon } from '../../utils/categoryIcons';
-import { isPremiumCategory, getPremiumPriceLabel, isTestAccount, ALL_CATEGORIES_PRICE, TRIAL_PRICE_WEB } from '../../utils/premiumConfig';
+import { isPremiumCategory, getPremiumPriceLabel, isTestAccount, ALL_CATEGORIES_PRICE, TRIAL_PRICE_ANDROID } from '../../utils/premiumConfig';
 import { isSignedIn, getCurrentUser } from '../../utils/authClient';
 import { fetchUnlockedCategories } from '../../utils/entitlements';
-import { startZiinaCheckout } from '../../utils/ziinaClient';
+import { getSkuForCategory, ALL_CATEGORIES_SKU, TRIAL_SKU } from '../../utils/playProducts';
+import { isPlayBillingAvailable, buyAndGrant } from '../../utils/playBillingClient';
 import { isRunningInAndroidApp } from '../../utils/platform';
+import { getValidSession } from '../../utils/authClient';
 import { isHiddenCategory } from '../../utils/hiddenCategories';
 import AuthForm from './AuthForm';
 
@@ -58,9 +60,9 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   const [unlockedCategories, setUnlockedCategories] = useState([]);
   const [unlocking, setUnlocking] = useState(false);
   const [unlockError, setUnlockError] = useState(null);
-  // One-game-only unlocks from the 1 AED trial — never written to Supabase,
+  // One-game-only unlocks from the trial SKU — never written to Supabase,
   // never persisted, so it naturally resets whenever CategoryPicker remounts
-  // for a new game. See TRIAL_PRICE_WEB note in premiumConfig.js.
+  // for a new game. See TRIAL_PRICE_ANDROID note in premiumConfig.js.
   const [trialCategories, setTrialCategories] = useState([]);
 
   const loadEntitlements = () => {
@@ -78,18 +80,6 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   };
 
   useEffect(() => { load(); }, []);
-
-  // Pick up a trial grant that PaymentResult.jsx stashed in sessionStorage
-  // after a successful 1 AED Ziina payment — consumed once, then cleared.
-  useEffect(() => {
-    try {
-      const pending = sessionStorage.getItem('mn_alwahsh_pending_trial');
-      if (pending) {
-        setTrialCategories(prev => prev.includes(pending) ? prev : [...prev, pending]);
-        sessionStorage.removeItem('mn_alwahsh_pending_trial');
-      }
-    } catch {}
-  }, []);
 
   const isUnlocked = (name) => !isPremiumCategory(name) || unlockedCategories.includes(name) || trialCategories.includes(name) || isTestAccount(getCurrentUser());
 
@@ -109,42 +99,54 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
     onSetSelected(shuffled.slice(0, Math.min(max, shuffled.length)));
   };
 
-  const handleUnlock = async (name) => {
+  // Shared setup for all three Play Billing purchase paths below: needs a
+  // signed-in Supabase session (its access token is what lets
+  // verify-play-purchase.js insert into `purchases` under the existing RLS
+  // policy — see entitlements.js).
+  const withSession = async (fn) => {
     setUnlockError(null);
     setUnlocking(true);
     try {
-      await startZiinaCheckout({ kind: 'category', category: name });
-      // Browser navigates away to Ziina's hosted page — nothing more to do here.
+      const session = await getValidSession();
+      if (!session?.access_token || !session?.user?.id) {
+        setUnlockError('يجب تسجيل الدخول أولاً');
+        return;
+      }
+      await fn(session);
     } catch (err) {
-      setUnlockError('تعذر بدء عملية الدفع — حاول مرة أخرى');
+      console.error('[CategoryPicker] purchase failed:', err);
+      setUnlockError('تعذر إتمام عملية الشراء — حاول مرة أخرى');
+    } finally {
       setUnlocking(false);
     }
   };
 
-  const handleUnlockAll = async () => {
-    setUnlockError(null);
-    setUnlocking(true);
-    try {
-      await startZiinaCheckout({ kind: 'all' });
-    } catch (err) {
-      setUnlockError('تعذر بدء عملية الدفع — حاول مرة أخرى');
-      setUnlocking(false);
-    }
-  };
+  const handleUnlock = (name) => withSession(async (session) => {
+    const sku = getSkuForCategory(name);
+    if (!sku) { setUnlockError('هذه الفئة غير متاحة للشراء حالياً'); return; }
+    await buyAndGrant({ sku, userId: session.user.id, accessToken: session.access_token });
+    loadEntitlements();
+    setUnlockPromptFor(null);
+  });
 
-  // Trial also goes through real payment now — 1 AED via Ziina — but grants
-  // only a local, one-game unlock on return (see PaymentResult.jsx), never
-  // written to Supabase.
-  const handleTrial = async (name) => {
-    setUnlockError(null);
-    setUnlocking(true);
-    try {
-      await startZiinaCheckout({ kind: 'trial', category: name });
-    } catch (err) {
-      setUnlockError('تعذر بدء عملية الدفع — حاول مرة أخرى');
-      setUnlocking(false);
-    }
-  };
+  const handleUnlockAll = () => withSession(async (session) => {
+    await buyAndGrant({ sku: ALL_CATEGORIES_SKU, userId: session.user.id, accessToken: session.access_token });
+    loadEntitlements();
+    setUnlockPromptFor(null);
+  });
+
+  // One-game-only unlock — grants nothing in Supabase, just adds the
+  // category to local trialCategories state for the rest of this session.
+  const handleTrial = (name) => withSession(async (session) => {
+    await buyAndGrant({
+      sku: TRIAL_SKU,
+      userId: session.user.id,
+      accessToken: session.access_token,
+      trialCategory: name,
+    });
+    setTrialCategories(prev => prev.includes(name) ? prev : [...prev, name]);
+    setUnlockPromptFor(null);
+  });
 
   if (loading) return <p className="text-center font-tajawal text-sm py-4" style={{ color: '#FF6666' }}>جاري تحميل الفئات...</p>;
 
@@ -337,7 +339,9 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
         })}
       </div>
 
-      {/* Unlock prompt — placeholder until Google Play Billing is wired in (see premiumConfig.js) */}
+      {/* Unlock prompt — real purchases go through Google Play Billing only,
+          see playBillingClient.js / verify-play-purchase.js. Web visitors
+          get pointed to the Play Store instead of a buy button. */}
       <AnimatePresence>
         {unlockPromptFor && (
           <motion.div
@@ -381,16 +385,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                   {unlockError && (
                     <p className="font-tajawal text-xs mb-2" style={{ color: '#FF6666' }}>{unlockError}</p>
                   )}
-                  {isRunningInAndroidApp() ? (
-                    // Google Play policy: apps may not lead users to any payment
-                    // method other than Google Play Billing, including linking
-                    // out to a website checkout — so no Ziina buttons here.
-                    // Real purchasing on Android needs Play Billing wired in
-                    // separately; until then this is informational only.
-                    <p className="font-tajawal text-sm mb-2" style={{ color: 'rgba(255,150,150,0.85)' }}>
-                      الشراء داخل التطبيق غير متاح حالياً.
-                    </p>
-                  ) : (
+                  {isRunningInAndroidApp() && isPlayBillingAvailable() ? (
                     <>
                       <button
                         onClick={() => handleUnlock(unlockPromptFor)}
@@ -414,11 +409,30 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                         className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
                         style={{ background: 'rgba(255,215,0,0.12)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.4)' }}
                       >
-                        {`جرّبها لهذه اللعبة فقط — ${TRIAL_PRICE_WEB} AED`}
+                        {`جرّبها لهذه اللعبة فقط — ${TRIAL_PRICE_ANDROID} AED`}
                       </button>
                       <p className="font-tajawal text-xs mb-2" style={{ color: 'rgba(255,150,150,0.7)' }}>
                         التجربة تفتح الفئة لهذه اللعبة فقط، وتُقفل مرة أخرى بعدها
                       </p>
+                    </>
+                  ) : (
+                    // Purchasing only happens through Google Play Billing now —
+                    // the website itself never takes payment (see
+                    // playBillingClient.js / verify-play-purchase.js). Anyone
+                    // hitting this on the open web gets pointed at the app.
+                    <>
+                      <p className="font-tajawal text-sm mb-3" style={{ color: 'rgba(255,150,150,0.85)' }}>
+                        الشراء متاح فقط عبر تطبيق Google Play
+                      </p>
+                      <a
+                        href="https://play.google.com/store/apps/details?id=com.mnalwahsh.twa"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full inline-block font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
+                        style={{ background: '#FFD700', color: '#2a0000' }}
+                      >
+                        حمّل التطبيق من Google Play
+                      </a>
                     </>
                   )}
                   <button

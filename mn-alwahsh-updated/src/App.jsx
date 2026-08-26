@@ -8,7 +8,6 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 // Add page imports here
 import Game from './pages/Game';
 import Login from './pages/Login';
-import PaymentResult from './pages/PaymentResult';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 
 const AuthenticatedApp = () => {
@@ -42,7 +41,6 @@ const AuthenticatedApp = () => {
       <Route path="/game" element={<Game />} />
       <Route path="/winner" element={<Game />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/payment-result" element={<PaymentResult />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>

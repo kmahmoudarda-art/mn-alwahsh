@@ -128,28 +128,20 @@ export function isTestAccount(user) {
 
 // ── Bundle & trial pricing ──
 // Shown as extra options alongside the single-category price whenever the
-// unlock prompt appears (see CategoryPicker.jsx's unlock modal).
+// unlock prompt appears (see CategoryPicker.jsx's unlock modal). All real
+// purchasing now goes through Google Play Billing only — see
+// playProducts.js, playBillingClient.js, and
+// netlify/functions/verify-play-purchase.js. The website itself never
+// takes payment; it points visitors to the Play Store instead (see
+// CategoryPicker.jsx's unlock modal).
 //
 // ALL_CATEGORIES_PRICE — permanent unlock of every current and future
 // premium category for this account. Recorded in the `purchases` table
 // exactly like a single-category buy, just for every key in
-// PREMIUM_CATEGORIES at once (see entitlements.js's grantAllCategoriesToCurrentUser).
+// PREMIUM_CATEGORIES at once (see verify-play-purchase.js).
 //
-// TRIAL_PRICE_WEB — deliberately NOT written to the purchases table. It's a
-// one-game-only unlock: local React state in CategoryPicker, reset the
-// moment a new game starts. Nothing to unwind server-side, nothing that
-// persists across devices — that's the point, it's a taste, not a purchase.
-//
-// Was 1 AED originally — raised to 5 because Ziina's API has a hard 2 AED
-// minimum per payment (a 1 AED charge is simply rejected), and even at
-// 2 AED the ~1.05 AED fee (2.6% + 1 AED) would eat over half of it. 5 AED
-// still reads as a clear discount against the 7-15 AED full-category
-// prices, while leaving a real margin after fees.
+// TRIAL_PRICE_ANDROID — one-game-only unlock via the TRIAL_SKU product in
+// playProducts.js. Deliberately NOT written to the purchases table: local
+// React state in CategoryPicker, reset the moment a new game starts.
 export const ALL_CATEGORIES_PRICE = 100;
-export const TRIAL_PRICE_WEB = 5;
-
-// TRIAL_PRICE_ANDROID — for when Google Play Billing gets wired in (not
-// built yet). Same one-game-only design as the web trial. Google Play
-// Billing's ~15% cut (vs. Ziina's ~2.6% + flat 1 AED) and no hard minimum
-// make a 1 AED one-shot viable there in a way it wasn't on Ziina.
 export const TRIAL_PRICE_ANDROID = 1;
