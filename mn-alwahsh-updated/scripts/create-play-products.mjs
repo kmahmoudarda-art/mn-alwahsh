@@ -20,13 +20,17 @@
 // Easiest way to set them for just this one run (bash/zsh):
 //
 //   export GOOGLE_SERVICE_ACCOUNT_EMAIL="your-sa@your-project.iam.gserviceaccount.com"
-//   export GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="$(node -pe "JSON.stringify(require('/path/to/downloaded-key.json').private_key)")"
+//   export GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="$(node -e "process.stdout.write(require('/path/to/downloaded-key.json').private_key)")"
 //   export ANDROID_PACKAGE_NAME="com.mnalwahsh.twa"
 //   node scripts/create-play-products.mjs
 //
 // The middle line reads private_key straight out of the downloaded JSON
-// file and escapes its newlines correctly — simplest way to avoid
-// mangling the key by pasting it manually.
+// file with its real newlines intact. Use process.stdout.write, NOT
+// JSON.stringify or `node -p` — both of those wrap the value in an extra
+// pair of literal quote characters (part of the printed text itself, not
+// shell syntax the surrounding "$(...)" strips), which corrupts the PEM
+// and fails with a cryptic "DECODER routines::unsupported" error from
+// Node's crypto module — nothing to do with the key itself being wrong.
 //
 // BEFORE RUNNING: the service account must already be invited into Play
 // Console (Users and permissions) with a permission that covers managing

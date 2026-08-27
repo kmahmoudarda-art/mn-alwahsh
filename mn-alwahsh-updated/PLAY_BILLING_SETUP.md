@@ -22,7 +22,7 @@ Add these in the Netlify dashboard (Site settings → Environment variables), sa
 ```bash
 cd mn-alwahsh-updated
 export GOOGLE_SERVICE_ACCOUNT_EMAIL="your-sa@your-project.iam.gserviceaccount.com"
-export GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="$(node -pe "JSON.stringify(require('/path/to/downloaded-key.json').private_key)")"
+export GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="$(node -e "process.stdout.write(require('/path/to/downloaded-key.json').private_key)")"
 export ANDROID_PACKAGE_NAME="com.mnalwahsh.twa"
 node scripts/create-play-products.mjs
 ```
