@@ -2,8 +2,21 @@
 // One-time script: creates all 71 in-app products (69 categories + the
 // all-categories bundle + the trial) in Google Play Console via the
 // Android Publisher API, so you don't have to click through the UI 71
-// times. Safe to re-run — products that already exist are skipped, not
-// duplicated or overwritten.
+// times. Safe to re-run — products that already exist are just updated
+// in place (upserted), not duplicated.
+//
+// REWRITTEN to use monetization.onetimeproducts instead of the older
+// inappproducts endpoint. The old endpoint (what this script originally
+// used) now returns a 403 "Please migrate to the new publishing API" for
+// newer developer accounts — Google has been migrating "in-app products"
+// (renamed "one-time products" in the Play Console UI) onto a new,
+// significantly more complex data model: instead of one defaultPrice +
+// autoConvertMissingPrices, each product now needs an explicit
+// PurchaseOption with a REGIONAL price for every supported country. This
+// script calls monetization.convertRegionPrices once per distinct AED
+// price (converting to every region Play supports) and reuses that
+// result across every product sharing that price, then PATCHes each
+// product as a create-or-update (allowMissing=true).
 //
 // Run locally (never in a browser, never paste the key anywhere public):
 //
@@ -24,13 +37,10 @@
 //   export ANDROID_PACKAGE_NAME="com.mnalwahsh.twa"
 //   node scripts/create-play-products.mjs
 //
-// The middle line reads private_key straight out of the downloaded JSON
-// file with its real newlines intact. Use process.stdout.write, NOT
-// JSON.stringify or `node -p` — both of those wrap the value in an extra
-// pair of literal quote characters (part of the printed text itself, not
-// shell syntax the surrounding "$(...)" strips), which corrupts the PEM
-// and fails with a cryptic "DECODER routines::unsupported" error from
-// Node's crypto module — nothing to do with the key itself being wrong.
+// Use process.stdout.write, NOT JSON.stringify or `node -p` — both of
+// those wrap the value in an extra pair of literal quote characters that
+// corrupts the PEM and fails with a cryptic "DECODER routines::unsupported"
+// error that has nothing to do with the key itself being wrong.
 //
 // BEFORE RUNNING: the service account must already be invited into Play
 // Console (Users and permissions) with a permission that covers managing
@@ -89,35 +99,62 @@ async function getAccessToken() {
   return access_token;
 }
 
-function priceMicros(aed) {
-  return String(Math.round(aed * 1_000_000));
+function moneyFromAed(aed) {
+  // AED prices here are all whole numbers, so nanos is always 0 — if you
+  // ever add a fractional AED price, this needs updating to split the
+  // decimal part into nanos (billionths of the currency unit).
+  return { currencyCode: 'AED', units: String(Math.trunc(aed)), nanos: 0 };
 }
 
-// English label is always present in PLAY_PRODUCT_MAP; the Arabic title
-// uses the first variant if it's non-Latin, otherwise falls back to the
-// English label for both listings.
-function listingsFor(label, arabicVariant, description_en, description_ar) {
-  const listings = {
-    'en-US': { title: label, description: description_en },
+// Converts one AED price into a full per-region pricing table via Play's
+// own conversion endpoint (today's exchange rates + regional pricing
+// patterns) — this replaces the old autoConvertMissingPrices flag, which
+// doesn't exist in the new API.
+async function convertPrice(accessToken, aed) {
+  const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${PACKAGE_NAME}/pricing:convertRegionPrices`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ price: moneyFromAed(aed) }),
+  });
+  if (!res.ok) {
+    throw new Error(`convertRegionPrices(${aed} AED) failed: ${res.status} ${await res.text()}`);
+  }
+  return res.json();
+}
+
+// Builds the regionalPricingAndAvailabilityConfigs + newRegionsConfig
+// pair every purchase option needs, from one convertRegionPrices result.
+function pricingConfigsFrom(conversion) {
+  const regionalPricingAndAvailabilityConfigs = Object.entries(conversion.convertedRegionPrices).map(
+    ([regionCode, { price }]) => ({ regionCode, price, availability: 'AVAILABLE' })
+  );
+  const newRegionsConfig = {
+    usdPrice: conversion.convertedOtherRegionsPrice.usdPrice,
+    eurPrice: conversion.convertedOtherRegionsPrice.eurPrice,
+    availability: 'AVAILABLE',
   };
+  return { regionalPricingAndAvailabilityConfigs, newRegionsConfig, regionsVersion: conversion.regionVersion.version };
+}
+
+// English label is always present in PLAY_PRODUCT_MAP; pulls in an Arabic
+// listing too when one of the category's variant strings is non-Latin.
+function listingsFor(label, arabicVariant, description_en, description_ar) {
+  const listings = [{ languageCode: 'en-US', title: label.slice(0, 55), description: description_en.slice(0, 200) }];
   if (arabicVariant && arabicVariant !== label) {
-    listings['ar'] = { title: arabicVariant, description: description_ar };
+    listings.push({ languageCode: 'ar', title: arabicVariant.slice(0, 55), description: description_ar.slice(0, 200) });
   }
   return listings;
 }
 
-function buildProducts() {
-  const products = [];
+function buildProductSpecs() {
+  const specs = [];
 
   for (const [sku, info] of Object.entries(PLAY_PRODUCT_MAP)) {
     const arabicVariant = info.categories.find((c) => !/^[\x00-\x7F]*$/.test(c));
-    products.push({
-      packageName: PACKAGE_NAME,
+    specs.push({
       sku,
-      status: 'active',
-      purchaseType: 'managedUser',
-      defaultLanguage: 'en-US',
-      defaultPrice: { currency: 'AED', priceMicros: priceMicros(info.price) },
+      price: info.price,
       listings: listingsFor(
         info.label,
         arabicVariant,
@@ -127,13 +164,9 @@ function buildProducts() {
     });
   }
 
-  products.push({
-    packageName: PACKAGE_NAME,
+  specs.push({
     sku: ALL_CATEGORIES_SKU,
-    status: 'active',
-    purchaseType: 'managedUser',
-    defaultLanguage: 'en-US',
-    defaultPrice: { currency: 'AED', priceMicros: priceMicros(100) },
+    price: 100,
     listings: listingsFor(
       'Unlock All Categories',
       'فتح جميع الفئات',
@@ -142,13 +175,9 @@ function buildProducts() {
     ),
   });
 
-  products.push({
-    packageName: PACKAGE_NAME,
+  specs.push({
     sku: TRIAL_SKU,
-    status: 'active',
-    purchaseType: 'managedUser',
-    defaultLanguage: 'en-US',
-    defaultPrice: { currency: 'AED', priceMicros: priceMicros(1) },
+    price: 1,
     listings: listingsFor(
       'Try One Category (1 Game)',
       'تجربة فئة واحدة',
@@ -157,56 +186,85 @@ function buildProducts() {
     ),
   });
 
-  return products;
+  return specs;
 }
 
-async function createProduct(accessToken, product) {
-  const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${PACKAGE_NAME}/inappproducts`;
+async function upsertProduct(accessToken, spec, pricing) {
+  const oneTimeProduct = {
+    packageName: PACKAGE_NAME,
+    productId: spec.sku,
+    listings: spec.listings,
+    purchaseOptions: [
+      {
+        purchaseOptionId: 'buy',
+        buyOption: { legacyCompatible: true, multiQuantityEnabled: false },
+        regionalPricingAndAvailabilityConfigs: pricing.regionalPricingAndAvailabilityConfigs,
+        newRegionsConfig: pricing.newRegionsConfig,
+      },
+    ],
+  };
+
+  const params = new URLSearchParams({
+    updateMask: 'listings,purchaseOptions',
+    'regionsVersion.version': pricing.regionsVersion,
+    allowMissing: 'true',
+  });
+  const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${PACKAGE_NAME}/onetimeproducts/${spec.sku}?${params}`;
+
   const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(product),
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(oneTimeProduct),
   });
 
   if (res.ok) {
-    return { sku: product.sku, status: 'created' };
+    return { sku: spec.sku, status: 'created/updated' };
   }
-
   const text = await res.text();
-  // Google returns 409/400-with-"already exists" style errors for a SKU
-  // that's already there — treat that as a no-op, not a failure, so the
-  // script is safe to re-run after fixing an unrelated error partway
-  // through a batch.
-  if (res.status === 409 || /already exists/i.test(text)) {
-    return { sku: product.sku, status: 'skipped (already exists)' };
-  }
-  return { sku: product.sku, status: `FAILED (${res.status}): ${text}` };
+  return { sku: spec.sku, status: `FAILED (${res.status}): ${text}` };
 }
 
 async function main() {
-  console.log(`Creating in-app products for ${PACKAGE_NAME}...\n`);
+  console.log(`Creating one-time products for ${PACKAGE_NAME}...\n`);
   const accessToken = await getAccessToken();
-  const products = buildProducts();
+  const specs = buildProductSpecs();
+
+  // Convert each distinct AED price exactly once and cache it — far fewer
+  // convertRegionPrices calls than one per product, and keeps every
+  // product at the same price in perfect sync with each other.
+  const uniquePrices = [...new Set(specs.map((s) => s.price))];
+  console.log(`Converting ${uniquePrices.length} distinct price point(s) to regional pricing...`);
+  const pricingByAed = new Map();
+  for (const aed of uniquePrices) {
+    try {
+      const conversion = await convertPrice(accessToken, aed);
+      pricingByAed.set(aed, pricingConfigsFrom(conversion));
+      console.log(`✓ ${aed} AED converted to ${Object.keys(conversion.convertedRegionPrices).length} regions`);
+    } catch (e) {
+      fail(e.message);
+    }
+    await new Promise((r) => setTimeout(r, 200));
+  }
+  console.log('');
 
   const results = [];
-  for (const product of products) {
-    const result = await createProduct(accessToken, product);
+  for (const spec of specs) {
+    const pricing = pricingByAed.get(spec.price);
+    const result = await upsertProduct(accessToken, spec, pricing);
     results.push(result);
     console.log(`${result.status.startsWith('FAILED') ? '✖' : '✓'} ${result.sku} — ${result.status}`);
-    // Gentle pacing — 71 requests well within quota, this just avoids
-    // bursting them all in the same instant.
+    // Gentle pacing — avoids bursting 71 requests in the same instant.
     await new Promise((r) => setTimeout(r, 250));
   }
 
   const failed = results.filter((r) => r.status.startsWith('FAILED'));
-  console.log(`\nDone: ${results.length - failed.length}/${results.length} succeeded or already existed.`);
+  console.log(`\nDone: ${results.length - failed.length}/${results.length} succeeded.`);
   if (failed.length) {
-    console.log(`\n${failed.length} failed — re-run this script after fixing the cause; already-created products will be skipped automatically:`);
+    console.log(`\n${failed.length} failed — re-run this script after fixing the cause (upserts are safe to repeat):`);
     failed.forEach((r) => console.log(`  - ${r.sku}: ${r.status}`));
     process.exitCode = 1;
+  } else {
+    console.log('\nAll products created. Double check in Play Console \u2192 Monetise with Play \u2192 One-time products that they show up, then activate the "buy" purchase option on each if it isn\'t already ACTIVE.');
   }
 }
 
