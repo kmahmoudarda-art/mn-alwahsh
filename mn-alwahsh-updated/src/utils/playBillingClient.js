@@ -31,6 +31,7 @@ export function isPlayBillingAvailable() {
 // `sku` must already exist as an active in-app product in Play Console —
 // see playProducts.js / PLAY_BILLING_SETUP.md.
 export async function purchaseWithPlayBilling(sku) {
+  alert('DEBUG A: purchaseWithPlayBilling called, sku=' + sku); // TEMP_DEBUG
   if (!isPlayBillingAvailable()) {
     throw new Error('play-billing-unavailable');
   }
@@ -38,6 +39,7 @@ export async function purchaseWithPlayBilling(sku) {
   // Confirms Chrome can actually reach Play's billing service right now
   // (fails fast with a clearer error than letting PaymentRequest hang).
   const digitalGoodsService = await window.getDigitalGoodsService(PLAY_BILLING_METHOD);
+  alert('DEBUG B: got digital goods service'); // TEMP_DEBUG
 
   const paymentMethods = [{ supportedMethods: PLAY_BILLING_METHOD, data: { sku } }];
   // Play Billing ignores this "total" — the real price is whatever was set
@@ -48,13 +50,17 @@ export async function purchaseWithPlayBilling(sku) {
   };
 
   const request = new PaymentRequest(paymentMethods, paymentDetails);
+  alert('DEBUG C: PaymentRequest created'); // TEMP_DEBUG
 
-  const canMakePayment = await request.canMakePayment().catch(() => false);
+  const canMakePayment = await request.canMakePayment().catch((e) => { alert('DEBUG canMakePayment threw: ' + e.message); return false; }); // TEMP_DEBUG
+  alert('DEBUG D: canMakePayment result = ' + canMakePayment); // TEMP_DEBUG
   if (!canMakePayment) {
     throw new Error('play-billing-cannot-pay');
   }
 
+  alert('DEBUG E: about to call request.show()'); // TEMP_DEBUG
   const response = await request.show();
+  alert('DEBUG F: request.show() resolved'); // TEMP_DEBUG
   const { purchaseToken } = response.details || {};
   if (!purchaseToken) {
     await response.complete('fail').catch(() => {});

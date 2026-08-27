@@ -106,14 +106,18 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   const withSession = async (fn) => {
     setUnlockError(null);
     setUnlocking(true);
+    alert('DEBUG 1: button tapped, starting purchase flow'); // TEMP_DEBUG
     try {
       const session = await getValidSession();
+      alert('DEBUG 2: got session, has token: ' + !!session?.access_token); // TEMP_DEBUG
       if (!session?.access_token || !session?.user?.id) {
         setUnlockError('يجب تسجيل الدخول أولاً');
         return;
       }
       await fn(session);
+      alert('DEBUG 3: purchase flow completed without throwing'); // TEMP_DEBUG
     } catch (err) {
+      alert('DEBUG ERROR: ' + (err?.message || String(err))); // TEMP_DEBUG
       console.error('[CategoryPicker] purchase failed:', err);
       setUnlockError('تعذر إتمام عملية الشراء — حاول مرة أخرى');
     } finally {
