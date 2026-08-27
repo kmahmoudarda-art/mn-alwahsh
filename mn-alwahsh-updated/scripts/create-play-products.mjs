@@ -137,12 +137,22 @@ function pricingConfigsFrom(conversion) {
   return { regionalPricingAndAvailabilityConfigs, newRegionsConfig, regionsVersion: conversion.regionVersion.version };
 }
 
-// English label is always present in PLAY_PRODUCT_MAP; pulls in an Arabic
-// listing too when one of the category's variant strings is non-Latin.
+// English label is always present in PLAY_PRODUCT_MAP. The app's default
+// Play Store language is Arabic, and Google requires EVERY product to
+// have a listing in the app's default language or the PATCH is rejected
+// with "Missing the listing for the default language ar" — so the 'ar'
+// listing below is unconditional, not just added when a distinct Arabic
+// variant exists. For categories with no separate Arabic name (e.g.
+// "CR7", "football logo"), the Latin title is reused as-is for the
+// Arabic listing too — that's normal in Arabic UI copy for brand/proper
+// names, not a mistake.
 function listingsFor(label, arabicVariant, description_en, description_ar) {
-  const listings = [{ languageCode: 'en-US', title: label.slice(0, 55), description: description_en.slice(0, 200) }];
-  if (arabicVariant && arabicVariant !== label) {
-    listings.push({ languageCode: 'ar', title: arabicVariant.slice(0, 55), description: description_ar.slice(0, 200) });
+  const arTitle = arabicVariant || label;
+  const listings = [
+    { languageCode: 'ar', title: arTitle.slice(0, 55), description: description_ar.slice(0, 200) },
+  ];
+  if (label !== arTitle) {
+    listings.push({ languageCode: 'en-US', title: label.slice(0, 55), description: description_en.slice(0, 200) });
   }
   return listings;
 }
