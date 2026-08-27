@@ -30,8 +30,8 @@ export function isPlayBillingAvailable() {
 // Returns { purchaseToken, productId } on success, throws on cancel/failure.
 // `sku` must already exist as an active in-app product in Play Console —
 // see playProducts.js / PLAY_BILLING_SETUP.md.
-export async function purchaseWithPlayBilling(sku) {
-  alert('DEBUG A: purchaseWithPlayBilling called, sku=' + sku); // TEMP_DEBUG
+export async function purchaseWithPlayBilling(sku, debug = () => {}) {
+  debug('A: purchaseWithPlayBilling called, sku=' + sku); // TEMP_DEBUG
   if (!isPlayBillingAvailable()) {
     throw new Error('play-billing-unavailable');
   }
@@ -39,7 +39,7 @@ export async function purchaseWithPlayBilling(sku) {
   // Confirms Chrome can actually reach Play's billing service right now
   // (fails fast with a clearer error than letting PaymentRequest hang).
   const digitalGoodsService = await window.getDigitalGoodsService(PLAY_BILLING_METHOD);
-  alert('DEBUG B: got digital goods service'); // TEMP_DEBUG
+  debug('B: got digital goods service'); // TEMP_DEBUG
 
   const paymentMethods = [{ supportedMethods: PLAY_BILLING_METHOD, data: { sku } }];
   // Play Billing ignores this "total" — the real price is whatever was set
@@ -50,17 +50,17 @@ export async function purchaseWithPlayBilling(sku) {
   };
 
   const request = new PaymentRequest(paymentMethods, paymentDetails);
-  alert('DEBUG C: PaymentRequest created'); // TEMP_DEBUG
+  debug('C: PaymentRequest created'); // TEMP_DEBUG
 
-  const canMakePayment = await request.canMakePayment().catch((e) => { alert('DEBUG canMakePayment threw: ' + e.message); return false; }); // TEMP_DEBUG
-  alert('DEBUG D: canMakePayment result = ' + canMakePayment); // TEMP_DEBUG
+  const canMakePayment = await request.canMakePayment().catch((e) => { debug('canMakePayment threw: ' + e.message); return false; }); // TEMP_DEBUG
+  debug('D: canMakePayment result = ' + canMakePayment); // TEMP_DEBUG
   if (!canMakePayment) {
     throw new Error('play-billing-cannot-pay');
   }
 
-  alert('DEBUG E: about to call request.show()'); // TEMP_DEBUG
+  debug('E: about to call request.show()'); // TEMP_DEBUG
   const response = await request.show();
-  alert('DEBUG F: request.show() resolved'); // TEMP_DEBUG
+  debug('F: request.show() resolved'); // TEMP_DEBUG
   const { purchaseToken } = response.details || {};
   if (!purchaseToken) {
     await response.complete('fail').catch(() => {});
@@ -96,8 +96,9 @@ export async function getPlayProductDetails(skus) {
 //
 // `trialCategory` is required only when sku === TRIAL_SKU — see
 // verify-play-purchase.js.
-export async function buyAndGrant({ sku, userId, accessToken, trialCategory }) {
-  const { purchaseToken } = await purchaseWithPlayBilling(sku);
+export async function buyAndGrant({ sku, userId, accessToken, trialCategory }, debug = () => {}) {
+  const { purchaseToken } = await purchaseWithPlayBilling(sku, debug);
+  debug('G: purchaseWithPlayBilling returned a token, calling verify-play-purchase'); // TEMP_DEBUG
 
   const res = await fetch('/.netlify/functions/verify-play-purchase', {
     method: 'POST',
