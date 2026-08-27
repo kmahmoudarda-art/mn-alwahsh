@@ -234,6 +234,28 @@ async function upsertProduct(accessToken, spec, pricing) {
   return { sku: spec.sku, status: `FAILED (${res.status}): ${text}` };
 }
 
+async function activateAllPurchaseOptions(accessToken, skus) {
+  const requests = skus.map((sku) => ({
+    activatePurchaseOptionRequest: {
+      packageName: PACKAGE_NAME,
+      productId: sku,
+      purchaseOptionId: 'buy',
+    },
+  }));
+
+  // Up to 100 per call; we have 71, so one call covers everything.
+  const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${PACKAGE_NAME}/oneTimeProducts/-/purchaseOptions:batchUpdateStates`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ requests }),
+  });
+  if (!res.ok) {
+    throw new Error(`activate batch failed: ${res.status} ${await res.text()}`);
+  }
+  return res.json();
+}
+
 async function main() {
   console.log(`Creating one-time products for ${PACKAGE_NAME}...\n`);
   const accessToken = await getAccessToken();
@@ -273,8 +295,17 @@ async function main() {
     console.log(`\n${failed.length} failed — re-run this script after fixing the cause (upserts are safe to repeat):`);
     failed.forEach((r) => console.log(`  - ${r.sku}: ${r.status}`));
     process.exitCode = 1;
-  } else {
-    console.log('\nAll products created. Double check in Play Console \u2192 Monetise with Play \u2192 One-time products that they show up, then activate the "buy" purchase option on each if it isn\'t already ACTIVE.');
+    return;
+  }
+
+  console.log('\nActivating all "buy" purchase options in one batch call...');
+  try {
+    const activated = await activateAllPurchaseOptions(accessToken, results.map((r) => r.sku));
+    console.log(`✓ Activated ${activated.oneTimeProducts?.length ?? results.length} purchase options.`);
+  } catch (e) {
+    console.log(`✖ ${e.message}`);
+    console.log('Products were still created successfully — you can activate them manually in Play Console, or re-run this script (upserting is safe and it will retry activation).');
+    process.exitCode = 1;
   }
 }
 
