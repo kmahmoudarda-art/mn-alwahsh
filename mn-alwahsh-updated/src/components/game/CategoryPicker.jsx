@@ -103,27 +103,17 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   // signed-in Supabase session (its access token is what lets
   // verify-play-purchase.js insert into `purchases` under the existing RLS
   // policy — see entitlements.js).
-  // TEMP_DEBUG: on-screen log, since alert() gets silently suppressed after
-  // the first call inside a TWA — visible text in the page works reliably
-  // everywhere instead.
-  const [debugLog, setDebugLog] = useState([]);
-  const debug = (msg) => setDebugLog((prev) => [...prev, msg]);
-
   const withSession = async (fn) => {
     setUnlockError(null);
     setUnlocking(true);
-    debug('1: button tapped, starting purchase flow'); // TEMP_DEBUG
     try {
       const session = await getValidSession();
-      debug('2: got session, has token: ' + !!session?.access_token); // TEMP_DEBUG
       if (!session?.access_token || !session?.user?.id) {
         setUnlockError('يجب تسجيل الدخول أولاً');
         return;
       }
       await fn(session);
-      debug('3: purchase flow completed without throwing'); // TEMP_DEBUG
     } catch (err) {
-      debug('ERROR: ' + (err?.message || String(err))); // TEMP_DEBUG
       console.error('[CategoryPicker] purchase failed:', err);
       setUnlockError('تعذر إتمام عملية الشراء — حاول مرة أخرى');
     } finally {
@@ -134,13 +124,13 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   const handleUnlock = (name) => withSession(async (session) => {
     const sku = getSkuForCategory(name);
     if (!sku) { setUnlockError('هذه الفئة غير متاحة للشراء حالياً'); return; }
-    await buyAndGrant({ sku, userId: session.user.id, accessToken: session.access_token }, debug); // TEMP_DEBUG
+    await buyAndGrant({ sku, userId: session.user.id, accessToken: session.access_token });
     loadEntitlements();
     setUnlockPromptFor(null);
   });
 
   const handleUnlockAll = () => withSession(async (session) => {
-    await buyAndGrant({ sku: ALL_CATEGORIES_SKU, userId: session.user.id, accessToken: session.access_token }, debug); // TEMP_DEBUG
+    await buyAndGrant({ sku: ALL_CATEGORIES_SKU, userId: session.user.id, accessToken: session.access_token });
     loadEntitlements();
     setUnlockPromptFor(null);
   });
@@ -153,7 +143,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
       userId: session.user.id,
       accessToken: session.access_token,
       trialCategory: name,
-    }, debug); // TEMP_DEBUG
+    });
     setTrialCategories(prev => prev.includes(name) ? prev : [...prev, name]);
     setUnlockPromptFor(null);
   });
@@ -394,12 +384,6 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                 <>
                   {unlockError && (
                     <p className="font-tajawal text-xs mb-2" style={{ color: '#FF6666' }}>{unlockError}</p>
-                  )}
-                  {debugLog.length > 0 && (
-                    // TEMP_DEBUG: on-screen log, left-to-right so it stays readable mixed with English/numbers
-                    <div dir="ltr" style={{ background: 'rgba(0,0,0,0.5)', borderRadius: 8, padding: 8, marginBottom: 8, maxHeight: 160, overflowY: 'auto', fontSize: 11, color: '#0f0', fontFamily: 'monospace', textAlign: 'left' }}>
-                      {debugLog.map((line, i) => <div key={i}>{line}</div>)}
-                    </div>
                   )}
                   {isRunningInAndroidApp() && isPlayBillingAvailable() ? (
                     <>
