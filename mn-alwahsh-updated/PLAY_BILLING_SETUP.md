@@ -17,7 +17,29 @@ Add these in the Netlify dashboard (Site settings → Environment variables), sa
 
 ## 2. Create the in-app products
 
-Play Console → your app → Monetise with Play → Products → In-app products → Create product, for each row below. Product ID must match the SKU column exactly (these are already wired into `src/utils/playProducts.js`). Price is a starting point — you can adjust anytime in Play Console without touching code.
+**Recommended — bulk-create via script (skips 71 manual clicks):**
+
+```bash
+cd mn-alwahsh-updated
+export GOOGLE_SERVICE_ACCOUNT_EMAIL="your-sa@your-project.iam.gserviceaccount.com"
+export GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="$(node -pe "JSON.stringify(require('/path/to/downloaded-key.json').private_key)")"
+export ANDROID_PACKAGE_NAME="com.mnalwahsh.twa"
+node scripts/create-play-products.mjs
+```
+
+Creates all 71 products directly as **active** — the API allows setting
+status on creation, so there's no separate "activate" step afterward like
+there is when creating them by hand. Safe to re-run: anything already
+created is skipped, not duplicated or overwritten. The service account
+needs to be invited into Play Console first (see step 1 above) with a
+permission covering in-app products (e.g. "Manage store presence").
+
+**Or manually**, if you'd rather not run the script: Play Console → your
+app → Monetise with Play → Products → One-time products (Google renamed
+"In-app products" to this) → Create product, for each row below. Product
+ID must match the SKU column exactly (already wired into
+`src/utils/playProducts.js`). Products created this way save as
+*Inactive* — activate each one afterward.
 
 Two extra products to create that aren't in the per-category list:
 
@@ -100,9 +122,9 @@ Then the 69 per-category products:
 | `cat068` | حيوانات خطرة | 11 AED |
 | `cat069` | حيوانات خطيرة | 11 AED |
 
-## 3. Activate each product
+## 3. Activate each product (manual creation only)
 
-New products save as *Inactive* — click **Activate** on each one (or select all and bulk-activate) or they won't be purchasable.
+Only needed if you created products by hand in step 2 — the script already sets them active. New products created via the UI save as *Inactive* — click **Activate** on each one (or select all and bulk-activate) or they won't be purchasable.
 
 ## 4. Test before going live
 
@@ -110,5 +132,4 @@ Play Console → Setup → License testing → add your own Google account as a 
 
 ## What this does NOT cover yet
 
-- **Bulk product creation** — the table above is manual entry via the Play Console UI. Google's Android Publisher API supports scripted creation (`inappproducts.insert`) if 71 manual entries is too tedious — ask if you want that script written.
 - **Subscriptions / recurring billing** — everything above is one-off purchases (`managed_by_android`), matching the old one-time-unlock model.
