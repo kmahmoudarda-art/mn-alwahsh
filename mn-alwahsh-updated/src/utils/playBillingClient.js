@@ -21,10 +21,37 @@
 // real Google Play Developer API server-side (never trust a client-side
 // "purchase succeeded" on its own) before writing to Supabase.
 
+import { TRIAL_SKU } from './playProducts.js';
+
 const PLAY_BILLING_METHOD = 'https://play.google.com/billing';
 
 export function isPlayBillingAvailable() {
   return typeof window !== 'undefined' && 'getDigitalGoodsService' in window;
+}
+
+// Self-heal step for TRIAL_SKU only: if Play still shows an existing,
+// unconsumed trial_pass purchase (e.g. left over from earlier testing, or
+// a player who closed the app before the previous purchase finished being
+// consumed), clear it server-side so Play will allow buying it again.
+// Silently does nothing if there's no stale purchase to clear, or if sku
+// isn't the trial — categories/the bundle must never be auto-consumed,
+// see consume-stale-trial.js.
+async function clearStaleTrialIfAny(digitalGoodsService, sku) {
+  if (sku !== TRIAL_SKU || typeof digitalGoodsService.listPurchases !== 'function') return;
+  let existing;
+  try {
+    existing = await digitalGoodsService.listPurchases();
+  } catch {
+    return; // listPurchases isn't universally supported — fine to skip
+  }
+  const stale = existing.find((p) => p.itemId === sku);
+  if (!stale?.purchaseToken) return;
+
+  await fetch('/.netlify/functions/consume-stale-trial', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sku, purchaseToken: stale.purchaseToken }),
+  }).catch(() => {}); // best-effort — if this fails, the purchase attempt below will just fail with the same "already owned" error as before, no worse off
 }
 
 // Returns { purchaseToken, productId } on success, throws on cancel/failure.
@@ -38,6 +65,8 @@ export async function purchaseWithPlayBilling(sku) {
   // Confirms Chrome can actually reach Play's billing service right now
   // (fails fast with a clearer error than letting PaymentRequest hang).
   const digitalGoodsService = await window.getDigitalGoodsService(PLAY_BILLING_METHOD);
+
+  await clearStaleTrialIfAny(digitalGoodsService, sku);
 
   const paymentMethods = [{ supportedMethods: PLAY_BILLING_METHOD, data: { sku } }];
   // Play Billing ignores this "total" — the real price is whatever was set

@@ -106,6 +106,23 @@ async function acknowledgePurchase(accessToken, productId, purchaseToken) {
   return res.ok;
 }
 
+// Consuming a managed product makes it purchasable again — required for
+// TRIAL_SKU specifically, since it's meant to be bought repeatedly (one
+// trial per game), unlike category/bundle purchases which should stay
+// permanently owned and never be consumed. Consuming also counts as
+// acknowledging (Google treats a consumed purchase as acknowledged), so
+// this replaces the acknowledge call for trial purchases rather than
+// needing both.
+async function consumePurchase(accessToken, productId, purchaseToken) {
+  const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${ANDROID_PACKAGE_NAME}/purchases/products/${productId}/tokens/${purchaseToken}:consume`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: '{}',
+  });
+  return res.ok;
+}
+
 // --- Supabase insert (mirrors entitlements.js's grant logic) -----------
 async function insertPurchases(accessToken, userId, categories) {
   const rows = categories.map((category) => ({ user_id: userId, category, platform: 'android' }));
@@ -169,10 +186,23 @@ export default async (req) => {
     }
 
     // acknowledgementState: 0 = not yet acknowledged, 1 = acknowledged.
-    // MUST acknowledge within 3 days or Google auto-refunds — do this
-    // before granting anything, so a failed acknowledge surfaces as an
-    // error rather than silently leaving the purchase to expire.
-    if (purchase.acknowledgementState === 0) {
+    // MUST acknowledge (or consume) within 3 days or Google auto-refunds —
+    // do this before granting anything, so a failure surfaces as an error
+    // rather than silently leaving the purchase to expire.
+    //
+    // Trial purchases are consumed instead of acknowledged: consuming both
+    // satisfies the acknowledge requirement AND resets the product back to
+    // purchasable, which is required since the trial can be bought
+    // repeatedly (one trial per game) — a plain acknowledge would leave it
+    // permanently "already owned" after the very first purchase, exactly
+    // like a category/bundle purchase (which SHOULD stay permanently
+    // owned, hence they use acknowledge, never consume).
+    if (isTrial) {
+      const consumed = await consumePurchase(googleAccessToken, sku, purchaseToken);
+      if (!consumed) {
+        return new Response(JSON.stringify({ error: 'consume-failed' }), { status: 502 });
+      }
+    } else if (purchase.acknowledgementState === 0) {
       const acked = await acknowledgePurchase(googleAccessToken, sku, purchaseToken);
       if (!acked) {
         return new Response(JSON.stringify({ error: 'acknowledge-failed' }), { status: 502 });
