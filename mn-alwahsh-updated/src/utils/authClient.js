@@ -5,7 +5,7 @@
 // cleanup routine in supabaseClient.js wipes every localStorage key that
 // does NOT start with that prefix on every app launch. Any other prefix
 // here would get silently deleted the moment the app reloads.
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabaseClient';
+import { SUPABASE_URL, SUPABASE_ANON_KEY, logLoginEvent } from './supabaseClient';
 
 const SESSION_KEY = 'mn_alwahsh_v3_auth_session';
 
@@ -86,6 +86,7 @@ export async function signUp(email, password) {
   const data = await authRequest('signup', { email, password });
   if (data.access_token) {
     saveSession(data);
+    logLoginEvent(email); // fire-and-forget — see logLoginEvent() in supabaseClient.js
     return { needsEmailConfirmation: false, user: data.user };
   }
   return { needsEmailConfirmation: true };
@@ -94,6 +95,7 @@ export async function signUp(email, password) {
 export async function signIn(email, password) {
   const data = await authRequest('token?grant_type=password', { email, password });
   saveSession(data);
+  logLoginEvent(email); // fire-and-forget — see logLoginEvent() in supabaseClient.js
   return data.user;
 }
 

@@ -544,3 +544,21 @@ export async function logAppOpen() {
     });
   } catch {}
 }
+
+// Logs which platform a sign-in came from, tied to the email — separate
+// from logAppOpen() (anonymous, no email) since this one identifies who
+// signed in. Called from authClient.js right after a successful sign-in.
+// See supabase-migrations/login_events.sql for the table and the query to
+// check "did my testers sign in from Android or web".
+export async function logLoginEvent(email) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/login_events`, {
+      method: 'POST',
+      headers: { ...BASE_HEADERS, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({
+        email,
+        platform: isRunningInAndroidApp() ? 'android_app' : 'web',
+      }),
+    });
+  } catch {}
+}
