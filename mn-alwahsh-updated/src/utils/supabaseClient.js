@@ -1,3 +1,5 @@
+import { isRunningInAndroidApp } from './platform.js';
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://cqqeyvhofbnvjemoihca.supabase.co';
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxcWV5dmhvZmJudmplbW9paGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MDg5ODIsImV4cCI6MjA5MjQ4NDk4Mn0.y_1B1Gy8EIEFpVrJu9TKX1fPSBfR1jFVrcgO1PA1-hs';
 export { SUPABASE_URL, SUPABASE_ANON_KEY };
@@ -522,4 +524,23 @@ export async function fetchGameCount() {
     const data = await res.json();
     return Array.isArray(data) ? data.length : null;
   } catch { return null; }
+}
+
+// Logs one row per real app launch — a first-party, honest engagement
+// signal that isn't dependent on Play Console's own dashboards (which can
+// under-report for TWA apps) or any third-party testing service's claims.
+// Fire-and-forget: never blocks app startup, never surfaces an error to
+// the user if it fails. See supabase-migrations/app_opens.sql for the
+// table this writes to.
+export async function logAppOpen() {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/app_opens`, {
+      method: 'POST',
+      headers: { ...BASE_HEADERS, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({
+        platform: isRunningInAndroidApp() ? 'android_app' : 'web',
+        user_agent: navigator.userAgent,
+      }),
+    });
+  } catch {}
 }

@@ -1,10 +1,12 @@
 import { Toaster } from "@/components/ui/toaster"
+import { useEffect } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import { logAppOpen } from '@/utils/supabaseClient';
 // Add page imports here
 import Game from './pages/Game';
 import Login from './pages/Login';
@@ -49,6 +51,15 @@ const AuthenticatedApp = () => {
 
 
 function App() {
+  // Fires once per real app launch — regardless of auth state, since a
+  // visitor should count as an open even before/without signing in. See
+  // logAppOpen() in supabaseClient.js and supabase-migrations/app_opens.sql
+  // for what this feeds — a first-party, honest engagement signal that
+  // isn't dependent on Play Console's own (sometimes-lagging) dashboards.
+  useEffect(() => {
+    logAppOpen();
+  }, []);
+
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
