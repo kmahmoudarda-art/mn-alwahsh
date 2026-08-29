@@ -6,7 +6,7 @@
   "display": "standalone",
   "background_color": "#050000",
   "theme_color": "#CC0000",
-  "orientation": "any",
+  "orientation": "landscape",
   "lang": "ar",
   "dir": "rtl",
   "icons": [
