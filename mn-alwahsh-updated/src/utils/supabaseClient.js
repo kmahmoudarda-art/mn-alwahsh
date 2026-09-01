@@ -266,14 +266,18 @@ async function fetchRowsFromTable(table, category, points) {
 
 // Mark a question as used in the correct table
 async function markQuestionUsed(row, table) {
+  // Match normalizeRow()'s own fallback: use a real id if the row has one,
+  // regardless of which table it's in — some Sin-Jim1/kids rows have no real
+  // id and rely on slot, just like Fam always does. Checking by table name
+  // alone missed those rows (silently never marked used).
   let filter;
-  if (table === TABLE_FAM || table === TABLE_KIDS) {
-    // These tables use slot as key instead of id
+  const id = row.id ?? row.question_id ?? row.ID ?? row.rowid;
+  if (id != null) {
+    filter = `id=eq.${encodeURIComponent(id)}`;
+  } else if (row.slot != null) {
     filter = `category=eq.${encodeURIComponent(row.category)}&points=eq.${row.points}&slot=eq.${encodeURIComponent(row.slot)}`;
   } else {
-    const id = row.id ?? row.question_id ?? row.ID ?? row.rowid;
-    if (!id) return;
-    filter = `id=eq.${encodeURIComponent(id)}`;
+    return;
   }
   await fetch(`${SUPABASE_URL}/rest/v1/${table}?${filter}`, {
     method: 'PATCH',
@@ -472,8 +476,13 @@ export async function reportQuestion(question) {
   if (!question || question.id == null || !question.source_table) return { ok: false };
   const { id, source_table } = question;
 
+  // Rows without a real primary key (Fam always, and some Sin-Jim1/kids rows —
+  // see normalizeRow()) use a composite "category|points|slot" id. Detect this
+  // by the id's shape, not by which table it came from — a "|" id sent as
+  // id=eq.<value> to a table with a real integer id column throws a 400
+  // (type mismatch), which is what was breaking reports on those rows.
   let filter;
-  if (source_table === TABLE_FAM && typeof id === 'string' && id.includes('|')) {
+  if (typeof id === 'string' && id.includes('|')) {
     const [fCategory, fPoints, fSlot] = id.split('|');
     filter = `category=eq.${encodeURIComponent(fCategory)}&points=eq.${encodeURIComponent(fPoints)}&slot=eq.${encodeURIComponent(fSlot)}`;
   } else {
@@ -484,9 +493,15 @@ export async function reportQuestion(question) {
     const getRes = await fetch(`${SUPABASE_URL}/rest/v1/${source_table}?select=report_count&${filter}&limit=1`, {
       headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' },
     });
-    if (!getRes.ok) return { ok: false };
+    if (!getRes.ok) {
+      console.error('[reportQuestion] GET failed', source_table, getRes.status, await getRes.text().catch(() => ''));
+      return { ok: false };
+    }
     const rows = await getRes.json();
-    if (!rows.length) return { ok: false };
+    if (!rows.length) {
+      console.error('[reportQuestion] no matching row', source_table, filter);
+      return { ok: false };
+    }
 
     const nextCount = (rows[0].report_count || 0) + 1;
 
