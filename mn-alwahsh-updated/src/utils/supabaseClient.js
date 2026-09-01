@@ -429,7 +429,14 @@ async function getIpInfo() {
 
 export async function insertGameSession({ game_name, team1_name, team2_name, categories }) {
   const ipInfo = await getIpInfo();
+  // id is text NOT NULL with no database default — must be supplied here,
+  // or every insert fails on a NOT NULL violation (this was happening
+  // silently before; see the comment in game_sessions_missing_columns.sql).
+  const id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const payload = {
+    id,
     game_name,
     team1_name,
     team2_name,
@@ -449,21 +456,25 @@ export async function insertGameSession({ game_name, team1_name, team2_name, cat
       headers: { ...BASE_HEADERS, 'Content-Type': 'application/json', Prefer: 'return=representation' },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error('[insertGameSession] failed', res.status, await res.text().catch(() => ''));
+      return null;
+    }
     const rows = await res.json();
     return rows?.[0]?.id ?? null;
-  } catch { return null; }
+  } catch (e) { console.error('[insertGameSession] error', e); return null; }
 }
 
 export async function updateGameSession(id, { status, winner, team1_score, team2_score }) {
   if (!id) return;
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/game_sessions?id=eq.${encodeURIComponent(id)}`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/game_sessions?id=eq.${encodeURIComponent(id)}`, {
       method: 'PATCH',
       headers: { ...BASE_HEADERS, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
       body: JSON.stringify({ status, winner, team1_score, team2_score, ended_at: new Date().toISOString() }),
     });
-  } catch {}
+    if (!res.ok) console.error('[updateGameSession] failed', res.status, await res.text().catch(() => ''));
+  } catch (e) { console.error('[updateGameSession] error', e); }
 }
 
 // ─── Question reporting ────────────────────────────────────────────────────
