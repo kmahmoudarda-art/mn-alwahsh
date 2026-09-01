@@ -155,8 +155,13 @@ function getReportedIdsForTable(table) {
 // normalizeRow/reportQuestion) — Fam is excluded via client-side filtering
 // instead, in fetchOneRandom/fetchRowsFromTable below.
 function reportedIdFilter(table) {
-  if (table === TABLE_FAM) return '';
-  const ids = getReportedIdsForTable(table);
+  // Composite "category|points|slot" ids (see normalizeRow) can't be
+  // expressed in an id=not.in.(...) filter against a real bigint id
+  // column — sending one throws a 400, and since this filter applies to
+  // every fetch from the table (not just the reported row), one reported
+  // slot-based question used to break ALL future fetches for that table.
+  // Skip composite ids by shape; only real ids get excluded this way.
+  const ids = getReportedIdsForTable(table).filter(id => !String(id).includes('|'));
   if (!ids.length) return '';
   return `&id=not.in.(${ids.map(encodeURIComponent).join(',')})`;
 }
