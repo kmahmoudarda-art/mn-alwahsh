@@ -7,7 +7,7 @@
   "display": "standalone",
   "background_color": "#0a0000",
   "theme_color": "#CC0000",
-  "orientation": "portrait",
+  "orientation": "Landscape",
   "lang": "ar",
   "dir": "rtl",
   "categories": ["games", "entertainment", "trivia"],
