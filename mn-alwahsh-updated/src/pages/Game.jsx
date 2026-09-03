@@ -308,12 +308,12 @@ export default function Game() {
     setGamePhase('playing');
     startPregeneration(allCategories);
     insertGameSession({
-      game_name: setup.gameName || null,
+      game_name: gameName || null,
       team1_name: setup.team1.name,
       team2_name: setup.team2.name,
       categories: allCategories,
     }).then(id => { gameSessionIdRef.current = id; });
-  }, [startPregeneration, generateBonusTiles, generateTrapTile]);
+  }, [startPregeneration, generateBonusTiles, generateTrapTile, gameName]);
 
   const getQuestion = useCallback(async (category, points) => {
     const prevAnswers = usedAnswersRef.current[category] || [];
@@ -761,7 +761,7 @@ export default function Game() {
   }
 
   if (gamePhase === 'setup') {
-    return <SetupScreen onStartGame={handleStartGame} />;
+    return <SetupScreen onStartGame={handleStartGame} gameName={gameName} />;
   }
 
   if (gamePhase === 'finished') {
@@ -871,6 +871,15 @@ export default function Game() {
       {showLuckyPopup && <LuckyDoublePopup teamName={luckyCell ? teams[luckyCell.losingTeam]?.name : ''} />}
 
       <ScoreBar team1={teams[1]} team2={teams[2]} currentTeam={currentTeam} onAdjust={handleAdjustScore} onBack={handleExit} modalOpen={modalOpen} />
+
+      {gameName && (
+        <div
+          className="relative text-center font-tajawal"
+          style={{ fontSize: 11, color: 'rgba(255,215,0,0.75)', zIndex: 6, marginTop: -4 }}
+        >
+          🎮 {gameName}
+        </div>
+      )}
 
       {/* ── Active-team glow beam under score bar ── */}
       {/* Outer wide bloom */}

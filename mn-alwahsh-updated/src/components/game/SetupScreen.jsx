@@ -16,7 +16,7 @@ function SelectedCategoryColumn({ categories, teamName, side, onRemove }) {
   const border = isRed ? 'rgba(204,0,0,0.5)' : 'rgba(17,85,204,0.5)';
 
   return (
-    <div style={{
+    <div className="side-col" style={{
       position: 'fixed',
       top: 0,
       [side]: 0,
@@ -53,6 +53,7 @@ function SelectedCategoryColumn({ categories, teamName, side, onRemove }) {
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
               onClick={() => onRemove(categories[i])}
               title="اضغط لإزالة الفئة"
+              className="side-col-card"
               style={{
                 width: 68, minHeight: 68,
                 borderRadius: 12,
@@ -82,6 +83,7 @@ function SelectedCategoryColumn({ categories, teamName, side, onRemove }) {
               key={`empty-${i}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
+              className="side-col-card"
               style={{
                 width: 68, height: 68, borderRadius: 12,
                 border: `1.5px dashed ${border}`,
@@ -95,10 +97,10 @@ function SelectedCategoryColumn({ categories, teamName, side, onRemove }) {
   );
 }
 
-export default function SetupScreen({ onStartGame }) {
+export default function SetupScreen({ onStartGame, gameName }) {
   const navigate = useNavigate();
-  const [team1Name, setTeam1Name] = useState('Monster Red');
-  const [team2Name, setTeam2Name] = useState('Monster Blue');
+  const [team1Name, setTeam1Name] = useState('وحش أحمر');
+  const [team2Name, setTeam2Name] = useState('وحش أزرق');
   const [team1Categories, setTeam1Categories] = useState([]);
   const [team2Categories, setTeam2Categories] = useState([]);
   const currentUser = getCurrentUser();
@@ -118,13 +120,13 @@ export default function SetupScreen({ onStartGame }) {
   const handleStart = () => {
     if (!isValid) return;
     onStartGame({
-      team1: { name: team1Name.trim() || 'Monster Red', categories: team1Categories },
-      team2: { name: team2Name.trim() || 'Monster Blue', categories: team2Categories },
+      team1: { name: team1Name.trim() || 'وحش أحمر', categories: team1Categories },
+      team2: { name: team2Name.trim() || 'وحش أزرق', categories: team2Categories },
     });
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" dir="rtl" style={{ background: '#0a0000' }}>
+    <div className="setup-wrapper min-h-screen flex items-center justify-center p-4 relative overflow-hidden" dir="rtl" style={{ background: '#0a0000' }}>
       <div className="absolute inset-0 pointer-events-none" style={{
         backgroundImage: 'url(/bg-setup.jpeg)',
         backgroundSize: 'cover', backgroundPosition: 'center', zIndex: 0,
@@ -188,13 +190,13 @@ export default function SetupScreen({ onStartGame }) {
       {/* Side columns — only on setup page */}
       <SelectedCategoryColumn
         categories={team1Categories}
-        teamName={team1Name.trim() || 'Monster Red'}
+        teamName={team1Name.trim() || 'وحش أحمر'}
         side="right"
         onRemove={(name) => toggleCategory(1, name)}
       />
       <SelectedCategoryColumn
         categories={team2Categories}
-        teamName={team2Name.trim() || 'Monster Blue'}
+        teamName={team2Name.trim() || 'وحش أزرق'}
         side="left"
         onRemove={(name) => toggleCategory(2, name)}
       />
@@ -217,6 +219,11 @@ export default function SetupScreen({ onStartGame }) {
             من الوحش
           </motion.h1>
           <p className="text-lg font-tajawal" style={{ color: '#FF6666', textShadow: '0 0 6px rgba(204,0,0,0.5)' }}>لعبة المعرفة والتحدي</p>
+          {gameName && (
+            <p className="font-tajawal text-sm mt-1" style={{ color: 'rgba(255,215,0,0.85)' }}>
+              🎮 لعبة: {gameName}
+            </p>
+          )}
         </div>
 
         {/* Start button — TOP */}
@@ -307,7 +314,7 @@ function TeamSetupCard({ teamNumber, teamName, onNameChange, categories, onToggl
       </div>
 
       <Input
-        placeholder={teamNumber === 1 ? 'Monster Red' : 'Monster Blue'}
+        placeholder={teamNumber === 1 ? 'وحش أحمر' : 'وحش أزرق'}
         value={teamName}
         onChange={(e) => onNameChange(e.target.value)}
         className="mb-3 font-cairo text-base h-12"

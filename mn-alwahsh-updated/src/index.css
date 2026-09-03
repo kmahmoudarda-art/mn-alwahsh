@@ -237,6 +237,37 @@ html, body {
   -webkit-overflow-scrolling: auto;
 }
 
+/* ── Reserve space for fixed vertical side panels ──
+   Both the setup screen's category columns (SetupScreen.jsx, 80px wide)
+   and the game board's team-score columns (Game.jsx, 52px wide) are
+   position:fixed, full viewport height, on the left/right screen edges.
+   Nothing reserved that space on the main content, so in portrait —
+   where the viewport is narrow enough for the centered content to reach
+   the edges — the setup form's team cards and the board's category
+   headings/point tiles rendered UNDERNEATH those fixed panels and were
+   cut off (M-02, M-03). This padding keeps content clear of them at
+   every viewport width, not just portrait, so there's no regression in
+   landscape either. */
+.setup-wrapper {
+  padding-left: 84px;
+  padding-right: 84px;
+  box-sizing: border-box;
+}
+@media (max-width: 420px) {
+  .setup-wrapper { padding-left: 68px; padding-right: 68px; }
+}
+
+.gb-board-wrapper,
+.gb-zoom-controls {
+  padding-left: 52px;
+  padding-right: 52px;
+  box-sizing: border-box;
+}
+@media (max-width: 420px) {
+  .gb-board-wrapper,
+  .gb-zoom-controls { padding-left: 44px; padding-right: 44px; }
+}
+
 /* ── Landscape phone: compact game board ── */
 @media (orientation: landscape) and (max-height: 600px) {
   .gb-board { padding-left: 2px !important; padding-right: 2px !important; }

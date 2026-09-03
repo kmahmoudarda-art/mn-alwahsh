@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Gamepad2, BookOpen, Download, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -146,6 +147,7 @@ export default function GameNameScreen({ onEnter }) {
   const [user, setUser] = useState(getCurrentUser());
   // 'account' = login/signup form, 'guest' = plain name entry, skipping account
   const [entryMode, setEntryMode] = useState('account');
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
 
   const isIOS = checkIsIOS();
   const isStandalone = checkIsStandalone();
@@ -429,7 +431,7 @@ export default function GameNameScreen({ onEnter }) {
                 </motion.div>
                 <button
                   type="button"
-                  onClick={handleSignOut}
+                  onClick={() => setShowSignOutConfirm(true)}
                   className="w-full font-tajawal text-xs py-1"
                   style={{ color: '#FF9999' }}
                 >
@@ -501,6 +503,63 @@ export default function GameNameScreen({ onEnter }) {
           </div>
         </motion.div>
       </div>
+
+      {/* Sign-out confirmation — same protective pattern as the restart/end-game overlays in Game.jsx */}
+      {showSignOutConfirm && createPortal(
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 99999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(6px)',
+        }}>
+          <div style={{
+            background: 'linear-gradient(160deg, #1a0000 0%, #0d0000 100%)',
+            border: '1.5px solid rgba(200,0,0,0.5)',
+            borderRadius: 16, padding: '32px 36px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20,
+            boxShadow: '0 0 40px rgba(180,0,0,0.3)',
+            minWidth: 280,
+          }}>
+            <span style={{ fontSize: 40 }}>🚪</span>
+            <p style={{
+              fontFamily: 'var(--font-cairo)', fontWeight: 800, fontSize: 20,
+              color: '#FFE0E0', textAlign: 'center', margin: 0, direction: 'rtl',
+            }}>
+              تسجيل الخروج؟
+            </p>
+            <p style={{
+              fontFamily: 'var(--font-cairo)', fontWeight: 600, fontSize: 14,
+              color: 'rgba(255,180,180,0.7)', textAlign: 'center', margin: 0, direction: 'rtl',
+            }}>
+              ستحتاج لتسجيل الدخول مرة أخرى للعب
+            </p>
+            <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
+              <button
+                onClick={() => { setShowSignOutConfirm(false); handleSignOut(); }}
+                style={{
+                  padding: '10px 28px', borderRadius: 10,
+                  background: 'rgba(180,0,0,0.85)', border: '1px solid rgba(255,60,60,0.6)',
+                  color: '#FFE0E0', fontFamily: 'var(--font-cairo)', fontWeight: 800,
+                  fontSize: 15, cursor: 'pointer',
+                }}
+              >
+                نعم، تسجيل الخروج
+              </button>
+              <button
+                onClick={() => setShowSignOutConfirm(false)}
+                style={{
+                  padding: '10px 22px', borderRadius: 10,
+                  background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)',
+                  color: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-cairo)', fontWeight: 700,
+                  fontSize: 15, cursor: 'pointer',
+                }}
+              >
+                رجوع
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

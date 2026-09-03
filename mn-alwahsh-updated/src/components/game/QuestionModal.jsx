@@ -276,6 +276,7 @@ export default function QuestionModal({
     catch { return new Set(); }
   });
   const [reporting, setReporting] = useState(false);
+  const [justReported, setJustReported] = useState(false);
   const [singerPhotoUrl, setSingerPhotoUrl] = useState(null);
   const closeTimeoutRef = useRef(null);
   const lastTapRef = useRef(0);
@@ -297,7 +298,7 @@ export default function QuestionModal({
     };
   }, []);
 
-  useEffect(() => { setSwapCount(0); }, [category, points]);
+  useEffect(() => { setSwapCount(0); setJustReported(false); }, [category, points]);
 
   useEffect(() => {
     setSingerPhotoUrl(null);
@@ -338,7 +339,7 @@ export default function QuestionModal({
   };
 
   const handleReport = async () => {
-    if (!question || question.id == null || reporting) return;
+    if (!question || question.id == null || reporting || justReported) return;
     const key = `${question.source_table}:${question.id}`;
     if (reportedIds.has(key)) { toast('تم الإبلاغ عن هذا السؤال من قبل'); return; }
 
@@ -356,10 +357,19 @@ export default function QuestionModal({
     setReportedIds(next);
     try { localStorage.setItem('mn_alwahsh_reported_qs', JSON.stringify([...next])); } catch {}
 
+    // Show a clear Arabic "sent" state in place of the report button before
+    // swapping to a new question. Previously the question changed out from
+    // under the player the instant the report succeeded, with no visible
+    // confirmation it was actually accepted, and no protection against a
+    // rapid double-click during that instant (S-04).
+    setReporting(false);
+    setJustReported(true);
+    await new Promise(resolve => setTimeout(resolve, 900));
+
     // Always line up a replacement question for this tile, whether the
     // report came before or after answering.
     const newQ = await fetchSwapQuestion(category, points, question.id, question.source_table);
-    setReporting(false);
+    setJustReported(false);
 
     // wasAnswered tells the parent whether it needs to reverse a score —
     // reported before answering is just a swap, same as the 🔄 button.
@@ -807,11 +817,18 @@ export default function QuestionModal({
                             background: GOLD_BG, color: '#000', border: `1px solid ${GOLD_BORDER}`,
                             fontFamily:'var(--font-cairo)', cursor: 'pointer',
                           }}>🔄 تغيير سؤال مكرر</button>
-                        <button onClick={handleReport} disabled={reporting}
-                          style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
-                            background: 'rgba(80,0,0,0.5)', color: '#FF9999', border: '1px solid rgba(255,60,60,0.35)',
-                            fontFamily:'var(--font-cairo)', cursor: 'pointer',
-                          }}>🚩 إبلاغ عن خطأ</button>
+                        {justReported ? (
+                          <span style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
+                            background: 'rgba(0,150,0,0.15)', color: '#4ade80', border: '1px solid rgba(74,222,128,0.4)',
+                            fontFamily:'var(--font-cairo)', display:'inline-block',
+                          }}>✅ تم الإبلاغ</span>
+                        ) : (
+                          <button onClick={handleReport} disabled={reporting}
+                            style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
+                              background: 'rgba(80,0,0,0.5)', color: '#FF9999', border: '1px solid rgba(255,60,60,0.35)',
+                              fontFamily:'var(--font-cairo)', cursor: 'pointer',
+                            }}>🚩 إبلاغ عن خطأ</button>
+                        )}
                       </div>
                     )}
                   </>
@@ -953,11 +970,18 @@ export default function QuestionModal({
                             background: GOLD_BG, color: '#000', border: `1px solid ${GOLD_BORDER}`,
                             fontFamily:'var(--font-cairo)', cursor: 'pointer',
                           }}>🔄 تغيير سؤال مكرر</button>
-                        <button onClick={handleReport} disabled={reporting}
-                          style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
-                            background: 'rgba(80,0,0,0.5)', color: '#FF9999', border: '1px solid rgba(255,60,60,0.35)',
-                            fontFamily:'var(--font-cairo)', cursor: 'pointer',
-                          }}>🚩 إبلاغ عن خطأ</button>
+                        {justReported ? (
+                          <span style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
+                            background: 'rgba(0,150,0,0.15)', color: '#4ade80', border: '1px solid rgba(74,222,128,0.4)',
+                            fontFamily:'var(--font-cairo)', display:'inline-block',
+                          }}>✅ تم الإبلاغ</span>
+                        ) : (
+                          <button onClick={handleReport} disabled={reporting}
+                            style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
+                              background: 'rgba(80,0,0,0.5)', color: '#FF9999', border: '1px solid rgba(255,60,60,0.35)',
+                              fontFamily:'var(--font-cairo)', cursor: 'pointer',
+                            }}>🚩 إبلاغ عن خطأ</button>
+                        )}
                       </div>
                     )}
                   </>
@@ -1027,11 +1051,18 @@ export default function QuestionModal({
                           background: GOLD_BG, color: '#000', border: `1px solid ${GOLD_BORDER}`,
                           fontFamily:'var(--font-cairo)', cursor: 'pointer',
                         }}>🔄 تغيير سؤال مكرر</button>
+                      {justReported ? (
+                        <span style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
+                          background: 'rgba(0,150,0,0.15)', color: '#4ade80', border: '1px solid rgba(74,222,128,0.4)',
+                          fontFamily:'var(--font-cairo)', display:'inline-block',
+                        }}>✅ تم الإبلاغ</span>
+                      ) : (
                         <button onClick={handleReport} disabled={reporting}
                           style={{ whiteSpace:'nowrap', padding:'6px 10px', fontSize:12, borderRadius:20, flexShrink:0,
                             background: 'rgba(80,0,0,0.5)', color: '#FF9999', border: '1px solid rgba(255,60,60,0.35)',
                             fontFamily:'var(--font-cairo)', cursor: 'pointer',
                           }}>🚩 إبلاغ عن خطأ</button>
+                      )}
                     </div>
                   )}
 
@@ -1111,11 +1142,18 @@ export default function QuestionModal({
                 )}
                 <div style={{ display:'flex', gap:8, justifyContent:'center', flexWrap:'wrap' }}>
                   <Button onClick={onClose} className="font-cairo bg-primary text-primary-foreground hover:bg-primary/90">متابعة</Button>
-                  <button onClick={handleReport} disabled={reporting}
-                    style={{ padding:'8px 14px', fontSize:12, borderRadius:20,
-                      background: 'rgba(204,0,0,0.08)', color: '#CC0000', border: '1px solid rgba(204,0,0,0.3)',
-                      fontFamily:'var(--font-cairo)', cursor: 'pointer',
-                    }}>🚩 إبلاغ عن خطأ في السؤال</button>
+                  {justReported ? (
+                    <span style={{ padding:'8px 14px', fontSize:12, borderRadius:20,
+                      background: 'rgba(34,197,94,0.1)', color: '#16a34a', border: '1px solid rgba(34,197,94,0.3)',
+                      fontFamily:'var(--font-cairo)', display:'inline-block',
+                    }}>✅ تم الإبلاغ</span>
+                  ) : (
+                    <button onClick={handleReport} disabled={reporting}
+                      style={{ padding:'8px 14px', fontSize:12, borderRadius:20,
+                        background: 'rgba(204,0,0,0.08)', color: '#CC0000', border: '1px solid rgba(204,0,0,0.3)',
+                        fontFamily:'var(--font-cairo)', cursor: 'pointer',
+                      }}>🚩 إبلاغ عن خطأ في السؤال</button>
+                  )}
                 </div>
               </motion.div>
             )}
