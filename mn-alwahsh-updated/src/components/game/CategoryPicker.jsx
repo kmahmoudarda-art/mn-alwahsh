@@ -65,6 +65,59 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   // for a new game. See TRIAL_PRICE_ANDROID note in premiumConfig.js.
   const [trialCategories, setTrialCategories] = useState([]);
 
+  // ── Request-a-category flow ──
+  // No automated payment yet (see send-category-request.js) — this just
+  // emails the request to the admin and logs it in Supabase so nothing
+  // gets lost; the 25 AED is arranged directly with the requester.
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [requestCategoryName, setRequestCategoryName] = useState('');
+  const [requestDetails, setRequestDetails] = useState('');
+  const [requestSending, setRequestSending] = useState(false);
+  const [requestSent, setRequestSent] = useState(false);
+  const [requestError, setRequestError] = useState(null);
+
+  async function handleSendCategoryRequest() {
+    if (!requestCategoryName.trim()) {
+      setRequestError('الرجاء كتابة اسم الفئة');
+      return;
+    }
+    setRequestSending(true);
+    setRequestError(null);
+    try {
+      const session = await getValidSession();
+      if (!session?.access_token || !session?.user?.id) {
+        setRequestError('الرجاء تسجيل الدخول أولاً');
+        setRequestSending(false);
+        return;
+      }
+      const res = await fetch('/.netlify/functions/send-category-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: session.user.id,
+          accessToken: session.access_token,
+          userEmail: session.user.email,
+          categoryName: requestCategoryName,
+          details: requestDetails,
+        }),
+      });
+      if (!res.ok) throw new Error('send-failed');
+      setRequestSent(true);
+    } catch {
+      setRequestError('تعذّر إرسال الطلب، حاول لاحقاً');
+    } finally {
+      setRequestSending(false);
+    }
+  }
+
+  function closeRequestModal() {
+    setShowRequestModal(false);
+    setRequestCategoryName('');
+    setRequestDetails('');
+    setRequestSent(false);
+    setRequestError(null);
+  }
+
   const loadEntitlements = () => {
     fetchUnlockedCategories().then(setUnlockedCategories);
   };
@@ -199,6 +252,25 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
       >
         <span style={{ fontSize: 18 }}>🎲</span>
         اختيار عشوائي
+      </motion.button>
+
+      {/* Request a new category */}
+      <motion.button
+        whileTap={{ scale: 0.92 }}
+        onClick={() => setShowRequestModal(true)}
+        dir="rtl"
+        className="w-full mb-3 flex items-center justify-center gap-2 rounded-xl font-cairo font-bold"
+        style={{
+          padding: '10px 16px',
+          background: 'linear-gradient(135deg, rgba(255,215,0,0.14), rgba(255,165,0,0.08))',
+          border: '1.5px solid rgba(255,215,0,0.5)',
+          color: '#FFD700',
+          fontSize: 14,
+          cursor: 'pointer',
+        }}
+      >
+        <span style={{ fontSize: 18 }}>🎯</span>
+        اطلب فئة جديدة — 25 درهم
       </motion.button>
 
       {hasLockedCategories && !isSignedIn() && (
@@ -456,6 +528,114 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                   >
                     إلغاء
                   </button>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Request-a-category modal */}
+      <AnimatePresence>
+        {showRequestModal && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={(e) => e.target === e.currentTarget && closeRequestModal()}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'rgba(0,0,0,0.75)', padding: 16,
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              dir="rtl"
+              style={{
+                width: '100%', maxWidth: 340,
+                background: 'linear-gradient(135deg, #2a0000, #140000)',
+                border: '1.5px solid #FFD700',
+                borderRadius: 16,
+                padding: 24,
+                textAlign: 'center',
+                boxShadow: '0 0 30px rgba(255,215,0,0.25)',
+              }}
+            >
+              {requestSent ? (
+                <>
+                  <span style={{ fontSize: 40 }}>✅</span>
+                  <h3 className="font-cairo font-bold text-lg mt-2 mb-1" style={{ color: '#FFE4E4' }}>
+                    تم إرسال طلبك!
+                  </h3>
+                  <p className="font-tajawal text-sm mb-4" style={{ color: 'rgba(255,200,200,0.8)' }}>
+                    سنتواصل معك قريبًا لترتيب الدفع (25 درهم) وإضافة الفئة
+                  </p>
+                  <button
+                    onClick={closeRequestModal}
+                    className="w-full font-cairo font-bold rounded-xl py-3"
+                    style={{ background: '#FFD700', color: '#2a0000' }}
+                  >
+                    تم
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span style={{ fontSize: 32 }}>🎯</span>
+                  <h3 className="font-cairo font-bold text-lg mt-1 mb-1" style={{ color: '#FFE4E4' }}>
+                    اطلب فئة جديدة
+                  </h3>
+                  <p className="font-tajawal text-xs mb-4" style={{ color: '#FFD700' }}>
+                    السعر 25 درهم — سنتواصل معك لترتيب الدفع بعد استلام طلبك
+                  </p>
+
+                  {isSignedIn() ? (
+                    <>
+                      {requestError && (
+                        <p className="font-tajawal text-xs mb-2" style={{ color: '#FF6666' }}>{requestError}</p>
+                      )}
+                      <input
+                        type="text"
+                        value={requestCategoryName}
+                        onChange={(e) => setRequestCategoryName(e.target.value)}
+                        placeholder="اسم الفئة المطلوبة"
+                        className="w-full rounded-lg px-3 py-2 text-sm font-tajawal mb-2"
+                        style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,215,0,0.3)', color: '#FFE4E4' }}
+                      />
+                      <textarea
+                        value={requestDetails}
+                        onChange={(e) => setRequestDetails(e.target.value)}
+                        placeholder="تفاصيل إضافية (اختياري)"
+                        rows={3}
+                        className="w-full rounded-lg px-3 py-2 text-sm font-tajawal mb-3"
+                        style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,215,0,0.3)', color: '#FFE4E4', resize: 'none' }}
+                      />
+                      <button
+                        onClick={handleSendCategoryRequest}
+                        disabled={requestSending}
+                        className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
+                        style={{ background: '#FFD700', color: '#2a0000' }}
+                      >
+                        {requestSending ? '...' : 'إرسال الطلب'}
+                      </button>
+                      <button
+                        onClick={closeRequestModal}
+                        className="w-full font-cairo text-sm py-2"
+                        style={{ color: '#FF9999' }}
+                      >
+                        إلغاء
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <AuthForm onSignedIn={() => { loadEntitlements(); }} />
+                      <button
+                        onClick={closeRequestModal}
+                        className="w-full font-cairo text-sm py-2 mt-2"
+                        style={{ color: '#FF9999' }}
+                      >
+                        إلغاء
+                      </button>
+                    </>
+                  )}
                 </>
               )}
             </motion.div>
