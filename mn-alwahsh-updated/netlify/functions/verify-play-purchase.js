@@ -140,8 +140,15 @@ async function insertPurchases(accessToken, userId, categories) {
 }
 
 function categoriesForSku(sku) {
+  // A single sentinel row, not a snapshot of today's PLAY_PRODUCT_MAP keys.
+  // Granting one row per current category meant anyone who bought the
+  // bundle only ever owned what existed at THEIR purchase moment — a
+  // category added afterward was invisible to them despite paying for
+  // "every current and future category" (see premiumConfig.js's comment
+  // on ALL_CATEGORIES_PRICE, which this now actually fulfills).
+  // CategoryPicker.jsx's isUnlocked() checks for this sentinel directly.
   if (sku === ALL_CATEGORIES_SKU) {
-    return Object.values(PLAY_PRODUCT_MAP).flatMap((info) => info.categories);
+    return ['__ALL__'];
   }
   const info = PLAY_PRODUCT_MAP[sku];
   return info ? info.categories : null;

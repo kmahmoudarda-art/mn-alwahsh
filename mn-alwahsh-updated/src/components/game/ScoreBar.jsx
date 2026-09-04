@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Plus, Minus, X } from 'lucide-react';
+import { Trophy, X } from 'lucide-react';
 import PayPalDonateButton from './PayPalDonateButton';
 
 const MILESTONES = [1000, 2000, 3000, 4000, 5000, 6000];
@@ -284,17 +284,6 @@ function TeamScore({ teamNum, name, score, isActive, scoreKey, reverse, onAdjust
                   </motion.span>
                 )}
               </AnimatePresence>
-            </div>
-
-            <div className="flex flex-col gap-1 shrink-0">
-              <button onClick={() => onAdjust(100)} className="w-7 h-7 rounded-lg flex items-center justify-center font-bold shadow-sm"
-                style={{ background: '#22c55e', color: '#fff' }}>
-                <Plus className="w-3.5 h-3.5" />
-              </button>
-              <button onClick={() => onAdjust(-100)} className="w-7 h-7 rounded-lg flex items-center justify-center font-bold shadow-sm"
-                style={{ background: C.primary, color: '#fff' }}>
-                <Minus className="w-3.5 h-3.5" />
-              </button>
             </div>
           </div>
         </div>

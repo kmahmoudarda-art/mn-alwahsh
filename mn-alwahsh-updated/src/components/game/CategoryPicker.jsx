@@ -81,7 +81,10 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
 
   useEffect(() => { load(); }, []);
 
-  const isUnlocked = (name) => !isPremiumCategory(name) || unlockedCategories.includes(name) || trialCategories.includes(name) || isTestAccount(getCurrentUser());
+  // '__ALL__' is the sentinel granted for the whole-bundle purchase — its
+  // presence means every current AND future premium category is unlocked,
+  // not just whatever existed at purchase time (see verify-play-purchase.js).
+  const isUnlocked = (name) => !isPremiumCategory(name) || unlockedCategories.includes('__ALL__') || unlockedCategories.includes(name) || trialCategories.includes(name) || isTestAccount(getCurrentUser());
 
   const toggleGroup = (g) => {
     setOpenGroups(prev => {
