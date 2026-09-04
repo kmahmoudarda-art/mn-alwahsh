@@ -270,7 +270,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
         }}
       >
         <span style={{ fontSize: 18 }}>🎯</span>
-        اطلب فئة جديدة — 25 درهم
+        اطلب فئة جديدة
       </motion.button>
 
       {hasLockedCategories && !isSignedIn() && (
@@ -567,7 +567,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                     تم إرسال طلبك!
                   </h3>
                   <p className="font-tajawal text-sm mb-4" style={{ color: 'rgba(255,200,200,0.8)' }}>
-                    سنتواصل معك قريبًا لترتيب الدفع (25 درهم) وإضافة الفئة
+                    سنراجع طلبك ونتواصل معك إذا تمت إضافة الفئة
                   </p>
                   <button
                     onClick={closeRequestModal}
@@ -584,7 +584,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                     اطلب فئة جديدة
                   </h3>
                   <p className="font-tajawal text-xs mb-4" style={{ color: '#FFD700' }}>
-                    السعر 25 درهم — سنتواصل معك لترتيب الدفع بعد استلام طلبك
+                    اقترح فئة وسنراجعها ونتواصل معك إذا أضفناها
                   </p>
 
                   {isSignedIn() ? (
