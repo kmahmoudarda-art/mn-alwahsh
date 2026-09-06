@@ -663,6 +663,12 @@ export default function Game() {
 
   // Exit without ending — game stays saved, player can resume by name
   const handleExit = useCallback(() => {
+    // Without this, a question left open mid-answer when exiting would
+    // silently pop back up the instant the board re-renders on re-entry —
+    // Game.jsx stays mounted across this transition, so modalOpen/
+    // currentQuestion otherwise carry over untouched.
+    setModalOpen(false);
+    setCurrentQuestion(null);
     setGameName(null);
   }, []);
 
@@ -672,6 +678,10 @@ export default function Game() {
   const handleRestartGame = useCallback(async () => {
     resetQuestionCache();
     usedAnswersRef.current = {};
+    // Same leftover-modal risk as handleExit — clear it before rebuilding
+    // the board so a stale question can't reappear.
+    setModalOpen(false);
+    setCurrentQuestion(null);
     // Reset Supabase used flags so all questions are available again
     const { resetAllQuestions } = await import('../utils/supabaseClient');
     resetAllQuestions().catch(() => {});
@@ -698,6 +708,9 @@ export default function Game() {
     resetQuestionCache();
     usedAnswersRef.current = {};
     if (gameName) clearSession(gameName);
+    // Same leftover-modal risk as handleExit/handleRestartGame.
+    setModalOpen(false);
+    setCurrentQuestion(null);
     try { sessionStorage.removeItem('luckyCell'); } catch {}
     setLuckyCell(null);
     setLuckyUsed(false);
@@ -727,6 +740,11 @@ export default function Game() {
 
   const handleEnterGameName = useCallback(async (name) => {
     setGameName(name);
+    // Defense in depth alongside the handleExit/handlePlayAgain/
+    // handleRestartGame fixes — never let a resumed session's board
+    // render with a leftover question modal already open.
+    setModalOpen(false);
+    setCurrentQuestion(null);
     const existing = await loadSession(name);
     if (existing?.gamePhase) {
       // Resume saved game
