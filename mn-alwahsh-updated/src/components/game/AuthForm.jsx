@@ -106,6 +106,9 @@ export default function AuthForm({ onSignedIn }) {
       <p className="font-tajawal text-xs mb-2" style={{ color: '#FF9999' }}>
         سجّل الدخول أو أنشئ حساب — نفس الحساب يعمل على الموقع والتطبيق
       </p>
+      {error && (
+        <p className="font-tajawal text-xs" style={{ color: '#FF6666' }}>{error}</p>
+      )}
       <input
         type="email"
         required
@@ -145,9 +148,6 @@ export default function AuthForm({ onSignedIn }) {
           style={{ accentColor: '#CC0000', width: 14, height: 14 }}
         />
       </label>
-      {error && (
-        <p className="font-tajawal text-xs" style={{ color: '#FF6666' }}>{error}</p>
-      )}
       <button
         type="submit"
         disabled={busy}

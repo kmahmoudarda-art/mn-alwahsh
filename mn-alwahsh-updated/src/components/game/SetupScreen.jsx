@@ -136,21 +136,6 @@ export default function SetupScreen({ onStartGame, gameName }) {
         background: 'radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.6) 100%)', zIndex: 0,
       }} />
 
-      {/* Account button — top center, above the side team columns */}
-      <button
-        onClick={() => navigate('/login')}
-        className="fixed top-3 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 rounded-full font-cairo text-xs font-bold"
-        style={{
-          padding: '6px 14px',
-          background: 'rgba(20,0,0,0.75)',
-          border: '1px solid rgba(204,0,0,0.5)',
-          color: '#FFE4E4',
-          backdropFilter: 'blur(4px)',
-        }}
-      >
-        <UserCircle2 className="w-4 h-4" style={{ color: '#FFD700' }} />
-        {currentUser ? currentUser.email : 'تسجيل الدخول'}
-      </button>
       <style>{`
         @keyframes titleGlow {
           0%, 100% { text-shadow: 0 0 10px rgba(204,0,0,0.8), 0 0 30px rgba(139,0,0,0.5); }
@@ -208,6 +193,28 @@ export default function SetupScreen({ onStartGame, gameName }) {
         className="w-full max-w-3xl"
         style={{ position: 'relative', zIndex: 1 }}
       >
+        {/* Account button — now a normal in-flow element (was fixed/floating,
+            which meant it sat on top of whatever scrolled underneath it —
+            colliding with the Team 2 heading on phone-width screens where
+            the team cards stack vertically). Scrolls away with the page now,
+            so it can never overlap anything. */}
+        <div className="flex justify-center mb-4">
+          <button
+            onClick={() => navigate('/login')}
+            className="flex items-center gap-1.5 rounded-full font-cairo text-xs font-bold"
+            style={{
+              padding: '6px 14px',
+              background: 'rgba(20,0,0,0.75)',
+              border: '1px solid rgba(204,0,0,0.5)',
+              color: '#FFE4E4',
+              backdropFilter: 'blur(4px)',
+            }}
+          >
+            <UserCircle2 className="w-4 h-4" style={{ color: '#FFD700' }} />
+            {currentUser ? currentUser.email : 'تسجيل الدخول'}
+          </button>
+        </div>
+
         <div className="setup-hero text-center mb-10">
           <motion.h1
             initial={{ scale: 0.8 }}

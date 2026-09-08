@@ -146,7 +146,7 @@ export default function GameNameScreen({ onEnter }) {
   const [gameCount, setGameCount] = useState(0);
   const [user, setUser] = useState(getCurrentUser());
   // 'account' = login/signup form, 'guest' = plain name entry, skipping account
-  const [entryMode, setEntryMode] = useState('account');
+  const [entryMode, setEntryMode] = useState('choice');
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
 
   const isIOS = checkIsIOS();
@@ -438,20 +438,53 @@ export default function GameNameScreen({ onEnter }) {
                   تسجيل الخروج
                 </button>
               </div>
-            ) : entryMode === 'account' ? (
-              /* Not signed in — login/signup up front; guest play still available below */
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <AuthForm onSignedIn={handleSignedIn} />
-                <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,150,150,0.7)', fontFamily: 'var(--font-cairo)', margin: 0 }}>
-                  تسجيل الدخول يفتح المزيد من الفئات المميزة
+            ) : entryMode === 'choice' ? (
+              /* First thing shown when signed out — guest play is an equal,
+                 immediately-visible option instead of being buried below a
+                 full login form that could push it off-screen (M-02). */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+                  <Button
+                    onClick={() => setEntryMode('guest')}
+                    className="w-full font-cairo font-bold py-5 rounded-xl gap-2"
+                    style={{
+                      background: 'linear-gradient(135deg, #6B0000 0%, #CC0000 50%, #6B0000 100%)',
+                      color: '#FFE4E4', border: '1px solid rgba(255,60,60,0.4)', fontSize: 16,
+                      boxShadow: '0 0 20px rgba(139,0,0,0.55)',
+                    }}
+                  >
+                    <Gamepad2 className="w-5 h-5" />
+                    متابعة كضيف بدون تسجيل
+                  </Button>
+                </motion.div>
+                <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,150,150,0.6)', fontFamily: 'var(--font-cairo)', margin: 0 }}>
+                  أو
                 </p>
                 <button
                   type="button"
-                  onClick={() => setEntryMode('guest')}
+                  onClick={() => setEntryMode('account')}
+                  className="w-full font-cairo font-bold py-3 rounded-xl"
+                  style={{
+                    background: 'rgba(10,0,0,0.7)', border: '1px solid rgba(139,0,0,0.7)',
+                    color: '#FFE4E4', fontSize: 14,
+                  }}
+                >
+                  تسجيل الدخول أو إنشاء حساب
+                </button>
+                <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,150,150,0.7)', fontFamily: 'var(--font-cairo)', margin: 0 }}>
+                  تسجيل الدخول يفتح المزيد من الفئات المميزة
+                </p>
+              </div>
+            ) : entryMode === 'account' ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <AuthForm onSignedIn={handleSignedIn} />
+                <button
+                  type="button"
+                  onClick={() => setEntryMode('choice')}
                   className="w-full font-tajawal text-xs py-1"
                   style={{ color: '#FF9999', textDecoration: 'underline' }}
                 >
-                  متابعة كضيف بدون تسجيل
+                  رجوع
                 </button>
               </div>
             ) : (
@@ -492,11 +525,11 @@ export default function GameNameScreen({ onEnter }) {
                 </p>
                 <button
                   type="button"
-                  onClick={() => setEntryMode('account')}
+                  onClick={() => setEntryMode('choice')}
                   className="w-full font-tajawal text-xs py-1"
                   style={{ color: '#FF9999', textDecoration: 'underline' }}
                 >
-                  لدي حساب — تسجيل الدخول
+                  رجوع
                 </button>
               </div>
             )}
