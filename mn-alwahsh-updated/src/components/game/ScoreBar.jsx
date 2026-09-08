@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, X } from 'lucide-react';
-import PayPalDonateButton from './PayPalDonateButton';
 
 const MILESTONES = [1000, 2000, 3000, 4000, 5000, 6000];
 
@@ -75,7 +74,6 @@ export default function ScoreBar({ team1, team2, currentTeam, onAdjust, onBack, 
               <span className="absolute -top-1 -right-1 text-xs">💀</span>
             </div>
             <span className="text-[10px] font-cairo font-black tracking-widest" style={{ color: '#FF4444', textShadow: '0 0 6px #FF0000' }}>من الوحش</span>
-            <PayPalDonateButton />
             <div className="flex gap-1 mt-0.5">
               <button onClick={onBack} className="w-6 h-6 flex items-center justify-center rounded-full" style={{ background: 'rgba(0,0,0,0.5)', color: '#fff' }}>
                 <X className="w-3.5 h-3.5" />

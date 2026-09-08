@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Gamepad2, BookOpen, Download, X } from 'lucide-react';
@@ -7,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import InstructionManual from './InstructionManual';
 import ScreenMirrorButton from './ScreenMirrorButton';
 import AuthForm from './AuthForm';
-import { getCurrentUser, signOut } from '../../utils/authClient';
+import { getCurrentUser, signOut, getValidSession } from '../../utils/authClient';
 import { fetchGameCount } from '@/utils/supabaseClient';
 
 const checkIsIOS = () =>
@@ -138,6 +139,7 @@ function InstallBanner({ prompt, onDismiss }) {
 }
 
 export default function GameNameScreen({ onEnter }) {
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [showManual, setShowManual] = useState(false);
   const [installPrompt, setInstallPrompt] = useState(null);
@@ -148,6 +150,9 @@ export default function GameNameScreen({ onEnter }) {
   // 'account' = login/signup form, 'guest' = plain name entry, skipping account
   const [entryMode, setEntryMode] = useState('choice');
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteSending, setDeleteSending] = useState(false);
+  const [deleteSent, setDeleteSent] = useState(false);
 
   const isIOS = checkIsIOS();
   const isStandalone = checkIsStandalone();
@@ -200,6 +205,33 @@ export default function GameNameScreen({ onEnter }) {
   const handleSignOut = () => {
     signOut();
     setUser(null);
+  };
+
+  const handleRequestAccountDeletion = async () => {
+    setDeleteSending(true);
+    try {
+      const session = await getValidSession();
+      if (!session?.access_token || !session?.user?.id) {
+        setDeleteSending(false);
+        return;
+      }
+      await fetch('/.netlify/functions/request-account-deletion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: session.user.id,
+          accessToken: session.access_token,
+          userEmail: session.user.email,
+        }),
+      });
+      setDeleteSent(true);
+    } catch {
+      // Even on failure, don't leave the player stuck — they can always
+      // fall back to the email address listed in the Privacy Policy.
+      setDeleteSent(true);
+    } finally {
+      setDeleteSending(false);
+    }
   };
 
   return (
@@ -437,6 +469,14 @@ export default function GameNameScreen({ onEnter }) {
                 >
                   تسجيل الخروج
                 </button>
+                <button
+                  type="button"
+                  onClick={() => { setShowDeleteConfirm(true); setDeleteSent(false); }}
+                  className="w-full font-tajawal text-xs py-1"
+                  style={{ color: 'rgba(255,120,120,0.55)' }}
+                >
+                  حذف الحساب
+                </button>
               </div>
             ) : entryMode === 'choice' ? (
               /* First thing shown when signed out — guest play is an equal,
@@ -593,6 +633,113 @@ export default function GameNameScreen({ onEnter }) {
         </div>,
         document.body
       )}
+
+      {/* Account-deletion request — same protective confirmation pattern,
+          satisfies Google Play's requirement that account creation be
+          matched by an in-app way to at least initiate deletion. */}
+      {showDeleteConfirm && createPortal(
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 99999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(6px)',
+        }}>
+          <div style={{
+            background: 'linear-gradient(160deg, #1a0000 0%, #0d0000 100%)',
+            border: '1.5px solid rgba(200,0,0,0.5)',
+            borderRadius: 16, padding: '32px 36px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20,
+            boxShadow: '0 0 40px rgba(180,0,0,0.3)',
+            minWidth: 280, maxWidth: 340,
+          }}>
+            {deleteSent ? (
+              <>
+                <span style={{ fontSize: 40 }}>✅</span>
+                <p style={{
+                  fontFamily: 'var(--font-cairo)', fontWeight: 800, fontSize: 18,
+                  color: '#FFE0E0', textAlign: 'center', margin: 0, direction: 'rtl',
+                }}>
+                  تم إرسال طلب حذف حسابك
+                </p>
+                <p style={{
+                  fontFamily: 'var(--font-cairo)', fontWeight: 600, fontSize: 13,
+                  color: 'rgba(255,180,180,0.7)', textAlign: 'center', margin: 0, direction: 'rtl',
+                }}>
+                  سنقوم بحذف حسابك وبياناتك خلال أيام قليلة
+                </p>
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  style={{
+                    padding: '10px 28px', borderRadius: 10,
+                    background: 'rgba(180,0,0,0.85)', border: '1px solid rgba(255,60,60,0.6)',
+                    color: '#FFE0E0', fontFamily: 'var(--font-cairo)', fontWeight: 800,
+                    fontSize: 15, cursor: 'pointer',
+                  }}
+                >
+                  تم
+                </button>
+              </>
+            ) : (
+              <>
+                <span style={{ fontSize: 40 }}>⚠️</span>
+                <p style={{
+                  fontFamily: 'var(--font-cairo)', fontWeight: 800, fontSize: 18,
+                  color: '#FFE0E0', textAlign: 'center', margin: 0, direction: 'rtl',
+                }}>
+                  حذف الحساب؟
+                </p>
+                <p style={{
+                  fontFamily: 'var(--font-cairo)', fontWeight: 600, fontSize: 13,
+                  color: 'rgba(255,180,180,0.7)', textAlign: 'center', margin: 0, direction: 'rtl',
+                }}>
+                  سيتم حذف حسابك وجميع بياناتك بشكل نهائي، بما في ذلك المشتريات والفئات المفتوحة
+                </p>
+                <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
+                  <button
+                    onClick={handleRequestAccountDeletion}
+                    disabled={deleteSending}
+                    style={{
+                      padding: '10px 28px', borderRadius: 10,
+                      background: 'rgba(180,0,0,0.85)', border: '1px solid rgba(255,60,60,0.6)',
+                      color: '#FFE0E0', fontFamily: 'var(--font-cairo)', fontWeight: 800,
+                      fontSize: 15, cursor: 'pointer', opacity: deleteSending ? 0.6 : 1,
+                    }}
+                  >
+                    {deleteSending ? '...' : 'نعم، احذف حسابي'}
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    style={{
+                      padding: '10px 22px', borderRadius: 10,
+                      background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)',
+                      color: 'rgba(255,255,255,0.7)', fontFamily: 'var(--font-cairo)', fontWeight: 700,
+                      fontSize: 15, cursor: 'pointer',
+                    }}
+                  >
+                    رجوع
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Privacy policy — discoverable from the entry screen, required by
+          Google Play (previously only reachable if you already knew the
+          /privacy URL, with no in-app link anywhere). */}
+      <button
+        type="button"
+        onClick={() => navigate('/privacy')}
+        style={{
+          position: 'fixed', bottom: 10, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 9000, background: 'none', border: 'none',
+          color: 'rgba(255,180,180,0.5)', fontFamily: 'var(--font-tajawal)', fontSize: 11,
+          textDecoration: 'underline', cursor: 'pointer',
+        }}
+      >
+        سياسة الخصوصية
+      </button>
     </div>
   );
 }
