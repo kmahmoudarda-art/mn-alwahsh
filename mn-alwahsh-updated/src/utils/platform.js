@@ -1,19 +1,23 @@
 // Detects whether the site is currently running inside the Android app
-// (a Trusted Web Activity wrapping mnalwahsh.com) rather than a normal
+// (a native WebView wrapping mnalwahsh.com) rather than a normal
 // mobile/desktop browser.
 //
 // Why this matters: purchasing only happens through Google Play Billing
 // (see playBillingClient.js), which is only reachable from inside the
-// packaged Android app — a normal browser tab has no Digital Goods API to
-// talk to Play with. CategoryPicker.jsx's unlock modal checks this (plus
+// packaged Android app — a normal browser tab has no bridge to Play
+// Billing. CategoryPicker.jsx's unlock modal checks this (plus
 // isPlayBillingAvailable()) to decide whether to show real buy buttons or
 // point the visitor at the Play Store listing instead.
 //
-// TWAs launched via Bubblewrap/PWABuilder set document.referrer to
-// "android-app://<package-id>" — that's the standard, documented way to
-// tell a TWA apart from a regular browser tab. A real browser's referrer
-// is either empty or a normal https:// URL, never android-app://.
+// The Android app injects window.AndroidBilling (see MainActivity's
+// JavaScript bridge) as soon as a page loads, so its presence is a
+// reliable signal we're inside the packaged app. document.referrer
+// starting with "android-app://" is kept as a fallback for the older TWA
+// build, in case that referrer ever shows up again.
 export function isRunningInAndroidApp() {
+  if (typeof window !== 'undefined' && typeof window.AndroidBilling !== 'undefined') {
+    return true;
+  }
   try {
     return document.referrer.startsWith('android-app://');
   } catch {
