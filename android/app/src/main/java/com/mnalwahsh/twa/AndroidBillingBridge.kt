@@ -105,14 +105,14 @@ class AndroidBillingBridge(
                     return@queryProductDetailsAsync
                 }
                 val out = JSONArray()
-                for (details in result.productDetailsList) {
+                for (details in result) {
                     val offer = details.oneTimePurchaseOfferDetails
                     out.put(
                         JSONObject().apply {
                             put("itemId", details.productId)
                             put("title", details.title)
                             put("price", offer?.formattedPrice ?: "")
-                            put("priceAmountMicros", offer?.priceAmountMicros ?: 0)
+                            put("priceAmountMicros", offer?.priceAmountMicros ?: 0L)
                             put("priceCurrencyCode", offer?.priceCurrencyCode ?: "")
                         }
                     )
@@ -160,7 +160,7 @@ class AndroidBillingBridge(
             if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
                 callback(null)
             } else {
-                callback(result.productDetailsList.firstOrNull())
+                callback(result.firstOrNull())
             }
         }
     }
