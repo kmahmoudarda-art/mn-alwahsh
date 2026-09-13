@@ -12,12 +12,12 @@ if (hasKeystoreProperties) {
 
 android {
     namespace "com.mnalwahsh.twa"
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.mnalwahsh.twa"
         minSdk 23
-        targetSdk 34
+        targetSdk 36
         // Old TWA build was versionCode 5 / versionName 1.0.0.7 — bumped by
         // one so this ships as an update, not a new listing.
         versionCode 6
@@ -64,5 +64,5 @@ dependencies {
     implementation "androidx.appcompat:appcompat:1.7.0"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
     implementation "androidx.browser:browser:1.8.0"
-    implementation "com.android.billingclient:billing-ktx:7.1.1"
+    implementation "com.android.billingclient:billing-ktx:8.0.0"
 }
