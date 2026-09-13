@@ -154,8 +154,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupSwipeToRefresh() {
-        swipeRefresh.setColorSchemeResources(android.R.color.holo_red_dark)
-        swipeRefresh.setOnRefreshListener { reload() }
+        // Disabled: an accidental downward swipe during a live game session
+        // would reload the page and wipe the player's in-progress game
+        // state. The offline screen's Retry button still calls reload()
+        // directly, so recovering from a dropped connection still works.
+        swipeRefresh.isEnabled = false
     }
 
     private fun reload() {
