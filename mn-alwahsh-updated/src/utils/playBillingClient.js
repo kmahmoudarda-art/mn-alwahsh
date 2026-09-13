@@ -1,19 +1,15 @@
-// Purchases a Google Play in-app product from inside the TWA.
+// Purchases a Google Play in-app product from inside the Android app.
 //
-// This is NOT the native Android Billing Library (that's for real Kotlin/
-// Java apps). Since this app is a Trusted Web Activity — Chrome showing
-// mnalwahsh.com — purchasing goes through two web-platform APIs that Chrome
-// wires up to Play Billing automatically when running inside a TWA:
-//   - Payment Request API (the purchase UI/sheet)
-//   - Digital Goods API (https://play.google.com/billing payment method,
-//     product details, and — critically — telling Chrome/Play "this
-//     purchase is done" via response.complete())
+// The app is a native WebView (not a Trusted Web Activity), so the web
+// platform's Payment Request / Digital Goods APIs aren't available —
+// WebView doesn't implement them. Instead, MainActivity.kt injects a
+// small JavaScript bridge, window.AndroidBilling, backed by the real
+// Google Play Billing Library running in Kotlin. This file just calls
+// that bridge; all the actual Play Billing calls happen natively.
 //
-// Neither API exists in a normal desktop/mobile browser tab, only inside
-// the packaged Android app. Always check isPlayBillingAvailable() first —
-// CategoryPicker.jsx only calls into this file when isRunningInAndroidApp()
-// is also true, but this file guards independently too since a TWA on an
-// old Chrome version could still fail the same way.
+// isPlayBillingAvailable() also still recognizes the old TWA-style
+// Digital Goods API, in case this code ever runs inside a Trusted Web
+// Activity again — but the shipped Android app is the WebView bridge.
 //
 // IMPORTANT — this purchases and returns a token; it does NOT grant
 // anything by itself. The token must be sent to
@@ -23,10 +19,9 @@
 
 import { TRIAL_SKU } from './playProducts.js';
 
-const PLAY_BILLING_METHOD = 'https://play.google.com/billing';
-
 export function isPlayBillingAvailable() {
-  return typeof window !== 'undefined' && 'getDigitalGoodsService' in window;
+  if (typeof window === 'undefined') return false;
+  return typeof window.AndroidBilling !== 'undefined' || 'getDigitalGoodsService' in window;
 }
 
 // Self-heal step for TRIAL_SKU only: if Play still shows an existing,
@@ -36,15 +31,15 @@ export function isPlayBillingAvailable() {
 // Silently does nothing if there's no stale purchase to clear, or if sku
 // isn't the trial — categories/the bundle must never be auto-consumed,
 // see consume-stale-trial.js.
-async function clearStaleTrialIfAny(digitalGoodsService, sku) {
-  if (sku !== TRIAL_SKU || typeof digitalGoodsService.listPurchases !== 'function') return;
+async function clearStaleTrialIfAny(sku) {
+  if (sku !== TRIAL_SKU) return;
   let existing;
   try {
-    existing = await digitalGoodsService.listPurchases();
+    existing = await listExistingPurchases();
   } catch {
-    return; // listPurchases isn't universally supported — fine to skip
+    return; // listing purchases isn't universally supported — fine to skip
   }
-  const stale = existing.find((p) => p.itemId === sku);
+  const stale = existing.find((p) => p.itemId === sku || p.productId === sku);
   if (!stale?.purchaseToken) return;
 
   await fetch('/.netlify/functions/consume-stale-trial', {
@@ -52,6 +47,15 @@ async function clearStaleTrialIfAny(digitalGoodsService, sku) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ sku, purchaseToken: stale.purchaseToken }),
   }).catch(() => {}); // best-effort — if this fails, the purchase attempt below will just fail with the same "already owned" error as before, no worse off
+}
+
+async function listExistingPurchases() {
+  if (window.AndroidBilling) return window.AndroidBilling.listPurchases();
+  if ('getDigitalGoodsService' in window) {
+    const service = await window.getDigitalGoodsService('https://play.google.com/billing');
+    if (typeof service.listPurchases === 'function') return service.listPurchases();
+  }
+  return [];
 }
 
 // Returns { purchaseToken, productId } on success, throws on cancel/failure.
@@ -62,40 +66,34 @@ export async function purchaseWithPlayBilling(sku) {
     throw new Error('play-billing-unavailable');
   }
 
-  // Confirms Chrome can actually reach Play's billing service right now
-  // (fails fast with a clearer error than letting PaymentRequest hang).
-  const digitalGoodsService = await window.getDigitalGoodsService(PLAY_BILLING_METHOD);
+  await clearStaleTrialIfAny(sku);
 
-  await clearStaleTrialIfAny(digitalGoodsService, sku);
+  if (window.AndroidBilling) {
+    const purchaseToken = await window.AndroidBilling.purchase(sku);
+    if (!purchaseToken) throw new Error('play-billing-no-token');
+    return { purchaseToken, productId: sku };
+  }
 
-  const paymentMethods = [{ supportedMethods: PLAY_BILLING_METHOD, data: { sku } }];
-  // Play Billing ignores this "total" — the real price is whatever was set
-  // for this product ID in Play Console. Payment Request API still requires
-  // a total to construct the request, so this is just a formality.
+  // Legacy TWA path (Digital Goods API + Payment Request), kept only in
+  // case this code ever runs inside a Trusted Web Activity again.
+  const digitalGoodsService = await window.getDigitalGoodsService('https://play.google.com/billing');
+  const paymentMethods = [{ supportedMethods: 'https://play.google.com/billing', data: { sku } }];
   const paymentDetails = {
     total: { label: 'Total', amount: { currency: 'USD', value: '0' } },
   };
-
   const request = new PaymentRequest(paymentMethods, paymentDetails);
-
   const canMakePayment = await request.canMakePayment().catch(() => false);
   if (!canMakePayment) {
     throw new Error('play-billing-cannot-pay');
   }
-
   const response = await request.show();
   const { purchaseToken } = response.details || {};
   if (!purchaseToken) {
     await response.complete('fail').catch(() => {});
     throw new Error('play-billing-no-token');
   }
-
-  // Tells Chrome the purchase sheet can close. This does NOT acknowledge
-  // the purchase to Google (that happens server-side in
-  // verify-play-purchase.js, which is required within 3 days or Google
-  // auto-refunds it) — it only finishes the UI flow.
   await response.complete('success');
-
+  void digitalGoodsService; // only needed to confirm availability above
   return { purchaseToken, productId: sku };
 }
 
@@ -104,7 +102,8 @@ export async function purchaseWithPlayBilling(sku) {
 export async function getPlayProductDetails(skus) {
   if (!isPlayBillingAvailable()) return [];
   try {
-    const service = await window.getDigitalGoodsService(PLAY_BILLING_METHOD);
+    if (window.AndroidBilling) return await window.AndroidBilling.getDetails(skus);
+    const service = await window.getDigitalGoodsService('https://play.google.com/billing');
     return await service.getDetails(skus);
   } catch {
     return [];

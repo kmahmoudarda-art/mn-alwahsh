@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">من الوحش</string>
+    <string name="offline_title">لا يوجد اتصال بالإنترنت</string>
+    <string name="offline_message">تعذّر تحميل الصفحة. تحقق من اتصالك بالإنترنت ثم أعد المحاولة.</string>
+    <string name="retry_button">إعادة المحاولة</string>
+</resources>
