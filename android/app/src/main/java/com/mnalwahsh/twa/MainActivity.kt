@@ -63,8 +63,9 @@ class MainActivity : AppCompatActivity() {
         webView.addJavascriptInterface(AndroidBillingBridge(this, webView), "AndroidBillingNative")
 
         webView.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                val uri = request.url
+            @Suppress("DEPRECATION")
+            override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                val uri = Uri.parse(url)
                 return if (isOwnSite(uri.host)) {
                     false // keep our own pages inside the app
                 } else {
