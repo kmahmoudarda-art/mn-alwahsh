@@ -18,10 +18,12 @@ android {
         applicationId "com.mnalwahsh.twa"
         minSdk 23
         targetSdk 36
-        // Old TWA build was versionCode 5 / versionName 1.0.0.7 — bumped by
-        // one so this ships as an update, not a new listing.
-        versionCode 6
-        versionName "1.0.0.8"
+        // Old TWA build was versionCode 5 / versionName 1.0.0.7. versionCode
+        // 6 got consumed by an earlier Play Console upload attempt that was
+        // rejected for missing requirements (API 36 / Billing Library 8),
+        // so this ships as 7.
+        versionCode 7
+        versionName "1.0.0.9"
     }
 
     signingConfigs {
