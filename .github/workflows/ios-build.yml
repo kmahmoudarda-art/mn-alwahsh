@@ -1,0 +1,193 @@
+name: iOS
+
+# Runs the iOS app on GitHub's own macOS runners — this is the "online
+# compiler" substitute for not having a local Mac/Xcode. See ios/README.md
+# ("Building without a Mac — GitHub Actions") for what each secret below
+# needs to contain and how to obtain it.
+#
+# Two separate jobs, on purpose:
+#   - build-simulator: compiles the app for the Simulator, no signing
+#     needed. Runs automatically on every push/PR that touches ios/**, so
+#     Swift mistakes get caught the same way any other CI check would,
+#     without needing any secrets configured.
+#   - archive-and-upload: does a real signed build and ships it to
+#     TestFlight. Manual only (workflow_dispatch) — it costs real macOS
+#     runner minutes and needs the signing secrets set up first, so it
+#     should never fire on its own.
+
+on:
+  push:
+    # Only main — a branch with an open PR already gets covered by the
+    # pull_request trigger below; without this, every push to a PR branch
+    # fired both triggers at once and ran build-simulator twice.
+    branches: [main]
+    paths:
+      - "ios/**"
+      - ".github/workflows/ios-build.yml"
+  pull_request:
+    paths:
+      - "ios/**"
+      - ".github/workflows/ios-build.yml"
+  workflow_dispatch:
+    inputs:
+      upload_to_testflight:
+        description: "Also sign and upload the build to TestFlight (needs the signing secrets — see ios/README.md)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: ios-build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-simulator:
+    name: Build (Simulator, unsigned)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: ios
+        run: xcodegen generate
+
+      - name: Build for Simulator
+        working-directory: ios
+        run: |
+          xcodebuild build \
+            -project MnAlwahsh.xcodeproj \
+            -scheme App \
+            -destination "generic/platform=iOS Simulator" \
+            CODE_SIGNING_ALLOWED=NO
+
+  archive-and-upload:
+    name: Archive, sign, and upload to TestFlight
+    runs-on: macos-15
+    if: github.event_name == 'workflow_dispatch' && inputs.upload_to_testflight
+    # Overrides the workflow-level concurrency group with one that never
+    # auto-cancels — losing a mid-flight signed upload to a stray push on
+    # the same branch would be worse than two uploads running at once.
+    concurrency:
+      group: ios-testflight-upload-${{ github.run_id }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: ios
+        run: xcodegen generate
+
+      # Standard GitHub Actions pattern for macOS signing: decode the
+      # distribution cert + provisioning profile from secrets into a
+      # scratch keychain that only exists for this job run, then discard
+      # it in the last step — nothing signing-related persists on the
+      # runner between builds.
+      - name: Import signing certificate & provisioning profile
+        env:
+          CERT_BASE64: ${{ secrets.IOS_DIST_CERTIFICATE_BASE64 }}
+          CERT_PASSWORD: ${{ secrets.IOS_DIST_CERTIFICATE_PASSWORD }}
+          PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          CERT_PATH="$RUNNER_TEMP/dist_cert.p12"
+          PROFILE_PATH="$RUNNER_TEMP/profile.mobileprovision"
+          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+
+          echo -n "$CERT_BASE64" | base64 --decode -o "$CERT_PATH"
+          echo -n "$PROFILE_BASE64" | base64 --decode -o "$PROFILE_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security default-keychain -s "$KEYCHAIN_PATH"
+
+          security import "$CERT_PATH" -P "$CERT_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH" -T /usr/bin/codesign
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | sed 's/"//g')
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          mkdir -p ~/Library/"MobileDevice"/"Provisioning Profiles"
+          cp "$PROFILE_PATH" ~/Library/"MobileDevice"/"Provisioning Profiles"/
+
+      - name: Archive
+        working-directory: ios
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
+          BUNDLE_ID: ${{ vars.IOS_BUNDLE_ID || 'com.mnalwahsh.ios' }}
+        run: |
+          set -euo pipefail
+          xcodebuild archive \
+            -project MnAlwahsh.xcodeproj \
+            -scheme App \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            CODE_SIGN_STYLE=Manual \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID"
+
+      - name: Export .ipa
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          PROFILE_NAME: ${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}
+          BUNDLE_ID: ${{ vars.IOS_BUNDLE_ID || 'com.mnalwahsh.ios' }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>teamID</key><string>$APPLE_TEAM_ID</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>$BUNDLE_ID</key><string>$PROFILE_NAME</string>
+            </dict>
+          </dict>
+          </plist>
+          PLIST
+
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
+
+      - name: Upload to TestFlight
+        env:
+          APPLE_ASC_KEY_ID: ${{ secrets.APPLE_ASC_KEY_ID }}
+          APPLE_ASC_ISSUER_ID: ${{ secrets.APPLE_ASC_ISSUER_ID }}
+          APPLE_ASC_PRIVATE_KEY_BASE64: ${{ secrets.APPLE_ASC_PRIVATE_KEY_BASE64 }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/private_keys
+          echo -n "$APPLE_ASC_PRIVATE_KEY_BASE64" | base64 --decode -o ~/private_keys/AuthKey_${APPLE_ASC_KEY_ID}.p8
+
+          IPA_PATH=$(find "$RUNNER_TEMP/export" -name "*.ipa" | head -n1)
+          xcrun altool --upload-app \
+            -f "$IPA_PATH" \
+            -t ios \
+            --apiKey "$APPLE_ASC_KEY_ID" \
+            --apiIssuer "$APPLE_ASC_ISSUER_ID"
+
+      - name: Upload .ipa as a workflow artifact too
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MnAlwahsh-ipa
+          path: ${{ runner.temp }}/export/*.ipa
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Clean up keychain
+        if: always()
+        run: security delete-keychain "$RUNNER_TEMP/app-signing.keychain-db" || true
