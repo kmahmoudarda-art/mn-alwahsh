@@ -1,10 +1,24 @@
 # iOS app — what's here and what you need to do
 
-This mirrors `ANDROID_HANDOFF.md`'s situation exactly: I wrote the
-complete iOS project (Swift, StoreKit 2, all 71 in-app products wired up),
-but **this cloud workspace has no macOS/Xcode**, so I can't generate the
-`.xcodeproj`, build, sign, or submit it from here. Everything below is
-exact copy-paste steps for doing that on your own Mac.
+This mirrors `ANDROID_HANDOFF.md`'s situation: I wrote the complete iOS
+project (Swift, StoreKit 2, all 71 in-app products wired up), but
+**this cloud workspace has no macOS/Xcode**, so I can't generate the
+`.xcodeproj`, build, sign, or submit it from here.
+
+There are two ways to actually build it — pick one:
+
+- **No Mac at all** — `.github/workflows/ios-build.yml` builds, signs, and
+  uploads to TestFlight on GitHub's own macOS runners. Every step,
+  including creating the signing certificate, works from a plain browser
+  and a terminal on any OS. See **"Building without a Mac"** below.
+- **You have a Mac** — build and submit locally with Xcode, the
+  traditional way. See **Phase 3 onward** below.
+
+Either way, **Phase 2** (getting the code) and **Phase 4** (registering
+the app in App Store Connect) are the same first steps. Phases 1, 3, 6,
+and 7 below are marked **Mac/Xcode path only** — if you're going the
+no-Mac route, skip them and use the **"Building without a Mac"** section
+instead, which replaces exactly those four.
 
 ## What's here
 
@@ -39,6 +53,9 @@ exact copy-paste steps for doing that on your own Mac.
 - `scripts/generate_app_icons.py` — regenerates every app-icon size from
   `mn-alwahsh-updated/icon-512.png` (already run once; the PNGs are
   checked in under `App/Assets.xcassets/AppIcon.appiconset/`).
+- `.github/workflows/ios-build.yml` (repo root) — builds this project on
+  GitHub's macOS runners, so you never need Xcode installed yourself. See
+  **"Building without a Mac"** below.
 
 Product IDs are **shared 1:1** with the Android app's SKUs (`cat001`,
 `cat002`, ..., `unlock_all_categories`, `trial_pass` — see
@@ -47,7 +64,7 @@ Store Connect with these exact IDs, which is also why the Netlify
 function can just re-import `PLAY_PRODUCT_MAP` for categories/prices
 rather than needing a second, drifting copy of that data.
 
-## Phase 1 — Install the build tools (one-time, macOS only)
+## Phase 1 — Install the build tools (Mac/Xcode path only)
 
 1. Install **Xcode** from the Mac App Store (needs macOS; there is no way
    around this for building/signing an iOS app — Apple only allows this on
@@ -57,14 +74,14 @@ rather than needing a second, drifting copy of that data.
    brew install xcodegen
    ```
 
-## Phase 2 — Getting the project onto your Mac
+## Phase 2 — Getting the project onto your computer
 
 1. Pull this branch from GitHub (`git clone`/`git pull`, or download as a
    ZIP and unzip).
 2. You should now have, alongside `android/` and `mn-alwahsh-updated/`, an
    `ios/` folder.
 
-## Phase 3 — Generate and open the Xcode project
+## Phase 3 — Generate and open the Xcode project (Mac/Xcode path only)
 
 ```bash
 cd path/to/mn-alwahsh/ios
@@ -111,6 +128,96 @@ In Xcode:
    **App Manager** role → note the **Key ID** and **Issuer ID**, and
    download the `.p8` file (Apple only lets you download it once).
 
+## Building without a Mac — GitHub Actions
+
+This replaces Phases 1, 3, 6, and 7 above. Everything here works from a
+plain browser and terminal on Windows/Linux/macOS — no Xcode install, no
+Mac at all. It uses `.github/workflows/ios-build.yml`, which runs on
+GitHub's own macOS runners (that's the actual Xcode instance — you're
+just never the one driving it).
+
+The workflow has two jobs:
+
+- **`build-simulator`** runs automatically on every push/PR that touches
+  `ios/**` — no secrets needed, no signing, just confirms the Swift code
+  compiles. This already runs on this branch/PR, same as any other CI
+  check.
+- **`archive-and-upload`** does a real signed build and ships it straight
+  to TestFlight. It's manual-only (a button you press), because it costs
+  real macOS runner minutes and needs the signing secrets below set up
+  first.
+
+### 1. Create a distribution certificate without Xcode
+
+Xcode normally generates this for you via Keychain Access. Without a Mac,
+`openssl` (already on Linux/macOS, or install via
+[Git for Windows](https://gitforwindows.org)'s bundled Git Bash on
+Windows) does the same job:
+
+```bash
+openssl genrsa -out ios_distribution.key 2048
+openssl req -new -key ios_distribution.key -out ios_distribution.csr \
+  -subj "/emailAddress=you@example.com/CN=Your Name/C=AE"
+```
+
+1. [developer.apple.com](https://developer.apple.com) → **Certificates,
+   Identifiers & Profiles** → **Certificates** → **+** → **Apple
+   Distribution** → upload `ios_distribution.csr` → download the
+   resulting `.cer` file.
+2. Convert it and package it with your private key into the `.p12` file
+   Xcode would normally have made:
+   ```bash
+   openssl x509 -in distribution.cer -inform DER -out ios_distribution.pem -outform PEM
+   openssl pkcs12 -export -inkey ios_distribution.key -in ios_distribution.pem \
+     -out ios_distribution.p12 -password pass:CHOOSE_A_PASSWORD
+   ```
+   Remember the password you chose — it's `IOS_DIST_CERTIFICATE_PASSWORD`
+   below.
+
+### 2. Create an App Store provisioning profile
+
+[developer.apple.com](https://developer.apple.com) → **Certificates,
+Identifiers & Profiles** → **Profiles** → **+** → **App Store Connect** →
+pick the App ID you registered in Phase 4 step 1 → pick the distribution
+certificate from step 1 above → name it something memorable (e.g.
+"MnAlwahsh App Store") → **Generate** → download the `.mobileprovision`
+file. The name you gave it is `IOS_PROVISIONING_PROFILE_NAME` below.
+
+### 3. Add the GitHub secrets
+
+Repo → **Settings → Secrets and variables → Actions** → **New repository
+secret**, one per row:
+
+| Secret | Value |
+|---|---|
+| `IOS_DIST_CERTIFICATE_BASE64` | `base64 -w0 ios_distribution.p12` (Linux) or `base64 -i ios_distribution.p12` (Mac) — the whole base64 blob |
+| `IOS_DIST_CERTIFICATE_PASSWORD` | the password you chose in step 1 |
+| `IOS_PROVISIONING_PROFILE_BASE64` | `base64 -w0 yourprofile.mobileprovision` |
+| `IOS_PROVISIONING_PROFILE_NAME` | the exact name you gave the profile in step 2 |
+| `IOS_KEYCHAIN_PASSWORD` | any password you make up — only used transiently inside each CI run |
+| `APPLE_TEAM_ID` | Apple Developer → **Membership** — a 10-character ID |
+| `APPLE_ASC_KEY_ID`, `APPLE_ASC_ISSUER_ID`, `APPLE_ASC_PRIVATE_KEY_BASE64` | same API key as Phase 4 step 4 / Phase 5 below — `APPLE_ASC_PRIVATE_KEY_BASE64` is `base64 -w0 AuthKey_XXXX.p8` |
+
+Also add, under **Variables** (not secrets — it's not sensitive) if your
+bundle id isn't the `com.mnalwahsh.ios` default: `IOS_BUNDLE_ID`.
+
+**Never send me any of these values or paste them in this chat** — they
+go directly into GitHub's secrets UI, which even you can't read back
+afterwards, only overwrite.
+
+### 4. Run it
+
+Repo → **Actions** tab → **iOS** workflow → **Run workflow** → tick
+"Also sign and upload the build to TestFlight" → **Run workflow**. Watch
+it in the Actions tab; a green run means a new build showed up in App
+Store Connect → TestFlight (usually a few minutes after the workflow
+finishes, while Apple processes it) — that's Phase 6's sandbox testing
+and Phase 7's upload, both done. The signed `.ipa` is also attached to
+the workflow run itself (Summary → Artifacts) if you ever want it
+directly.
+
+From here, skip to **Phase 8** below to submit it for review.
+
 ## Phase 5 — Wire up server-side verification (Netlify)
 
 In your Netlify site's **Environment variables**, add:
@@ -129,7 +236,7 @@ from the repo the same way it already does for the website.
 **Never send me the `.p8` file's contents or paste them in this chat** —
 they go directly into Netlify's env var UI, nowhere else.
 
-## Phase 6 — Test purchases before submitting anything
+## Phase 6 — Test purchases before submitting anything (Mac/Xcode path only)
 
 **Local (Simulator, no App Store Connect products needed yet):**
 
@@ -154,7 +261,7 @@ Apple transaction to verify) — don't rely on it to prove
    sheet. This exercises the real path all the way through
    `verify-apple-purchase.js`.
 
-## Phase 7 — Archive and upload to TestFlight
+## Phase 7 — Archive and upload to TestFlight (Mac/Xcode path only)
 
 In Xcode: **Product → Archive** (only enabled when the run destination is
 "Any iOS Device", not a Simulator). Once archived, the Organizer window
