@@ -17,6 +17,10 @@ name: iOS
 
 on:
   push:
+    # Only main — a branch with an open PR already gets covered by the
+    # pull_request trigger below; without this, every push to a PR branch
+    # fired both triggers at once and ran build-simulator twice.
+    branches: [main]
     paths:
       - "ios/**"
       - ".github/workflows/ios-build.yml"
@@ -30,6 +34,10 @@ on:
         description: "Also sign and upload the build to TestFlight (needs the signing secrets — see ios/README.md)"
         type: boolean
         default: false
+
+concurrency:
+  group: ios-build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-simulator:
@@ -58,6 +66,12 @@ jobs:
     name: Archive, sign, and upload to TestFlight
     runs-on: macos-15
     if: github.event_name == 'workflow_dispatch' && inputs.upload_to_testflight
+    # Overrides the workflow-level concurrency group with one that never
+    # auto-cancels — losing a mid-flight signed upload to a stray push on
+    # the same branch would be worse than two uploads running at once.
+    concurrency:
+      group: ios-testflight-upload-${{ github.run_id }}
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
 
