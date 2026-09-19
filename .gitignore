@@ -1,1 +1,9 @@
 /signing.keystore
+
+# iOS — XcodeGen generates MnAlwahsh.xcodeproj from ios/project.yml; the
+# generated project and per-developer Xcode state should never be
+# committed (mirrors why android/ commits gradle sources but not build/).
+ios/MnAlwahsh.xcodeproj/
+ios/**/xcuserdata/
+ios/DerivedData/
+ios/build/

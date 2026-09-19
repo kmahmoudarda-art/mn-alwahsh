@@ -8,7 +8,8 @@ import { isSignedIn, getCurrentUser } from '../../utils/authClient';
 import { fetchUnlockedCategories } from '../../utils/entitlements';
 import { getSkuForCategory, ALL_CATEGORIES_SKU, TRIAL_SKU } from '../../utils/playProducts';
 import { isPlayBillingAvailable, buyAndGrant } from '../../utils/playBillingClient';
-import { isRunningInAndroidApp } from '../../utils/platform';
+import { isStoreKitBillingAvailable, buyAndGrantWithStoreKit, restoreStoreKitPurchases } from '../../utils/storeKitBillingClient';
+import { isRunningInAndroidApp, isRunningInIOSApp, isLikelyIOSDevice } from '../../utils/platform';
 import { getValidSession } from '../../utils/authClient';
 import { isHiddenCategory } from '../../utils/hiddenCategories';
 import AuthForm from './AuthForm';
@@ -177,16 +178,24 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
     }
   };
 
+  // Picks whichever native purchase bridge the app is actually running
+  // inside — Google Play Billing on Android, StoreKit on iOS. Neither
+  // path is reachable from the open web (see nativeBillingReady below),
+  // so this never runs in a plain browser tab.
+  const buyNative = (args) => (
+    isRunningInAndroidApp() ? buyAndGrant(args) : buyAndGrantWithStoreKit(args)
+  );
+
   const handleUnlock = (name) => withSession(async (session) => {
     const sku = getSkuForCategory(name);
     if (!sku) { setUnlockError('هذه الفئة غير متاحة للشراء حالياً'); return; }
-    await buyAndGrant({ sku, userId: session.user.id, accessToken: session.access_token });
+    await buyNative({ sku, userId: session.user.id, accessToken: session.access_token });
     loadEntitlements();
     setUnlockPromptFor(null);
   });
 
   const handleUnlockAll = () => withSession(async (session) => {
-    await buyAndGrant({ sku: ALL_CATEGORIES_SKU, userId: session.user.id, accessToken: session.access_token });
+    await buyNative({ sku: ALL_CATEGORIES_SKU, userId: session.user.id, accessToken: session.access_token });
     loadEntitlements();
     setUnlockPromptFor(null);
   });
@@ -194,7 +203,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   // One-game-only unlock — grants nothing in Supabase, just adds the
   // category to local trialCategories state for the rest of this session.
   const handleTrial = (name) => withSession(async (session) => {
-    await buyAndGrant({
+    await buyNative({
       sku: TRIAL_SKU,
       userId: session.user.id,
       accessToken: session.access_token,
@@ -202,6 +211,11 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
     });
     setTrialCategories(prev => prev.includes(name) ? prev : [...prev, name]);
     setUnlockPromptFor(null);
+  });
+
+  const handleRestore = () => withSession(async (session) => {
+    await restoreStoreKitPurchases({ userId: session.user.id, accessToken: session.access_token });
+    loadEntitlements();
   });
 
   if (loading) return <p className="text-center font-tajawal text-sm py-4" style={{ color: '#FF6666' }}>جاري تحميل الفئات...</p>;
@@ -279,10 +293,26 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
           background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.3)',
           borderRadius: 10, padding: '8px 10px',
         }}>
-          {isRunningInAndroidApp()
+          {(isRunningInAndroidApp() || isRunningInIOSApp())
             ? '🔒 سجّل الدخول لفتح المزيد من الفئات'
             : '🔒 سجّل الدخول لفتح المزيد من الفئات أو شرائها'}
         </p>
+      )}
+
+      {/* Apple (Guideline 3.1.2) requires a way to restore prior purchases.
+          Real entitlements already live in Supabase keyed by account (see
+          entitlements.js), so this mainly re-syncs a device that somehow
+          missed a grant — never the only way to get back paid categories. */}
+      {isRunningInIOSApp() && isSignedIn() && (
+        <button
+          onClick={handleRestore}
+          disabled={unlocking}
+          dir="rtl"
+          className="w-full mb-3 font-tajawal text-xs disabled:opacity-50"
+          style={{ color: '#FF9999', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
+        >
+          {unlocking ? '...' : 'استعادة المشتريات السابقة'}
+        </button>
       )}
 
       <div className="cat-scroll-area category-scroll overflow-y-auto overflow-x-hidden" style={{ height: '60vh', scrollBehavior: 'smooth' }}>
@@ -460,7 +490,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                   {unlockError && (
                     <p className="font-tajawal text-xs mb-2" style={{ color: '#FF6666' }}>{unlockError}</p>
                   )}
-                  {isRunningInAndroidApp() && isPlayBillingAvailable() ? (
+                  {(isRunningInAndroidApp() && isPlayBillingAvailable()) || (isRunningInIOSApp() && isStoreKitBillingAvailable()) ? (
                     <>
                       <button
                         onClick={() => handleUnlock(unlockPromptFor)}
@@ -491,22 +521,30 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                       </p>
                     </>
                   ) : (
-                    // Purchasing only happens through Google Play Billing now —
-                    // the website itself never takes payment (see
-                    // playBillingClient.js / verify-play-purchase.js). Anyone
-                    // hitting this on the open web gets pointed at the app.
+                    // Purchasing only happens through the native app's own
+                    // billing (Google Play Billing on Android, StoreKit on
+                    // iOS) — the website itself never takes payment (see
+                    // playBillingClient.js / storeKitBillingClient.js).
+                    // Anyone hitting this on the open web gets pointed at
+                    // whichever store matches their device.
                     <>
                       <p className="font-tajawal text-sm mb-3" style={{ color: 'rgba(255,150,150,0.85)' }}>
-                        الشراء متاح فقط عبر تطبيق Google Play
+                        {isLikelyIOSDevice() ? 'الشراء متاح فقط عبر تطبيق App Store' : 'الشراء متاح فقط عبر تطبيق Google Play'}
                       </p>
                       <a
-                        href="https://play.google.com/store/apps/details?id=com.mnalwahsh.twa"
+                        href={isLikelyIOSDevice()
+                          // TODO: replace with the real App Store URL once
+                          // the app is created in App Store Connect (the
+                          // numeric id only exists after that) — see
+                          // ios/README.md.
+                          ? 'https://apps.apple.com/app/id0000000000'
+                          : 'https://play.google.com/store/apps/details?id=com.mnalwahsh.twa'}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-full inline-block font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
                         style={{ background: '#FFD700', color: '#2a0000' }}
                       >
-                        حمّل التطبيق من Google Play
+                        {isLikelyIOSDevice() ? 'حمّل التطبيق من App Store' : 'حمّل التطبيق من Google Play'}
                       </a>
                     </>
                   )}

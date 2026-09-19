@@ -1,0 +1,1081 @@
+{
+  "identifier": "74b089ef-c697-45bc-aef0-ef86deb9a795",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "a271f12b-9a0f-4cde-9629-cc98bc067d86",
+      "localizations": [
+        {
+          "description": "football logo — من الوحش",
+          "displayName": "football logo",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat001",
+      "referenceName": "football logo",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "2bca3032-d911-40c4-8b48-a4798a92e47d",
+      "localizations": [
+        {
+          "description": "CR7 — من الوحش",
+          "displayName": "CR7",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat002",
+      "referenceName": "CR7",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "7626a9ed-f5a3-4d27-b53e-418e6774338f",
+      "localizations": [
+        {
+          "description": "ميسي — من الوحش",
+          "displayName": "ميسي",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat003",
+      "referenceName": "ميسي",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "02f977c7-7796-4f3e-ad1d-20a03faa09cc",
+      "localizations": [
+        {
+          "description": "كأس العرب — من الوحش",
+          "displayName": "كأس العرب",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat004",
+      "referenceName": "كأس العرب",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "833df682-bd13-4dce-bb75-272d4189d3c4",
+      "localizations": [
+        {
+          "description": "كأس آسيا — من الوحش",
+          "displayName": "كأس آسيا",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat005",
+      "referenceName": "كأس آسيا",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "eb5a819f-446b-45f1-a59d-4834aa0ca8cf",
+      "localizations": [
+        {
+          "description": "Champions League — من الوحش",
+          "displayName": "Champions League",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat006",
+      "referenceName": "Champions League",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "ac3101bb-fb13-4bc2-9145-11c485e5a5f2",
+      "localizations": [
+        {
+          "description": "المنتخب الأردني — من الوحش",
+          "displayName": "المنتخب الأردني",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat007",
+      "referenceName": "المنتخب الأردني",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "2f5ece0e-9b3f-4a2e-9f48-011638354fab",
+      "localizations": [
+        {
+          "description": "League of Legends — من الوحش",
+          "displayName": "League of Legends",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat008",
+      "referenceName": "League of Legends",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "3b72e932-fb8e-4b75-9239-feddaf30839e",
+      "localizations": [
+        {
+          "description": "Real Madrid — من الوحش",
+          "displayName": "Real Madrid",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat009",
+      "referenceName": "Real Madrid",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "6457b71c-87cd-4307-a06b-d033d37b25bc",
+      "localizations": [
+        {
+          "description": "Barcelona — من الوحش",
+          "displayName": "Barcelona",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat010",
+      "referenceName": "Barcelona",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "cf5eaa52-680d-4871-b507-243354da4f1e",
+      "localizations": [
+        {
+          "description": "WildRift — من الوحش",
+          "displayName": "WildRift",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat011",
+      "referenceName": "WildRift",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "ce859129-8f38-4d26-965b-327c0a4292ea",
+      "localizations": [
+        {
+          "description": "ريال مدريد — من الوحش",
+          "displayName": "ريال مدريد",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat012",
+      "referenceName": "ريال مدريد",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "179991c0-9f18-4796-a6f6-e321c3faa3f6",
+      "localizations": [
+        {
+          "description": "برشلونة — من الوحش",
+          "displayName": "برشلونة",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat013",
+      "referenceName": "برشلونة",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "b9a4807b-43f8-4548-85bd-6c44d97268ab",
+      "localizations": [
+        {
+          "description": "برشلونه — من الوحش",
+          "displayName": "برشلونه",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat014",
+      "referenceName": "برشلونه",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "054d7bee-ad82-4146-ba9c-03ba6ccdcf50",
+      "localizations": [
+        {
+          "description": "وايلد ريفت — من الوحش",
+          "displayName": "وايلد ريفت",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat015",
+      "referenceName": "وايلد ريفت",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "0d1054cd-02f7-423f-a878-466f58656d04",
+      "localizations": [
+        {
+          "description": "محترف كرة — من الوحش",
+          "displayName": "محترف كرة",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat016",
+      "referenceName": "محترف كرة",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "d2f5da23-e898-4d53-b7ac-a8ce21dc0267",
+      "localizations": [
+        {
+          "description": "جيم اوف ثرونز — من الوحش",
+          "displayName": "جيم اوف ثرونز",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat017",
+      "referenceName": "جيم اوف ثرونز",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "368e20c4-184e-4813-b9e7-a5c297747e67",
+      "localizations": [
+        {
+          "description": "جميل وهناء — من الوحش",
+          "displayName": "جميل وهناء",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat018",
+      "referenceName": "جميل وهناء",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "b082db37-9d10-4daf-b24f-7d359030798d",
+      "localizations": [
+        {
+          "description": "جميل و هناء — من الوحش",
+          "displayName": "جميل و هناء",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat019",
+      "referenceName": "جميل و هناء",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "a42c5603-dd8c-4ff9-8bc6-dcc461f8357d",
+      "localizations": [
+        {
+          "description": "أفلام إنجليزية — من الوحش",
+          "displayName": "أفلام إنجليزية",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat020",
+      "referenceName": "أفلام إنجليزية",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "9716bafc-1ba0-4784-991d-b87065cf6868",
+      "localizations": [
+        {
+          "description": "نتفليكس — من الوحش",
+          "displayName": "نتفليكس",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat021",
+      "referenceName": "نتفليكس",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "306d790a-bd7c-48cf-99d8-b564ec22aed0",
+      "localizations": [
+        {
+          "description": "بريكينج باد — من الوحش",
+          "displayName": "بريكينج باد",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat022",
+      "referenceName": "بريكينج باد",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "82d365cb-250a-4e32-9a09-b4f39d3b65be",
+      "localizations": [
+        {
+          "description": "بيكي بلايندرز — من الوحش",
+          "displayName": "بيكي بلايندرز",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat023",
+      "referenceName": "بيكي بلايندرز",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "8786700c-4a77-4531-b247-472ca946eca7",
+      "localizations": [
+        {
+          "description": "بريزون بريك — من الوحش",
+          "displayName": "بريزون بريك",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat024",
+      "referenceName": "بريزون بريك",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "6a082b22-67c7-4544-9d37-87e46952f100",
+      "localizations": [
+        {
+          "description": "Friends — من الوحش",
+          "displayName": "Friends",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat025",
+      "referenceName": "Friends",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "e368b745-8810-4fd7-96de-be32cc52a75d",
+      "localizations": [
+        {
+          "description": "Arab Idol — من الوحش",
+          "displayName": "Arab Idol",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat026",
+      "referenceName": "Arab Idol",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "d2c17382-ecfe-4d77-bd67-e3a651151008",
+      "localizations": [
+        {
+          "description": "Arab Got Talent — من الوحش",
+          "displayName": "Arab Got Talent",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat027",
+      "referenceName": "Arab Got Talent",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "332bf018-6174-4779-b16d-683fcf859908",
+      "localizations": [
+        {
+          "description": "Game of Thrones — من الوحش",
+          "displayName": "Game of Thrones",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat028",
+      "referenceName": "Game of Thrones",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "0be0f07c-f6cf-4f6e-ae27-e00f33df88bb",
+      "localizations": [
+        {
+          "description": "باب الحارة — من الوحش",
+          "displayName": "باب الحارة",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat029",
+      "referenceName": "باب الحارة",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "1d7a433c-3a5c-4a4d-8ffc-0297f34c2179",
+      "localizations": [
+        {
+          "description": "أفلام احمد حلمي — من الوحش",
+          "displayName": "أفلام احمد حلمي",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat030",
+      "referenceName": "أفلام احمد حلمي",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "4e40b9f8-106a-4d35-a56b-ac3ce22db6e9",
+      "localizations": [
+        {
+          "description": "Who Said GOT — من الوحش",
+          "displayName": "Who Said GOT",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat031",
+      "referenceName": "Who Said GOT",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "e26b5fc2-ebb3-4a0b-960f-fedc7b3c2259",
+      "localizations": [
+        {
+          "description": "أم كلثوم — من الوحش",
+          "displayName": "أم كلثوم",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat032",
+      "referenceName": "أم كلثوم",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "d36ca904-f11f-4c5d-82c9-e6e7a34fdb9b",
+      "localizations": [
+        {
+          "description": "عبد الحليم — من الوحش",
+          "displayName": "عبد الحليم",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat033",
+      "referenceName": "عبد الحليم",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "da705a83-ad69-4956-b4c0-32b879a23b61",
+      "localizations": [
+        {
+          "description": "حمو بيكا — من الوحش",
+          "displayName": "حمو بيكا",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat034",
+      "referenceName": "حمو بيكا",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "423bf3a3-4a48-4cfd-bcd5-55057eb7ce79",
+      "localizations": [
+        {
+          "description": "تامر حسني — من الوحش",
+          "displayName": "تامر حسني",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat035",
+      "referenceName": "تامر حسني",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "fa1326a5-4955-4b8b-b22d-5c0a9924e91b",
+      "localizations": [
+        {
+          "description": "عمرو دياب — من الوحش",
+          "displayName": "عمرو دياب",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat036",
+      "referenceName": "عمرو دياب",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "71a2f86d-9fb4-47d7-a0e6-b505d55ff7f6",
+      "localizations": [
+        {
+          "description": "أغاني قديمة — من الوحش",
+          "displayName": "أغاني قديمة",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat037",
+      "referenceName": "أغاني قديمة",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "bf6f8270-63f7-4f3d-8ee3-209e7c899c85",
+      "localizations": [
+        {
+          "description": "من غنى ؟ — من الوحش",
+          "displayName": "من غنى ؟",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat038",
+      "referenceName": "من غنى ؟",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "93bca064-e506-4aef-b608-9e3b69cf78cc",
+      "localizations": [
+        {
+          "description": "لمن الاغنية — من الوحش",
+          "displayName": "لمن الاغنية",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat039",
+      "referenceName": "لمن الاغنية",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "64096900-e668-4206-806f-fc1ef660098a",
+      "localizations": [
+        {
+          "description": "أعلام العالم — من الوحش",
+          "displayName": "أعلام العالم",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat040",
+      "referenceName": "أعلام العالم",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "cf011bce-8208-478c-9657-3d1725a211fc",
+      "localizations": [
+        {
+          "description": "الأردن — من الوحش",
+          "displayName": "الأردن",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat041",
+      "referenceName": "الأردن",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "796aa9b8-a81b-42f6-a9d9-960f873ade01",
+      "localizations": [
+        {
+          "description": "دبي — من الوحش",
+          "displayName": "دبي",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat042",
+      "referenceName": "دبي",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "66e5051d-bea6-40d5-807d-2582e574261c",
+      "localizations": [
+        {
+          "description": "براندات — من الوحش",
+          "displayName": "براندات",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat043",
+      "referenceName": "براندات",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "fa71c616-989b-4773-a923-53e46492b0eb",
+      "localizations": [
+        {
+          "description": "أسئلة إنجليزية — من الوحش",
+          "displayName": "أسئلة إنجليزية",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat044",
+      "referenceName": "أسئلة إنجليزية",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "816ddf8c-1882-401c-8ff5-6d8d85e448c8",
+      "localizations": [
+        {
+          "description": "هواتف ذكية — من الوحش",
+          "displayName": "هواتف ذكية",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat045",
+      "referenceName": "هواتف ذكية",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "d8b524e0-1b6d-4368-98cf-6cf11e33c10f",
+      "localizations": [
+        {
+          "description": "سيارات — من الوحش",
+          "displayName": "سيارات",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat046",
+      "referenceName": "سيارات",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "9c4eee06-a27a-4c5d-8e61-c0613c97d0b1",
+      "localizations": [
+        {
+          "description": "سبيستون — من الوحش",
+          "displayName": "سبيستون",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat047",
+      "referenceName": "سبيستون",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "a3928386-0524-4945-8f73-89a198a38beb",
+      "localizations": [
+        {
+          "description": "Sephora — من الوحش",
+          "displayName": "Sephora",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat048",
+      "referenceName": "Sephora",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "e543165c-ae03-4ce8-ab79-0b408f91f519",
+      "localizations": [
+        {
+          "description": "سيفورا — من الوحش",
+          "displayName": "سيفورا",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat049",
+      "referenceName": "سيفورا",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "a7df012b-ae21-44fa-9b54-e12afbf48bdb",
+      "localizations": [
+        {
+          "description": "guess fashion — من الوحش",
+          "displayName": "guess fashion",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat050",
+      "referenceName": "guess fashion",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "4e4f278b-768c-444a-b74c-6349d3cff991",
+      "localizations": [
+        {
+          "description": "Dubai Bling — من الوحش",
+          "displayName": "Dubai Bling",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat051",
+      "referenceName": "Dubai Bling",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "90dea5fb-8484-442a-8c72-6592654498f9",
+      "localizations": [
+        {
+          "description": "guess fashion easy — من الوحش",
+          "displayName": "guess fashion easy",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat052",
+      "referenceName": "guess fashion easy",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "2c51d0b2-a388-49f8-a8d3-3761fb4634a1",
+      "localizations": [
+        {
+          "description": "ديزني — من الوحش",
+          "displayName": "ديزني",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat053",
+      "referenceName": "ديزني",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "aef846c8-dc05-40a8-a7aa-6325162735b7",
+      "localizations": [
+        {
+          "description": "Disney — من الوحش",
+          "displayName": "Disney",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat054",
+      "referenceName": "Disney",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "47abf85e-6944-465d-ba33-9c7d85bb7436",
+      "localizations": [
+        {
+          "description": "بيبي شارك — من الوحش",
+          "displayName": "بيبي شارك",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat055",
+      "referenceName": "بيبي شارك",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "cc3c53d0-5ace-43fa-acf9-ecc906bf0391",
+      "localizations": [
+        {
+          "description": "Baby Shark — من الوحش",
+          "displayName": "Baby Shark",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat056",
+      "referenceName": "Baby Shark",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "476a6285-1e60-4e14-a35f-795015644c72",
+      "localizations": [
+        {
+          "description": "سبونج بوب — من الوحش",
+          "displayName": "سبونج بوب",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat057",
+      "referenceName": "سبونج بوب",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "0aa1c67c-36a3-423f-b44b-d52e49159dd8",
+      "localizations": [
+        {
+          "description": "SpongeBob — من الوحش",
+          "displayName": "SpongeBob",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat058",
+      "referenceName": "SpongeBob",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "33ad07db-fda8-4c53-b312-e9b2da0f7d6c",
+      "localizations": [
+        {
+          "description": "من الشخصية ؟ — من الوحش",
+          "displayName": "من الشخصية ؟",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat059",
+      "referenceName": "من الشخصية ؟",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "5c9d2965-6ac2-49c2-a3bd-96a0cc35eb01",
+      "localizations": [
+        {
+          "description": "IQ — من الوحش",
+          "displayName": "IQ",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat060",
+      "referenceName": "IQ",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "f47427cb-8e21-4677-887d-fe565d80fff6",
+      "localizations": [
+        {
+          "description": "رياضيات — من الوحش",
+          "displayName": "رياضيات",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat061",
+      "referenceName": "رياضيات",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "3.99",
+      "familyShareable": false,
+      "internalID": "b646db39-a6bb-4b12-b8b6-96ba00a87d61",
+      "localizations": [
+        {
+          "description": "الغاز محيرة — من الوحش",
+          "displayName": "الغاز محيرة",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat062",
+      "referenceName": "الغاز محيرة",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "9578fe6c-c027-4e34-97d2-f2fea6b7ae15",
+      "localizations": [
+        {
+          "description": "Logos — من الوحش",
+          "displayName": "Logos",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat063",
+      "referenceName": "Logos",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "edfa693e-696f-4916-beee-58c0d3953c34",
+      "localizations": [
+        {
+          "description": "فلسفة — من الوحش",
+          "displayName": "فلسفة",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat064",
+      "referenceName": "فلسفة",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "ba6041b3-3df6-45d7-b64b-e30e12a69081",
+      "localizations": [
+        {
+          "description": "محاسبة — من الوحش",
+          "displayName": "محاسبة",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat065",
+      "referenceName": "محاسبة",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "1.99",
+      "familyShareable": false,
+      "internalID": "78f3ccc3-6c3a-4300-a944-f06cfe9f6d6d",
+      "localizations": [
+        {
+          "description": "حيوانات — من الوحش",
+          "displayName": "حيوانات",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat066",
+      "referenceName": "حيوانات",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "a13257cb-376c-4b7c-9e85-25a182160f35",
+      "localizations": [
+        {
+          "description": "Dangerous Animals — من الوحش",
+          "displayName": "Dangerous Animals",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat067",
+      "referenceName": "Dangerous Animals",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "0a1137e3-5a7f-4a1a-b6c8-9644abceee6a",
+      "localizations": [
+        {
+          "description": "حيوانات خطرة — من الوحش",
+          "displayName": "حيوانات خطرة",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat068",
+      "referenceName": "حيوانات خطرة",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "2.99",
+      "familyShareable": false,
+      "internalID": "3b0b80c5-2a42-46c9-b000-b05498a5afbd",
+      "localizations": [
+        {
+          "description": "حيوانات خطيرة — من الوحش",
+          "displayName": "حيوانات خطيرة",
+          "locale": "ar"
+        }
+      ],
+      "productID": "cat069",
+      "referenceName": "حيوانات خطيرة",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "24.99",
+      "familyShareable": false,
+      "internalID": "3dc3189c-8576-4f48-ae7e-992869bdf5ac",
+      "localizations": [
+        {
+          "description": "فتح جميع الفئات — من الوحش",
+          "displayName": "فتح جميع الفئات",
+          "locale": "ar"
+        }
+      ],
+      "productID": "unlock_all_categories",
+      "referenceName": "Unlock all categories",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "0.99",
+      "familyShareable": false,
+      "internalID": "c8cf9423-be56-47a9-8b92-d12a7307e318",
+      "localizations": [
+        {
+          "description": "تجربة لعبة واحدة — من الوحش",
+          "displayName": "تجربة لعبة واحدة",
+          "locale": "ar"
+        }
+      ],
+      "productID": "trial_pass",
+      "referenceName": "One-game trial pass",
+      "type": "Consumable"
+    }
+  ],
+  "settings": {
+    "_applicationInternalID": "0",
+    "_developerTeamID": "0000000000",
+    "_lastSynchronizedDate": 0
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 3,
+    "minor": 0
+  }
+}
