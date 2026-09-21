@@ -29,9 +29,11 @@
 // by hand.
 //
 // This makes real, non-reversible changes to your App Store Connect app —
-// review the log output as it runs. It's also idempotent-ish: re-running
-// after a partial failure will fail with "already exists" on products
-// already created (harmless — the script just moves to the next one).
+// review the log output as it runs. It's fully safe to re-run: it looks up
+// which products already exist first, and for those, only (re)attempts
+// localization and pricing rather than skipping them outright — so a
+// re-run after a partial failure (e.g. only pricing failed last time)
+// finishes the job instead of reporting "already exists" and moving on.
 //
 // Usage:
 //   APPLE_ISSUER_ID=... APPLE_KEY_ID=... APPLE_PRIVATE_KEY_PATH=/path/to/AuthKey_XXXX.p8 \
@@ -148,6 +150,21 @@ products.push({
   price: TRIAL_PRICE_ANDROID,
 });
 
+// Builds productId -> inAppPurchase id for everything already created in
+// this app, so a re-run can pick up exactly where a previous run left off
+// instead of erroring on "already exists" and skipping useful follow-up
+// work (localization, pricing) for those products.
+async function fetchExistingProducts() {
+  const map = new Map();
+  let url = `/v2/apps/${APP_ID}/inAppPurchases?limit=200&fields[inAppPurchases]=productId`;
+  while (url) {
+    const res = await api('GET', url);
+    for (const item of res.data) map.set(item.attributes.productId, item.id);
+    url = res.links?.next ? res.links.next.replace(API_BASE, '') : null;
+  }
+  return map;
+}
+
 async function createProduct({ sku, type, name }) {
   const res = await api('POST', '/v2/inAppPurchases', {
     data: {
@@ -167,20 +184,30 @@ async function createProduct({ sku, type, name }) {
   return res.data.id;
 }
 
+// Returns 'created', 'already-exists', or throws. Apple returns a 409
+// (CONFLICT / STATE_ERROR-ish) if this locale is already localized for
+// this product, which a re-run hits every time for already-processed
+// products — treated as success, not a failure to report.
 async function createLocalization(iapId, name) {
-  await api('POST', '/v1/inAppPurchaseLocalizations', {
-    data: {
-      type: 'inAppPurchaseLocalizations',
-      attributes: {
-        name: name.slice(0, 30),
-        description: `فتح فئة ${name} في لعبة من الوحش`.slice(0, 45),
-        locale: 'ar-SA',
+  try {
+    await api('POST', '/v1/inAppPurchaseLocalizations', {
+      data: {
+        type: 'inAppPurchaseLocalizations',
+        attributes: {
+          name: name.slice(0, 30),
+          description: `فتح فئة ${name} في لعبة من الوحش`.slice(0, 45),
+          locale: 'ar-SA',
+        },
+        relationships: {
+          inAppPurchaseV2: { data: { type: 'inAppPurchases', id: iapId } },
+        },
       },
-      relationships: {
-        inAppPurchaseV2: { data: { type: 'inAppPurchases', id: iapId } },
-      },
-    },
-  });
+    });
+    return 'created';
+  } catch (err) {
+    if (err.status === 409) return 'already-exists';
+    throw err;
+  }
 }
 
 // Picks the cheapest US price point whose customerPrice (USD) is >= the
@@ -205,41 +232,60 @@ async function findPricePoint(iapId, aedPrice) {
 }
 
 async function createPriceSchedule(iapId, pricePointId) {
-  await api('POST', '/v1/inAppPurchasePriceSchedules', {
-    data: {
-      type: 'inAppPurchasePriceSchedules',
-      relationships: {
-        inAppPurchase: { data: { type: 'inAppPurchases', id: iapId } },
-        baseTerritory: { data: { type: 'territories', id: 'USA' } },
-        manualPrices: { data: [{ type: 'inAppPurchasePrices', id: 'manualPrice1' }] },
-      },
-    },
-    included: [
-      {
-        type: 'inAppPurchasePrices',
-        id: 'manualPrice1',
-        attributes: { startDate: null },
+  // Apple's JSON:API "inline creation" convention requires locally-scoped
+  // ids in POST bodies to be wrapped as '${...}' — a bare string like
+  // 'manualPrice1' is rejected with ENTITY_ERROR.INCLUDED.INVALID_ID even
+  // though it looks like exactly what their own docs/README examples show.
+  const localId = '${manualPrice1}';
+  try {
+    await api('POST', '/v1/inAppPurchasePriceSchedules', {
+      data: {
+        type: 'inAppPurchasePriceSchedules',
         relationships: {
-          inAppPurchasePricePoint: { data: { type: 'inAppPurchasePricePoints', id: pricePointId } },
+          inAppPurchase: { data: { type: 'inAppPurchases', id: iapId } },
+          baseTerritory: { data: { type: 'territories', id: 'USA' } },
+          manualPrices: { data: [{ type: 'inAppPurchasePrices', id: localId }] },
         },
       },
-    ],
-  });
+      included: [
+        {
+          type: 'inAppPurchasePrices',
+          id: localId,
+          attributes: { startDate: null },
+          relationships: {
+            inAppPurchasePricePoint: { data: { type: 'inAppPurchasePricePoints', id: pricePointId } },
+          },
+        },
+      ],
+    });
+  } catch (err) {
+    if (err.status === 409) return; // a price schedule already exists — fine
+    throw err;
+  }
 }
 
 async function main() {
-  console.log(`Creating ${products.length} in-app purchases for app ${APP_ID}...\n`);
+  console.log(`Looking up already-created products for app ${APP_ID}...`);
+  const existing = await fetchExistingProducts();
+  console.log(`Found ${existing.size} already created. Processing ${products.length} total...\n`);
+
   const needsManualPricing = [];
   const failed = [];
 
   for (const [i, product] of products.entries()) {
     const tag = `[${i + 1}/${products.length}] ${product.sku}`;
-    try {
-      const iapId = await createProduct(product);
-      console.log(`${tag}: created (id ${iapId})`);
+    let iapId = existing.get(product.sku);
 
-      await createLocalization(iapId, product.name);
-      console.log(`${tag}: localization added`);
+    try {
+      if (iapId) {
+        console.log(`${tag}: already exists (id ${iapId})`);
+      } else {
+        iapId = await createProduct(product);
+        console.log(`${tag}: created (id ${iapId})`);
+      }
+
+      const localizationResult = await createLocalization(iapId, product.name);
+      console.log(`${tag}: localization ${localizationResult}`);
 
       try {
         const pricePoint = await findPricePoint(iapId, product.price);
@@ -251,10 +297,6 @@ async function main() {
         needsManualPricing.push(product.sku);
       }
     } catch (err) {
-      if (err.status === 409 || /already exist|CONFLICT/i.test(err.message)) {
-        console.log(`${tag}: already exists, skipping`);
-        continue;
-      }
       console.error(`${tag}: FAILED — ${err.message}`);
       failed.push(product.sku);
     }
