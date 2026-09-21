@@ -123,6 +123,25 @@ In Xcode:
    match Google Play's exact AED figure to the cent).
    This is the single most tedious step — there's no bulk-import UI for
    this in App Store Connect's web interface. Do it once, carefully.
+
+   **Faster alternative**: `scripts/create_iap_products.mjs` creates all
+   71 products via the App Store Connect API instead of the "+" form,
+   using the API key from step 4 below (so do step 4 first). It handles
+   product ID, type, reference name, and an Arabic localization for every
+   product, and attempts pricing too — anything it can't price it lists at
+   the end for you to set manually (Apple's pricing API is the flakiest
+   part of this). Run it from the repo root:
+   ```bash
+   APPLE_ISSUER_ID=<issuer id from step 4> \
+   APPLE_KEY_ID=<key id from step 4> \
+   APPLE_PRIVATE_KEY_PATH=/path/to/AuthKey_XXXX.p8 \
+   APPLE_APP_ID=<numeric App ID — shown in App Store Connect's URL for your app> \
+   node ios/scripts/create_iap_products.mjs
+   ```
+   It still leaves two things for you to do manually afterward (per
+   product, in App Store Connect's UI): the review screenshot, and
+   anything it flagged as needing manual pricing. Everything else (name,
+   ID, type, localization) is done.
 4. **Users and Access → Integrations → In-App Purchase** (or "App Store
    Connect API", same page) → create an API key with at least the
    **App Manager** role → note the **Key ID** and **Issuer ID**, and
