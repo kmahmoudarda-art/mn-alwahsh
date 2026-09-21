@@ -156,7 +156,11 @@ products.push({
 // work (localization, pricing) for those products.
 async function fetchExistingProducts() {
   const map = new Map();
-  let url = `/v2/apps/${APP_ID}/inAppPurchases?limit=200&fields[inAppPurchases]=productId`;
+  // Apple's actual route for this: the app's relationship endpoint is
+  // named "inAppPurchasesV2" (a holdover from when they introduced the v2
+  // in-app purchase model) and lives under /v1/apps/, not /v2/apps/ —
+  // there is no /v2/apps/{id}/inAppPurchases route at all.
+  let url = `/v1/apps/${APP_ID}/inAppPurchasesV2?limit=200`;
   while (url) {
     const res = await api('GET', url);
     for (const item of res.data) map.set(item.attributes.productId, item.id);
