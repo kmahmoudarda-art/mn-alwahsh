@@ -61,6 +61,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   const [unlockedCategories, setUnlockedCategories] = useState([]);
   const [unlocking, setUnlocking] = useState(false);
   const [unlockError, setUnlockError] = useState(null);
+  const [restoreMessage, setRestoreMessage] = useState(null);
   // One-game-only unlocks from the trial SKU — never written to Supabase,
   // never persisted, so it naturally resets whenever CategoryPicker remounts
   // for a new game. See TRIAL_PRICE_ANDROID note in premiumConfig.js.
@@ -213,10 +214,36 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
     setUnlockPromptFor(null);
   });
 
-  const handleRestore = () => withSession(async (session) => {
-    await restoreStoreKitPurchases({ userId: session.user.id, accessToken: session.access_token });
-    loadEntitlements();
-  });
+  // Deliberately doesn't go through withSession — that helper's catch block
+  // always shows the generic "purchase failed" wording, and that text was
+  // never even rendered here (it only renders inside the unlock-prompt
+  // modal). The result was this button doing something invisible: tap it
+  // and, success or failure, nothing on screen ever changed — see S-07.
+  const handleRestore = async () => {
+    setRestoreMessage(null);
+    setUnlocking(true);
+    try {
+      const session = await getValidSession();
+      if (!session?.access_token || !session?.user?.id) {
+        setRestoreMessage('يجب تسجيل الدخول أولاً');
+        return;
+      }
+      const { ok, restored } = await restoreStoreKitPurchases({ userId: session.user.id, accessToken: session.access_token });
+      if (!ok) {
+        setRestoreMessage('تعذّرت استعادة المشتريات — حاول مرة أخرى');
+        return;
+      }
+      await loadEntitlements();
+      setRestoreMessage(restored.length
+        ? `تمت استعادة ${restored.length} من مشترياتك`
+        : 'لا توجد مشتريات سابقة على هذا الحساب');
+    } catch (err) {
+      console.error('[CategoryPicker] restore failed:', err);
+      setRestoreMessage('تعذّرت استعادة المشتريات — حاول مرة أخرى');
+    } finally {
+      setUnlocking(false);
+    }
+  };
 
   if (loading) return <p className="text-center font-tajawal text-sm py-4" style={{ color: '#FF6666' }}>جاري تحميل الفئات...</p>;
 
@@ -304,15 +331,20 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
           entitlements.js), so this mainly re-syncs a device that somehow
           missed a grant — never the only way to get back paid categories. */}
       {isRunningInIOSApp() && isSignedIn() && (
-        <button
-          onClick={handleRestore}
-          disabled={unlocking}
-          dir="rtl"
-          className="w-full mb-3 font-tajawal text-xs disabled:opacity-50"
-          style={{ color: '#FF9999', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
-        >
-          {unlocking ? '...' : 'استعادة المشتريات السابقة'}
-        </button>
+        <div className="mb-3 text-center">
+          <button
+            onClick={handleRestore}
+            disabled={unlocking}
+            dir="rtl"
+            className="w-full font-tajawal text-xs disabled:opacity-50"
+            style={{ color: '#FF9999', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            {unlocking ? '...' : 'استعادة المشتريات السابقة'}
+          </button>
+          {restoreMessage && (
+            <p dir="rtl" className="font-tajawal text-xs" style={{ color: '#FFD700', marginTop: 4 }}>{restoreMessage}</p>
+          )}
+        </div>
       )}
 
       <div className="cat-scroll-area category-scroll overflow-y-auto overflow-x-hidden" style={{ height: '60vh', scrollBehavior: 'smooth' }}>

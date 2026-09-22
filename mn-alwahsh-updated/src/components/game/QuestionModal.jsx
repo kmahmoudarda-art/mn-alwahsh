@@ -1068,7 +1068,7 @@ export default function QuestionModal({
 
                   {/* Options before answer */}
                   {!answered && (
-                    <div style={{ flexShrink:0, display:'grid', gridTemplateColumns:'1fr 1fr', gap:6, padding:'0 12px 10px' }}>
+                    <div style={{ flexShrink:0, display:'grid', gridTemplateColumns:'minmax(0,1fr) minmax(0,1fr)', gap:6, padding:'0 12px 10px' }}>
                       {Object.entries(question.options).map(([key, value]) => {
                         const isEliminated = friendHint === key;
                         const isFirstWrong = firstWrongAnswer === key;
@@ -1079,7 +1079,7 @@ export default function QuestionModal({
                         if (isFirstWrong) { bg='rgba(239,68,68,0.18)'; bdr='1.5px solid rgba(239,68,68,0.65)'; clr='rgb(185,28,28)'; }
                         return (
                           <button key={key} onClick={() => !isDisabled && onAnswer(key)} disabled={isDisabled}
-                            style={{ minHeight:48, borderRadius:10, padding:'6px 10px',
+                            style={{ minHeight:48, minWidth:0, borderRadius:10, padding:'6px 10px',
                               fontSize:16, fontWeight:700, lineHeight:1.3, wordBreak:'break-word',
                               display:'flex', alignItems:'center', justifyContent:'flex-end', gap:8,
                               direction:'rtl', textAlign:'right',
@@ -1088,6 +1088,7 @@ export default function QuestionModal({
                               textDecoration: isEliminated ? 'line-through' : 'none',
                               cursor: isDisabled ? 'not-allowed' : 'pointer',
                               fontFamily:'var(--font-cairo)', transition:'background 0.15s',
+                              boxSizing:'border-box', width:'100%',
                             }}>
                             <span style={{ fontWeight:700, color: isFirstWrong ? 'rgb(185,28,28)' : GOLD, flexShrink:0 }}>{key}. {isFirstWrong ? '✗' : ''}</span>
                             {value}
@@ -1099,7 +1100,7 @@ export default function QuestionModal({
 
                   {/* Options after answer */}
                   {answered && (
-                    <div style={{ flexShrink:0, display:'grid', gridTemplateColumns:'1fr 1fr', gap:6, padding:'0 12px 8px' }}>
+                    <div style={{ flexShrink:0, display:'grid', gridTemplateColumns:'minmax(0,1fr) minmax(0,1fr)', gap:6, padding:'0 12px 8px' }}>
                       {Object.entries(question.options).map(([key, value]) => {
                         const isCorrectAnswer = question.correct === key;
                         const isSelected = selectedAnswer === key;
@@ -1109,11 +1110,11 @@ export default function QuestionModal({
                         else if (isSelected || isFirstWrong) { bg=ANS_WRONG_BG; border=ANS_WRONG_BDR; color=ANS_WRONG_CLR; }
                         const showRedCross = (isSelected || isFirstWrong) && !isCorrectAnswer;
                         return (
-                          <div key={key} style={{ minHeight:48, borderRadius:10, padding:'6px 10px',
+                          <div key={key} style={{ minHeight:48, minWidth:0, borderRadius:10, padding:'6px 10px',
                             fontSize:16, fontWeight:700, lineHeight:1.3, wordBreak:'break-word',
                             display:'flex', alignItems:'center', justifyContent:'flex-end', gap:8,
                             direction:'rtl', textAlign:'right', background:bg, border, color,
-                            fontFamily:'var(--font-cairo)',
+                            fontFamily:'var(--font-cairo)', boxSizing:'border-box', width:'100%',
                           }}>
                             <span style={{ fontWeight:700, color: showRedCross ? 'rgb(185,28,28)' : ANS_KEY_CLR, flexShrink:0 }}>{key}. {showRedCross ? '✗' : ''}</span>
                             {value}
