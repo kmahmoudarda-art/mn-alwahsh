@@ -10,14 +10,22 @@ import ScreenMirrorButton from './ScreenMirrorButton';
 import AuthForm from './AuthForm';
 import { getCurrentUser, signOut, getValidSession } from '../../utils/authClient';
 import { fetchGameCount } from '@/utils/supabaseClient';
+import { isRunningInIOSApp, isRunningInAndroidApp } from '../../utils/platform';
 
 const checkIsIOS = () =>
   /iPad|iPhone|iPod/.test(navigator.userAgent) ||
   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
+// Also true inside the native iOS/Android apps: there the "install" flow
+// (Safari → Add to Home Screen) makes no sense and reads to App Review
+// like a website wrapper. WKWebView's user agent has no "Safari/" token,
+// which is known from the first render, unlike window.WebkitBilling that
+// the iOS app only injects once the page has finished loading.
 const checkIsStandalone = () =>
   window.matchMedia('(display-mode: standalone)').matches ||
-  window.navigator.standalone === true;
+  window.navigator.standalone === true ||
+  isRunningInIOSApp() || isRunningInAndroidApp() ||
+  (/iPad|iPhone|iPod/.test(navigator.userAgent) && !/Safari\//.test(navigator.userAgent));
 
 function IOSInstallModal({ onClose }) {
   return (
