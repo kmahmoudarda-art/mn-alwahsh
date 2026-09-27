@@ -8,7 +8,7 @@ import { isSignedIn, getCurrentUser } from '../../utils/authClient';
 import { fetchUnlockedCategories } from '../../utils/entitlements';
 import { getSkuForCategory, ALL_CATEGORIES_SKU, TRIAL_SKU } from '../../utils/playProducts';
 import { isPlayBillingAvailable, buyAndGrant } from '../../utils/playBillingClient';
-import { isStoreKitBillingAvailable, buyAndGrantWithStoreKit, restoreStoreKitPurchases } from '../../utils/storeKitBillingClient';
+import { isStoreKitBillingAvailable, buyAndGrantWithStoreKit, restoreStoreKitPurchases, getStoreKitProductDetails } from '../../utils/storeKitBillingClient';
 import { isRunningInAndroidApp, isRunningInIOSApp, isLikelyIOSDevice } from '../../utils/platform';
 import { getValidSession } from '../../utils/authClient';
 import { isHiddenCategory } from '../../utils/hiddenCategories';
@@ -66,6 +66,12 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   // never persisted, so it naturally resets whenever CategoryPicker remounts
   // for a new game. See TRIAL_PRICE_ANDROID note in premiumConfig.js.
   const [trialCategories, setTrialCategories] = useState([]);
+  // iOS only: Apple's own localized prices ({ sku: "AED 14.99" }) for the
+  // open unlock prompt. The AED reference prices in premiumConfig.js don't
+  // match what the App Store charges (prices were rounded to Apple's price
+  // points, and each storefront uses its own currency), so on iOS only
+  // StoreKit's displayPrice is ever shown (App Review Guidelines 2.3/3.1).
+  const [storePrices, setStorePrices] = useState({});
 
   // ── Request-a-category flow ──
   // No automated payment yet (see send-category-request.js) — this just
@@ -135,6 +141,29 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   };
 
   useEffect(() => { load(); }, []);
+
+  const showStorePrices = isRunningInIOSApp() && isStoreKitBillingAvailable();
+
+  useEffect(() => {
+    if (!unlockPromptFor || !showStorePrices) return;
+    const skus = [getSkuForCategory(unlockPromptFor), ALL_CATEGORIES_SKU, TRIAL_SKU].filter(Boolean);
+    let cancelled = false;
+    getStoreKitProductDetails(skus).then((details) => {
+      if (cancelled) return;
+      const prices = {};
+      for (const d of details || []) prices[d.itemId] = d.price;
+      setStorePrices((prev) => ({ ...prev, ...prices }));
+    });
+    return () => { cancelled = true; };
+  }, [unlockPromptFor, showStorePrices]);
+
+  // " — <price>" suffix for the unlock prompt: Apple's price on iOS (empty
+  // until StoreKit answers, never a guessed one), the AED reference price
+  // everywhere else.
+  const priceSuffix = (sku, fallbackLabel) => {
+    if (!showStorePrices) return ` — ${fallbackLabel}`;
+    return storePrices[sku] ? ` — ${storePrices[sku]}` : '';
+  };
 
   // '__ALL__' is the sentinel granted for the whole-bundle purchase — its
   // presence means every current AND future premium category is unlocked,
@@ -514,7 +543,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                 {unlockPromptFor}
               </h3>
               <p className="font-tajawal text-sm mb-4" style={{ color: '#FF9999' }}>
-                فئة مميزة — {getPremiumPriceLabel(unlockPromptFor)}
+                فئة مميزة{priceSuffix(getSkuForCategory(unlockPromptFor), getPremiumPriceLabel(unlockPromptFor))}
               </p>
 
               {isSignedIn() ? (
@@ -530,7 +559,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                         className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
                         style={{ background: '#FFD700', color: '#2a0000' }}
                       >
-                        {unlocking ? '...' : `فتح هذه الفئة — ${getPremiumPriceLabel(unlockPromptFor)}`}
+                        {unlocking ? '...' : `فتح هذه الفئة${priceSuffix(getSkuForCategory(unlockPromptFor), getPremiumPriceLabel(unlockPromptFor))}`}
                       </button>
                       <button
                         onClick={handleUnlockAll}
@@ -538,7 +567,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                         className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
                         style={{ background: 'linear-gradient(135deg, #FFD700, #FFA500)', color: '#2a0000' }}
                       >
-                        {unlocking ? '...' : `فتح جميع الفئات — ${ALL_CATEGORIES_PRICE} AED`}
+                        {unlocking ? '...' : `فتح جميع الفئات${priceSuffix(ALL_CATEGORIES_SKU, `${ALL_CATEGORIES_PRICE} AED`)}`}
                       </button>
                       <button
                         onClick={() => handleTrial(unlockPromptFor)}
@@ -546,7 +575,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                         className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
                         style={{ background: 'rgba(255,215,0,0.12)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.4)' }}
                       >
-                        {`جرّبها لهذه اللعبة فقط — ${TRIAL_PRICE_ANDROID} AED`}
+                        {`جرّبها لهذه اللعبة فقط${priceSuffix(TRIAL_SKU, `${TRIAL_PRICE_ANDROID} AED`)}`}
                       </button>
                       <p className="font-tajawal text-xs mb-2" style={{ color: 'rgba(255,150,150,0.7)' }}>
                         التجربة تفتح الفئة لهذه اللعبة فقط، وتُقفل مرة أخرى بعدها
