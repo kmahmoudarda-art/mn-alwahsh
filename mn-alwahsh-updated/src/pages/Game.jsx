@@ -779,7 +779,7 @@ export default function Game() {
   }
 
   if (gamePhase === 'setup') {
-    return <SetupScreen onStartGame={handleStartGame} gameName={gameName} />;
+    return <SetupScreen onStartGame={handleStartGame} onBack={handleExit} gameName={gameName} />;
   }
 
   if (gamePhase === 'finished') {
