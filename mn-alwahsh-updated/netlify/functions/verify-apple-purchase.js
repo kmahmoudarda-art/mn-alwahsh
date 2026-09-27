@@ -46,23 +46,43 @@ const APPLE_BUNDLE_ID = process.env.APPLE_BUNDLE_ID || 'com.mnalwahsh.ios';
 // default — never fall back to skipping verification.
 // See "Obtaining Apple Root Certificates" in the app-store-server-library
 // README: https://github.com/apple/app-store-server-library-node
+// Each root has its current and older URL — Apple has moved some of these
+// files (AppleIncRootCertificate.cer now 404s under /certificateauthority/).
+// Roots are fetched independently and any that fail are skipped:
+// StoreKit 2 transactions chain to Apple Root CA - G3, so that one alone
+// is enough, and verification only fails (closed) if no root at all could
+// be fetched.
 const APPLE_ROOT_CA_URLS = [
-  'https://www.apple.com/certificateauthority/AppleRootCA-G3.cer',
-  'https://www.apple.com/certificateauthority/AppleComputerRootCertificate.cer',
-  'https://www.apple.com/certificateauthority/AppleIncRootCertificate.cer',
+  ['https://www.apple.com/certificateauthority/AppleRootCA-G3.cer'],
+  ['https://www.apple.com/appleca/AppleIncRootCertificate.cer',
+    'https://www.apple.com/certificateauthority/AppleIncRootCertificate.cer'],
+  ['https://www.apple.com/certificateauthority/AppleComputerRootCertificate.cer',
+    'https://www.apple.com/appleca/AppleComputerRootCertificate.cer'],
 ];
+
+async function fetchFirstAvailable(urls) {
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) return Buffer.from(await res.arrayBuffer());
+      console.warn(`[verify-apple-purchase] root CA ${url} -> ${res.status}`);
+    } catch (e) {
+      console.warn(`[verify-apple-purchase] root CA ${url} failed:`, e);
+    }
+  }
+  return null;
+}
 
 let cachedRootCAs = null;
 async function getAppleRootCAs() {
   if (cachedRootCAs) return cachedRootCAs;
-  const buffers = await Promise.all(
-    APPLE_ROOT_CA_URLS.map(async (url) => {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`apple-root-ca-fetch-failed: ${url} (${res.status})`);
-      return Buffer.from(await res.arrayBuffer());
-    })
-  );
-  cachedRootCAs = buffers;
+  const results = await Promise.all(APPLE_ROOT_CA_URLS.map(fetchFirstAvailable));
+  const buffers = results.filter(Boolean);
+  if (!buffers.length) throw new Error('apple-root-ca-fetch-failed');
+  // Only cache once G3 (the root StoreKit 2 actually uses) is in hand, so a
+  // transient failure fetching it is retried on the next request instead
+  // of sticking for the life of the warm instance.
+  if (results[0]) cachedRootCAs = buffers;
   return buffers;
 }
 
