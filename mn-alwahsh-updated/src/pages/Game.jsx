@@ -10,7 +10,7 @@ import { sounds } from '../utils/soundEffects';
 import SetupScreen from '../components/game/SetupScreen';
 import ScoreBar from '../components/game/ScoreBar';
 import GameBoard from '../components/game/GameBoard';
-import QuestionModal from '../components/game/QuestionModal';
+import QuestionModal, { LOCKED_VIEWPORT } from '../components/game/QuestionModal';
 import WinnerScreen from '../components/game/WinnerScreen';
 import SpecialCards from '../components/game/SpecialCards';
 import GameNameScreen from '../components/game/GameNameScreen';
@@ -338,7 +338,7 @@ export default function Game() {
     sounds.tileClick();
     // Reset viewport zoom immediately before modal renders
     const vp = document.querySelector('meta[name="viewport"]');
-    if (vp) vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no');
+    if (vp) vp.setAttribute('content', LOCKED_VIEWPORT);
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
