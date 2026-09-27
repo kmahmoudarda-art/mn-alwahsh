@@ -181,6 +181,12 @@ export default async (req) => {
     return new Response(JSON.stringify({ ok: true, granted: categoriesToGrant }), { status: 200 });
   } catch (e) {
     console.error('[verify-apple-purchase] failed:', e);
-    return new Response(JSON.stringify({ error: 'internal-error' }), { status: 500 });
+    // detail is shown in small print in the app's error message so a
+    // failed purchase can be diagnosed from a screenshot. Only error
+    // codes/messages — never keys or tokens.
+    const detail = e?.apiError ? `apple-api-${e.httpStatusCode}-${e.apiError}`
+      : e?.httpStatusCode ? `apple-api-${e.httpStatusCode}`
+      : String(e?.message || e).slice(0, 120);
+    return new Response(JSON.stringify({ error: 'internal-error', detail }), { status: 500 });
   }
 };
