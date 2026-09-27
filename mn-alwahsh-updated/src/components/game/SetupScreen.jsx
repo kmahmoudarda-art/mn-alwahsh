@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Play, UserCircle2 } from 'lucide-react';
+import { Users, Play, UserCircle2, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import CategoryPicker from './CategoryPicker';
@@ -97,7 +97,7 @@ function SelectedCategoryColumn({ categories, teamName, side, onRemove }) {
   );
 }
 
-export default function SetupScreen({ onStartGame, gameName }) {
+export default function SetupScreen({ onStartGame, onBack, gameName }) {
   const navigate = useNavigate();
   const [team1Name, setTeam1Name] = useState('وحش أحمر');
   const [team2Name, setTeam2Name] = useState('وحش أزرق');
@@ -198,7 +198,23 @@ export default function SetupScreen({ onStartGame, gameName }) {
             colliding with the Team 2 heading on phone-width screens where
             the team cards stack vertically). Scrolls away with the page now,
             so it can never overlap anything. */}
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center gap-2 mb-4">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="flex items-center gap-1.5 rounded-full font-cairo text-xs font-bold"
+              style={{
+                padding: '6px 14px',
+                background: 'rgba(20,0,0,0.75)',
+                border: '1px solid rgba(204,0,0,0.5)',
+                color: '#FFE4E4',
+                backdropFilter: 'blur(4px)',
+              }}
+            >
+              <ArrowRight className="w-4 h-4" style={{ color: '#FFD700' }} />
+              رجوع
+            </button>
+          )}
           <button
             onClick={() => navigate('/login')}
             className="flex items-center gap-1.5 rounded-full font-cairo text-xs font-bold"
