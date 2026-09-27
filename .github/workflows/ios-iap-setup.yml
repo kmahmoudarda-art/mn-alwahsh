@@ -7,6 +7,8 @@ name: iOS in-app purchase setup
 #     already have a working one)
 #   - makes every product available in all countries/regions
 #     (ios/scripts/set_iap_availability.mjs)
+#   - replaces brand/celebrity names in product names with neutral ones
+#     (ios/scripts/rename_iap_products.mjs, Guideline 5.2)
 #
 # Reuses the same App Store Connect API key secrets as the TestFlight
 # upload in ios-build.yml (see ios/README.md). The key needs the Admin or
@@ -21,6 +23,10 @@ on:
         default: true
       set_availability:
         description: "Make every in-app purchase available in all countries/regions"
+        type: boolean
+        default: true
+      rename_products:
+        description: "Replace brand/celebrity names in in-app purchase names with neutral ones"
         type: boolean
         default: true
 
@@ -61,3 +67,8 @@ jobs:
         # Independent of the screenshot step — run it even if that one failed.
         if: ${{ !cancelled() && inputs.set_availability }}
         run: node ios/scripts/set_iap_availability.mjs
+
+      - name: Rename products without brand names
+        # Independent of the other steps — run it even if one of them failed.
+        if: ${{ !cancelled() && inputs.rename_products }}
+        run: node ios/scripts/rename_iap_products.mjs
