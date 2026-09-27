@@ -186,6 +186,21 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
     onSetSelected(shuffled.slice(0, Math.min(max, shuffled.length)));
   };
 
+  // Short technical reason shown in small print after the generic error,
+  // so a failed purchase can be diagnosed from a screenshot: the native
+  // bridge's code ("product-not-found", StoreKit's own message, ...) or
+  // the verify function's JSON error/detail. null = the player cancelled.
+  const purchaseErrorReason = (err) => {
+    const msg = String(err?.message || err || 'unknown');
+    if (msg === 'canceled' || msg === 'USER_CANCELED') return null;
+    try {
+      const data = JSON.parse(msg);
+      return String(data.detail || data.error || msg).slice(0, 120);
+    } catch {
+      return msg.slice(0, 120);
+    }
+  };
+
   // Shared setup for all three Play Billing purchase paths below: needs a
   // signed-in Supabase session (its access token is what lets
   // verify-play-purchase.js insert into `purchases` under the existing RLS
@@ -202,7 +217,9 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
       await fn(session);
     } catch (err) {
       console.error('[CategoryPicker] purchase failed:', err);
-      setUnlockError('تعذر إتمام عملية الشراء — حاول مرة أخرى');
+      const reason = purchaseErrorReason(err);
+      if (reason === null) return; // the player cancelled the store sheet — not an error
+      setUnlockError(`تعذر إتمام عملية الشراء — حاول مرة أخرى (${reason})`);
     } finally {
       setUnlocking(false);
     }
