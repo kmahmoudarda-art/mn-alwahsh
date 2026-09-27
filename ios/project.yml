@@ -45,3 +45,8 @@ targets:
     settings:
       base:
         PRODUCT_NAME: "من الوحش"
+        # iPhone only. Set here on the target because the settingGroups
+        # entry above isn't applied by XcodeGen (its TARGETED_DEVICE_FAMILY
+        # "1,2" never took effect either), so without this the app
+        # defaulted to iPhone + iPad.
+        TARGETED_DEVICE_FAMILY: "1"
