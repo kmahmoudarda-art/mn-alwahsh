@@ -182,7 +182,11 @@ const modalStyle = {
   maxWidth: '100vw',
   maxHeight: '100dvh',
   margin: 0,
-  padding: 0,
+  // index.html uses viewport-fit=cover, so in landscape on a notched
+  // iPhone the page runs under the notch/Dynamic Island and the rounded
+  // corners — keep the answers clear of them.
+  padding: '0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)',
+  boxSizing: 'border-box',
   borderRadius: 0,
   overflow: 'hidden',
   display: 'flex',
@@ -208,9 +212,15 @@ const ANS_DIM_BG      = 'rgba(0,0,0,0.03)';
 const ANS_DIM_BDR     = '1px solid rgba(0,0,0,0.06)';
 const ANS_DIM_CLR     = 'rgba(0,0,0,0.18)';
 
+// Both keep index.html's viewport-fit=cover: dropping it while a question
+// is open makes iOS re-lay-out the page at a different width, shifting the
+// modal sideways so one column of answers ends up off-screen.
+export const LOCKED_VIEWPORT = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover';
+const DEFAULT_VIEWPORT = 'width=device-width, initial-scale=1.0, viewport-fit=cover';
+
 function lockViewport() {
   const vp = document.querySelector('meta[name="viewport"]');
-  if (vp) vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no');
+  if (vp) vp.setAttribute('content', LOCKED_VIEWPORT);
   window.scrollTo(0, 0);
   document.documentElement.scrollTop = 0;
   document.body.scrollTop = 0;
@@ -229,7 +239,7 @@ function unlockViewport() {
   document.body.style.top = '';
   window.scrollTo(0, parseInt(scrollY || '0') * -1);
   const vp = document.querySelector('meta[name="viewport"]');
-  if (vp) vp.setAttribute('content', 'width=device-width, initial-scale=1.0');
+  if (vp) vp.setAttribute('content', DEFAULT_VIEWPORT);
 }
 
 export default function QuestionModal({
