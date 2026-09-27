@@ -29,6 +29,10 @@ on:
         description: "Replace brand/celebrity names in in-app purchase names with neutral ones"
         type: boolean
         default: true
+      check_status:
+        description: "Print every in-app purchase's status and what's missing (read-only)"
+        type: boolean
+        default: true
 
 jobs:
   setup:
@@ -72,3 +76,7 @@ jobs:
         # Independent of the other steps — run it even if one of them failed.
         if: ${{ !cancelled() && inputs.rename_products }}
         run: node ios/scripts/rename_iap_products.mjs
+
+      - name: Report in-app purchase status
+        if: ${{ !cancelled() && inputs.check_status }}
+        run: node ios/scripts/check_iap_status.mjs
