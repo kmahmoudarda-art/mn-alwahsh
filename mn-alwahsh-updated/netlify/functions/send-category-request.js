@@ -3,12 +3,12 @@
 // the requesting user's own access token (RLS-scoped — same pattern as
 // entitlements.js, no service-role key needed for the DB write).
 //
-// Payment (25 AED) is NOT collected automatically here — the request form
-// tells the player payment is arranged separately. The admin follows up
-// with the requester directly, then once the category is actually added
-// to the game, manually grants it to that specific user for free via a
-// direct Supabase insert into `purchases` (category name, user_id from
-// category_requests) — see the table's admin notes.
+// Requests are free suggestions — no payment is asked for or arranged
+// (on iOS, charging for digital content outside the App Store would break
+// App Review Guideline 3.1.1). If the category is added to the game, the
+// admin can grant it to the requester for free via a direct Supabase
+// insert into `purchases` (category name, user_id from category_requests)
+// — see the table's admin notes.
 //
 // REQUIRED Netlify environment variable: RESEND_API_KEY
 // REQUIRED Supabase setup — run once in the SQL editor:
@@ -105,7 +105,6 @@ export default async (req) => {
             <hr/>
             <p><strong>بريد المستخدم:</strong> ${userEmail || 'غير معروف'}</p>
             <p><strong>معرّف المستخدم (لازم لمنحه الفئة مجانًا لاحقًا):</strong><br/><code>${userId}</code></p>
-            <p style="color:#888; font-size:12px;">السعر المتفق عليه: 25 درهم — يُرتّب الدفع يدويًا مع المستخدم مباشرة.</p>
           </div>
         `,
       }),

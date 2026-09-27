@@ -74,9 +74,9 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   const [storePrices, setStorePrices] = useState({});
 
   // ── Request-a-category flow ──
-  // No automated payment yet (see send-category-request.js) — this just
-  // emails the request to the admin and logs it in Supabase so nothing
-  // gets lost; the 25 AED is arranged directly with the requester.
+  // A free suggestion — no payment involved (see send-category-request.js).
+  // This just emails the request to the admin and logs it in Supabase so
+  // nothing gets lost.
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [requestCategoryName, setRequestCategoryName] = useState('');
   const [requestDetails, setRequestDetails] = useState('');
