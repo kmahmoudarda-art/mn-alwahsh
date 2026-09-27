@@ -156,7 +156,7 @@ async function commitScreenshot(screenshotId) {
 async function hasScreenshot(iapId) {
   let res;
   try {
-    res = await api('GET', `/v1/inAppPurchases/${iapId}/appStoreReviewScreenshot`);
+    res = await api('GET', `/v2/inAppPurchases/${iapId}/appStoreReviewScreenshot`);
   } catch (err) {
     if (err.status === 404) return false;
     throw err;
