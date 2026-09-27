@@ -58,5 +58,6 @@ jobs:
         run: node ios/scripts/upload_iap_screenshots.mjs
 
       - name: Make available in all countries/regions
-        if: inputs.set_availability
+        # Independent of the screenshot step — run it even if that one failed.
+        if: ${{ !cancelled() && inputs.set_availability }}
         run: node ios/scripts/set_iap_availability.mjs
