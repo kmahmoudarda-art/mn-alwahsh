@@ -150,14 +150,22 @@ async function commitScreenshot(screenshotId) {
   });
 }
 
+// A screenshot whose upload never finished processing (or that Apple
+// rejected, e.g. wrong dimensions) still "exists" but leaves the product
+// stuck at Missing Metadata — delete those so they get re-uploaded.
 async function hasScreenshot(iapId) {
+  let res;
   try {
-    const res = await api('GET', `/v1/inAppPurchases/${iapId}/appStoreReviewScreenshot`);
-    return !!res?.data;
+    res = await api('GET', `/v1/inAppPurchases/${iapId}/appStoreReviewScreenshot`);
   } catch (err) {
     if (err.status === 404) return false;
     throw err;
   }
+  if (!res?.data) return false;
+  const state = res.data.attributes?.assetDeliveryState?.state;
+  if (state === 'COMPLETE' || state === 'UPLOAD_COMPLETE') return true;
+  await api('DELETE', `/v1/inAppPurchaseAppStoreReviewScreenshots/${res.data.id}`);
+  return false;
 }
 
 async function main() {
@@ -201,6 +209,7 @@ async function main() {
   if (failed.length) {
     console.log(`\nThese failed — check the errors above:`);
     console.log(failed.join(', '));
+    process.exit(1);
   } else {
     console.log('\nAll products now have a review screenshot.');
   }

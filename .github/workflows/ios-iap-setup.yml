@@ -1,0 +1,62 @@
+name: iOS in-app purchase setup
+
+# One-click App Store Connect setup for every in-app purchase, so it
+# doesn't have to be done by hand 71 times in the App Store Connect UI:
+#   - uploads ios/review/iap_review_2688x1242.png as the review screenshot
+#     (ios/scripts/upload_iap_screenshots.mjs — skips products that
+#     already have a working one)
+#   - makes every product available in all countries/regions
+#     (ios/scripts/set_iap_availability.mjs)
+#
+# Reuses the same App Store Connect API key secrets as the TestFlight
+# upload in ios-build.yml (see ios/README.md). The key needs the Admin or
+# App Manager role. Manual only — run it from the Actions tab.
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload_screenshots:
+        description: "Upload the review screenshot to every in-app purchase"
+        type: boolean
+        default: true
+      set_availability:
+        description: "Make every in-app purchase available in all countries/regions"
+        type: boolean
+        default: true
+
+jobs:
+  setup:
+    name: Configure in-app purchases
+    runs-on: ubuntu-latest
+    env:
+      APPLE_APP_ID: "6814543685"
+      APPLE_KEY_ID: ${{ secrets.APPLE_ASC_KEY_ID }}
+      APPLE_ISSUER_ID: ${{ secrets.APPLE_ASC_ISSUER_ID }}
+      APPLE_PRIVATE_KEY_PATH: ${{ github.workspace }}/../AuthKey.p8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Write App Store Connect API key
+        env:
+          APPLE_ASC_PRIVATE_KEY_BASE64: ${{ secrets.APPLE_ASC_PRIVATE_KEY_BASE64 }}
+        run: |
+          set -euo pipefail
+          if [ -z "$APPLE_ASC_PRIVATE_KEY_BASE64" ] || [ -z "$APPLE_KEY_ID" ] || [ -z "$APPLE_ISSUER_ID" ]; then
+            echo "::error::Missing APPLE_ASC_KEY_ID / APPLE_ASC_ISSUER_ID / APPLE_ASC_PRIVATE_KEY_BASE64 secrets — see ios/README.md"
+            exit 1
+          fi
+          echo -n "$APPLE_ASC_PRIVATE_KEY_BASE64" | base64 --decode > "$APPLE_PRIVATE_KEY_PATH"
+
+      - name: Upload review screenshots
+        if: inputs.upload_screenshots
+        env:
+          APPLE_SCREENSHOT_PATH: ios/review/iap_review_2688x1242.png
+        run: node ios/scripts/upload_iap_screenshots.mjs
+
+      - name: Make available in all countries/regions
+        if: inputs.set_availability
+        run: node ios/scripts/set_iap_availability.mjs
