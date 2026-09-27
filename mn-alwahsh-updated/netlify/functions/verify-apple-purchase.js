@@ -77,16 +77,23 @@ async function fetchSignedTransaction(transactionId) {
   const issuerId = process.env.APPLE_ISSUER_ID;
   if (!signingKey || !keyId || !issuerId) throw new Error('missing-apple-api-key-env');
 
+  // Production answers 401 (not 404) for an app that has never been
+  // approved/released, so a 401 there must not stop the sandbox lookup —
+  // otherwise every TestFlight/App Review (sandbox) purchase fails before
+  // the first release. Only a failure in both environments is reported,
+  // using the more informative (non-404) error if there is one.
+  let lastError = null;
   for (const environment of [Environment.PRODUCTION, Environment.SANDBOX]) {
     const client = new AppStoreServerAPIClient(signingKey, keyId, issuerId, APPLE_BUNDLE_ID, environment);
     try {
       const { signedTransactionInfo } = await client.getTransactionInfo(transactionId);
       return { signedTransactionInfo, environment };
     } catch (e) {
-      if (e?.httpStatusCode === 404) continue; // not in this environment — try the other
-      throw e;
+      if (e?.httpStatusCode !== 401 && e?.httpStatusCode !== 404) throw e;
+      if (!lastError || lastError.httpStatusCode === 404) lastError = e;
     }
   }
+  if (lastError && lastError.httpStatusCode !== 404) throw lastError;
   throw new Error('transaction-not-found');
 }
 
