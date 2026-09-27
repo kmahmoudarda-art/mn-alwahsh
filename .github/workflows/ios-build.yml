@@ -146,6 +146,10 @@ jobs:
           # +100 keeps it above builds uploaded before this was automated.
           BUILD_NUMBER=$((GITHUB_RUN_NUMBER + 100))
           echo "Build number: $BUILD_NUMBER"
+          # Written into Info.plist directly: it holds literal version
+          # values, not $(CURRENT_PROJECT_VERSION), so a build-setting
+          # override alone wouldn't reach the app bundle.
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" App/Info.plist
           xcodebuild archive \
             -project MnAlwahsh.xcodeproj \
             -scheme App \
@@ -156,8 +160,7 @@ jobs:
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
             PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
-            PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
-            CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
+            PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID"
 
       - name: Export .ipa
         env:
