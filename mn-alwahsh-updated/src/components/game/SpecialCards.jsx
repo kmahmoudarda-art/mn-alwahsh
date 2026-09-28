@@ -108,7 +108,7 @@ export default function SpecialCards({
       // 1% jackpot chance
       let base;
       if (Math.random() < 0.01) {
-        base = { delta: 500, label: '🏆 جاكبوت! ربحت 500 نقطة!' };
+        base = { delta: 500, label: '🏆 مكافأة كبرى! ربحت 500 نقطة!' };
         const teamName = teamNum === 1 ? team1?.name : team2?.name;
         setJackpot({ teamName });
         // Rapid multi-cannon confetti bursts
@@ -237,7 +237,7 @@ export default function SpecialCards({
             style={(team1UsedLucky || luckyPending) ? btnUsed : btnActive(true)}
             title="بطاقة الحظ"
           >
-            🃏 حظ
+            ⭐ حظ
           </button>
           <button
             onClick={() => onQuickTimer(1)}
@@ -261,7 +261,7 @@ export default function SpecialCards({
             style={(team2UsedLucky || luckyPending) ? btnUsed : btnActive(false)}
             title="بطاقة الحظ"
           >
-            🃏 حظ
+            ⭐ حظ
           </button>
           <button
             onClick={() => onQuickTimer(2)}
@@ -325,7 +325,7 @@ export default function SpecialCards({
               style={{ background: '#1a0000', border: '2px solid #CC0000', boxShadow: '0 0 30px rgba(204,0,0,0.5)', maxWidth: 340 }}
             >
               {showSpinner ? (
-                <p className="text-2xl font-cairo font-black animate-pulse" style={{ color: '#CC0000', textShadow: '0 0 10px rgba(255,0,0,0.8)' }}>🎲 يتم السحب...</p>
+                <p className="text-2xl font-cairo font-black animate-pulse" style={{ color: '#CC0000', textShadow: '0 0 10px rgba(255,0,0,0.8)' }}>✨ جاري الاختيار...</p>
               ) : luckyResult ? (
                 <>
                   <p
@@ -404,7 +404,7 @@ export default function SpecialCards({
             ))}
 
             {/* Floating emoji stars */}
-            {['⭐','🌟','💫','✨','🏆','💰','🎊','🎉'].map((em, i) => (
+            {['⭐','🌟','💫','✨','🏆','🥇','🎊','🎉'].map((em, i) => (
               <div key={i} style={{
                 position: 'absolute',
                 left: `${8 + i * 11}%`,
@@ -441,9 +441,9 @@ export default function SpecialCards({
                 fontSize: 48,
                 animation: 'jpPulse 0.8s ease-in-out infinite, jpRainbow 1.2s linear infinite',
                 marginBottom: 10,
-                letterSpacing: 2,
+                letterSpacing: 0,
               }}>
-                JACKPOT!
+                مكافأة كبرى!
               </div>
               <div style={{
                 fontFamily: 'var(--font-cairo)',
