@@ -658,7 +658,7 @@ export default function QuestionModal({
                 </div>
                 {activeLifeline === 'trap' && (
                   <div style={{ background:'rgba(234,179,8,0.85)', border:'1px solid rgba(180,130,0,0.6)', borderRadius:12, padding:'10px 14px', textAlign:'center' }}>
-                    <p style={{ color:'#000000', fontFamily:'var(--font-cairo)', fontWeight:800, fontSize:13, margin:0 }}>💰 دبل يا كبير مفعّل! إجابة صح = خصم من الخصم</p>
+                    <p style={{ color:'#000000', fontFamily:'var(--font-cairo)', fontWeight:800, fontSize:13, margin:0 }}>🎯 دبل يا كبير مفعّل! إجابة صح = خصم من الخصم</p>
                   </div>
                 )}
                 <Button onClick={onShowQuestion} className="w-full font-cairo font-bold bg-primary text-primary-foreground">أظهر السؤال</Button>

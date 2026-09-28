@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 
 const LIFELINES = [
   { id: 'callFriend', label: 'احذف اجابة 🗑️', desc: 'احذف إجابة خاطئة من الخيارات', phase: 'after' },
-  { id: 'trap', label: 'دبل يا كبير 💰', desc: 'إجابة صح = خصم من الخصم', phase: 'before' },
+  { id: 'trap', label: 'دبل يا كبير 🎯', desc: 'إجابة صح = خصم من الخصم', phase: 'before' },
   { id: 'twoAnswers', label: 'جاوب جوابين ✌️', desc: 'اختر إجابتين', phase: 'after' },
 ];
 
