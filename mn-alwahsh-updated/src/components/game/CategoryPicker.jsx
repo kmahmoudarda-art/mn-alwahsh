@@ -536,7 +536,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
               position: 'fixed', inset: 0, zIndex: 200,
               background: 'rgba(0,0,0,0.7)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: 20,
+              padding: 'max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left))',
             }}
           >
             <motion.div
@@ -547,6 +547,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
               dir="rtl"
               style={{
                 width: '100%', maxWidth: 340,
+                maxHeight: '90svh', overflowY: 'auto',
                 background: 'linear-gradient(135deg, #2a0000, #140000)',
                 border: '1.5px solid #FFD700',
                 borderRadius: 16,
@@ -668,6 +669,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
               dir="rtl"
               style={{
                 width: '100%', maxWidth: 340,
+                maxHeight: '90svh', overflowY: 'auto',
                 background: 'linear-gradient(135deg, #2a0000, #140000)',
                 border: '1.5px solid #FFD700',
                 borderRadius: 16,
