@@ -144,8 +144,10 @@ export default function SetupScreen({ onStartGame, onBack, gameName }) {
         @media (orientation: landscape) and (max-height: 600px) {
           .setup-hero { display: none !important; }
           .setup-start-top { display: none !important; }
+          /* Keep clear of the 60px fixed side columns (+ notch inset) —
+             a plain 4px here let the team cards run underneath them. */
           .setup-wrapper {
-            padding: 4px !important;
+            padding: 4px calc(64px + env(safe-area-inset-left)) 4px calc(64px + env(safe-area-inset-right)) !important;
             gap: 4px !important;
           }
           .setup-grid {

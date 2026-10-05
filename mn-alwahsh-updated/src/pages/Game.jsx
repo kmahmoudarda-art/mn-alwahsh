@@ -1035,6 +1035,7 @@ export default function Game() {
           position: 'fixed', inset: 0, zIndex: 99999,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(6px)',
+          padding: 16,
         }}>
           <div style={{
             background: 'linear-gradient(160deg, #001a00 0%, #000d00 100%)',
@@ -1042,7 +1043,8 @@ export default function Game() {
             borderRadius: 16, padding: '32px 36px',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20,
             boxShadow: '0 0 40px rgba(0,150,0,0.25)',
-            minWidth: 280,
+            minWidth: 'min(280px, 100%)',
+            maxHeight: '90svh', overflowY: 'auto', boxSizing: 'border-box',
           }}>
             <span style={{ fontSize: 40 }}>🔄</span>
             <p style={{
@@ -1092,6 +1094,7 @@ export default function Game() {
           position: 'fixed', inset: 0, zIndex: 99999,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(6px)',
+          padding: 16,
         }}>
           <div style={{
             background: 'linear-gradient(160deg, #1a0000 0%, #0d0000 100%)',
@@ -1099,7 +1102,8 @@ export default function Game() {
             borderRadius: 16, padding: '32px 36px',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20,
             boxShadow: '0 0 40px rgba(180,0,0,0.3)',
-            minWidth: 280,
+            minWidth: 'min(280px, 100%)',
+            maxHeight: '90svh', overflowY: 'auto', boxSizing: 'border-box',
           }}>
             <span style={{ fontSize: 40 }}>⚠️</span>
             <p style={{
