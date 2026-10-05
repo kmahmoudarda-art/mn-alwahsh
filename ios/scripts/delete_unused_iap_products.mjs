@@ -144,6 +144,28 @@ async function fetchExistingProducts() {
   return new Map(items.map((item) => [item.attributes.productId, item.id]));
 }
 
+async function detachFromSubmissions(unusedIds) {
+  const submissions = await fetchAllPages(`/v1/reviewSubmissions?filter[app]=${APP_ID}&limit=50`);
+  for (const sub of submissions) {
+    const state = sub.attributes.state;
+    console.log(`Review submission ${sub.id}: ${state}`);
+    if (state === 'COMPLETE' || state === 'CANCELING') continue;
+    const items = await fetchAllPages(`/v1/reviewSubmissions/${sub.id}/items?limit=200`);
+    for (const item of items) {
+      const rels = item.relationships || {};
+      const iapId = rels.inAppPurchaseV2?.data?.id;
+      if (!iapId) continue;
+      if (!unusedIds.has(iapId)) continue;
+      try {
+        await api('DELETE', `/v1/reviewSubmissionItems/${item.id}`);
+        console.log(`  ${unusedIds.get(iapId)}: removed from submission`);
+      } catch (err) {
+        console.error(`  ${unusedIds.get(iapId)}: could not remove from submission — ${err.message}`);
+      }
+    }
+  }
+}
+
 async function main() {
   console.log('Loading categories from Supabase...');
   const categories = await fetchSupabaseCategories();
@@ -160,6 +182,12 @@ async function main() {
 
   console.log(`\nLooking up product ids for app ${APP_ID}...`);
   const existing = await fetchExistingProducts();
+
+  // Apple refuses to delete a product that is still attached to a review
+  // submission (409 IAP_DELETE_NOT_ALLOWED), so first take it out of any
+  // open submission — the same as unticking it on the version page.
+  const unusedIds = new Map(unused.filter((u) => existing.has(u.sku)).map((u) => [existing.get(u.sku), u.sku]));
+  await detachFromSubmissions(unusedIds);
 
   const failed = [];
   for (const { sku } of unused) {
