@@ -5,17 +5,17 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import kotlin.random.Random
 
 /**
  * A minimal Android TV home-screen launcher: shows a row of installed apps'
- * icons, and crossfades a full-screen background between a set of character
- * photos as D-pad focus moves from one icon to the next.
+ * icons, and crossfades a full-screen background to a random photo (pulled
+ * from Android/data/com.mnalwahsh.tvlauncher/files/characters/ on the device)
+ * every time D-pad focus moves to a different icon. Push new photos there
+ * any time with `adb push` -- no rebuild needed.
  */
 class MainActivity : AppCompatActivity() {
 
@@ -23,13 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bgB: ImageView
     private lateinit var iconRow: LinearLayout
     private var topIsA = true
-    private var characterIndex = 0
-
-    // Cycle through these on every focus change, in order, looping.
-    private val characterDrawables = listOf(
-        R.drawable.character_baby,
-        R.drawable.character_girl
-    )
+    private var lastPhotoIndex = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +33,8 @@ class MainActivity : AppCompatActivity() {
         bgB = findViewById(R.id.bgB)
         iconRow = findViewById(R.id.iconRow)
 
-        bgA.setImageResource(characterDrawables[0])
-
         buildIconRow()
+        advanceBackground() // show something right away
     }
 
     private fun buildIconRow() {
@@ -92,13 +85,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun advanceBackground() {
-        characterIndex = (characterIndex + 1) % characterDrawables.size
-        val nextRes = characterDrawables[characterIndex]
+        val photos = PhotoStore.listPhotos(this)
+        if (photos.isEmpty()) return
+
+        val nextIndex = if (photos.size == 1) {
+            0
+        } else {
+            var candidate: Int
+            do {
+                candidate = Random.nextInt(photos.size)
+            } while (candidate == lastPhotoIndex)
+            candidate
+        }
+        lastPhotoIndex = nextIndex
 
         val showing = if (topIsA) bgA else bgB
         val hidden = if (topIsA) bgB else bgA
 
-        hidden.setImageResource(nextRes)
+        val targetW = hidden.width.takeIf { it > 0 } ?: resources.displayMetrics.widthPixels
+        val targetH = hidden.height.takeIf { it > 0 } ?: resources.displayMetrics.heightPixels
+        val bitmap = PhotoStore.decodeSampledBitmap(photos[nextIndex], targetW, targetH) ?: return
+
+        hidden.setImageBitmap(bitmap)
         hidden.alpha = 0f
         hidden.animate().alpha(1f).setDuration(400).start()
         showing.animate().alpha(0f).setDuration(400).start()
@@ -108,18 +116,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun getLaunchableApps(): List<ResolveInfo> {
         val pm = packageManager
-        val intent = Intent(Intent.ACTION_MAIN, null).apply {
+
+        val leanbackIntent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
         }
-        var apps = pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
-        if (apps.isEmpty()) {
-            // Fallback for devices/emulators without leanback-category apps
-            val fallbackIntent = Intent(Intent.ACTION_MAIN, null).apply {
-                addCategory(Intent.CATEGORY_LAUNCHER)
-            }
-            apps = pm.queryIntentActivities(fallbackIntent, PackageManager.MATCH_ALL)
+        val launcherIntent = Intent(Intent.ACTION_MAIN, null).apply {
+            addCategory(Intent.CATEGORY_LAUNCHER)
         }
-        return apps
+
+        val combined = pm.queryIntentActivities(leanbackIntent, 0) +
+            pm.queryIntentActivities(launcherIntent, 0)
+
+        return combined
             .filter { it.activityInfo.packageName != packageName }
             .distinctBy { it.activityInfo.packageName }
             .sortedBy { it.loadLabel(pm).toString() }

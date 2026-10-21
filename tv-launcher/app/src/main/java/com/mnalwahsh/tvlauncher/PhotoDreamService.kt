@@ -1,4 +1,4 @@
-package com.mnalwahsh.twa
+package com.mnalwahsh.tvlauncher
 
 import android.graphics.Color
 import android.os.Handler
@@ -8,10 +8,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import java.io.File
 
-/**
- * Screensaver (Daydream) that cycles through the same photo folder as
- * PhotoWallpaperService: Android/data/com.mnalwahsh.twa/files/wallpapers/
- */
 class PhotoDreamService : DreamService() {
 
     private val handler = Handler(Looper.getMainLooper())
@@ -32,9 +28,7 @@ class PhotoDreamService : DreamService() {
         isInteractive = false
         isFullscreen = true
 
-        val frame = FrameLayout(this).apply {
-            setBackgroundColor(Color.BLACK)
-        }
+        val frame = FrameLayout(this).apply { setBackgroundColor(Color.BLACK) }
         imageView = ImageView(this).apply {
             scaleType = ImageView.ScaleType.CENTER_CROP
             layoutParams = FrameLayout.LayoutParams(
@@ -56,10 +50,7 @@ class PhotoDreamService : DreamService() {
     }
 
     private fun refreshPhotos() {
-        val dir = getExternalFilesDir("wallpapers")
-        photos = dir?.listFiles { f ->
-            f.isFile && f.extension.lowercase() in listOf("jpg", "jpeg", "png", "webp")
-        }?.toList()?.sortedBy { it.name } ?: emptyList()
+        photos = PhotoStore.listPhotos(applicationContext)
     }
 
     private fun showNext() {
@@ -67,7 +58,7 @@ class PhotoDreamService : DreamService() {
         val file = photos[index % photos.size]
         val targetW = imageView.width.takeIf { it > 0 } ?: 1920
         val targetH = imageView.height.takeIf { it > 0 } ?: 1080
-        val bitmap = PhotoWallpaperService.decodeSampledBitmap(file, targetW, targetH)
+        val bitmap = PhotoStore.decodeSampledBitmap(file, targetW, targetH)
         if (bitmap != null) {
             imageView.alpha = 0f
             imageView.setImageBitmap(bitmap)

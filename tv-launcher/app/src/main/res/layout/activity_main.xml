@@ -18,11 +18,13 @@
         android:scaleType="centerCrop"
         android:alpha="0" />
 
-    <!-- darken the background so icon row stays readable -->
+    <!-- Only the strip behind the icon row is darkened, so the photo itself
+         stays fully clear/visible everywhere else on screen. -->
     <View
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#88000000" />
+        android:layout_height="260dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bottom_scrim" />
 
     <HorizontalScrollView
         android:id="@+id/iconScroll"

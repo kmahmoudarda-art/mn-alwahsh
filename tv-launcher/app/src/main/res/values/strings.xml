@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TV Home</string>
+    <string name="wallpaper_label">TV Home Photos</string>
+    <string name="dream_label">TV Home Screensaver</string>
 </resources>
