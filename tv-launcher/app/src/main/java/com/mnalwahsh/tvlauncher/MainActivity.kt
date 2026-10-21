@@ -44,8 +44,15 @@ class MainActivity : AppCompatActivity() {
 
         for (info in apps) {
             val pm = packageManager
-            val label = info.loadLabel(pm)
-            val icon: Drawable = info.loadIcon(pm)
+            val label: CharSequence
+            val icon: Drawable
+            try {
+                label = info.loadLabel(pm)
+                icon = info.loadIcon(pm)
+            } catch (e: Exception) {
+                // One broken app's resources shouldn't take down the whole row.
+                continue
+            }
             val launchIntent = pm.getLaunchIntentForPackage(info.activityInfo.packageName)
 
             val iv = ImageView(this).apply {
@@ -86,25 +93,40 @@ class MainActivity : AppCompatActivity() {
 
     private fun advanceBackground() {
         val photos = PhotoStore.listPhotos(this)
+        android.util.Log.i("TvLauncher", "advanceBackground: found ${photos.size} photo(s) in ${photosDirPath()}")
         if (photos.isEmpty()) return
 
-        val nextIndex = if (photos.size == 1) {
-            0
-        } else {
-            var candidate: Int
-            do {
-                candidate = Random.nextInt(photos.size)
-            } while (candidate == lastPhotoIndex)
-            candidate
+        val targetW = resources.displayMetrics.widthPixels
+        val targetH = resources.displayMetrics.heightPixels
+
+        // Try up to all photos in case one file is corrupt/undecodable, instead of
+        // silently giving up on the whole cycle after a single bad file.
+        var tries = 0
+        var bitmap: android.graphics.Bitmap? = null
+        var nextIndex = -1
+        while (tries < photos.size && bitmap == null) {
+            nextIndex = if (photos.size == 1) {
+                0
+            } else {
+                var candidate: Int
+                do {
+                    candidate = Random.nextInt(photos.size)
+                } while (candidate == lastPhotoIndex)
+                candidate
+            }
+            bitmap = try {
+                PhotoStore.decodeSampledBitmap(photos[nextIndex], targetW, targetH)
+            } catch (e: Exception) {
+                android.util.Log.w("TvLauncher", "failed to decode ${photos[nextIndex].name}", e)
+                null
+            }
+            tries++
         }
+        if (bitmap == null) return
         lastPhotoIndex = nextIndex
 
         val showing = if (topIsA) bgA else bgB
         val hidden = if (topIsA) bgB else bgA
-
-        val targetW = hidden.width.takeIf { it > 0 } ?: resources.displayMetrics.widthPixels
-        val targetH = hidden.height.takeIf { it > 0 } ?: resources.displayMetrics.heightPixels
-        val bitmap = PhotoStore.decodeSampledBitmap(photos[nextIndex], targetW, targetH) ?: return
 
         hidden.setImageBitmap(bitmap)
         hidden.alpha = 0f
@@ -113,6 +135,9 @@ class MainActivity : AppCompatActivity() {
 
         topIsA = !topIsA
     }
+
+    private fun photosDirPath(): String =
+        getExternalFilesDir("characters")?.absolutePath ?: "(unavailable)"
 
     private fun getLaunchableApps(): List<ResolveInfo> {
         val pm = packageManager
