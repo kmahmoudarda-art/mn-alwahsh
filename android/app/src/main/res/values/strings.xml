@@ -4,4 +4,6 @@
     <string name="offline_title">لا يوجد اتصال بالإنترنت</string>
     <string name="offline_message">تعذّر تحميل الصفحة. تحقق من اتصالك بالإنترنت ثم أعد المحاولة.</string>
     <string name="retry_button">إعادة المحاولة</string>
+    <string name="wallpaper_label">صور من الوحش</string>
+    <string name="dream_label">شاشة توقف من الوحش</string>
 </resources>
