@@ -45,8 +45,16 @@ targets:
     settings:
       base:
         PRODUCT_NAME: "من الوحش"
-        # iPhone only. Set here on the target because the settingGroups
-        # entry above isn't applied by XcodeGen (its TARGETED_DEVICE_FAMILY
-        # "1,2" never took effect either), so without this the app
-        # defaulted to iPhone + iPad.
-        TARGETED_DEVICE_FAMILY: "1"
+        # iPhone + iPad (TARGETED_DEVICE_FAMILY "1,2" from the shared
+        # settingGroup above). A prior change pinned this to "1" (iPhone
+        # only) to dodge iPad review, but Apple still reviews iPhone-only
+        # builds on iPad in compatibility/scaled mode (confirmed: the
+        # 2026-10-05 rejection was tested on an "iPad Air 11-inch (M3)")
+        # — so restricting the device family doesn't actually avoid iPad
+        # review, it just makes the app render smaller/boxed there instead
+        # of filling the screen. Since MainViewController's WKWebView is
+        # pinned to view bounds with Auto Layout (fills whatever screen
+        # it's given) and the site itself is already responsive (flex
+        # layout, vw/dvh units, env(safe-area-inset-*), a user zoom
+        # control), genuinely supporting iPad should render correctly
+        # with no further native changes needed. No override here.
