@@ -72,6 +72,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
   // points, and each storefront uses its own currency), so on iOS only
   // StoreKit's displayPrice is ever shown (App Review Guidelines 2.3/3.1).
   const [storePrices, setStorePrices] = useState({});
+  const [storeTitles, setStoreTitles] = useState({});
 
   // ── Request-a-category flow ──
   // A free suggestion — no payment involved (see send-category-request.js).
@@ -151,8 +152,10 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
     getStoreKitProductDetails(skus).then((details) => {
       if (cancelled) return;
       const prices = {};
-      for (const d of details || []) prices[d.itemId] = d.price;
+      const titles = {};
+      for (const d of details || []) { prices[d.itemId] = d.price; titles[d.itemId] = d.title; }
       setStorePrices((prev) => ({ ...prev, ...prices }));
+      setStoreTitles((prev) => ({ ...prev, ...titles }));
     });
     return () => { cancelled = true; };
   }, [unlockPromptFor, showStorePrices]);
@@ -536,7 +539,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
               position: 'fixed', inset: 0, zIndex: 200,
               background: 'rgba(0,0,0,0.7)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: 20,
+              padding: 'max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left))',
             }}
           >
             <motion.div
@@ -547,6 +550,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
               dir="rtl"
               style={{
                 width: '100%', maxWidth: 340,
+                maxHeight: '90svh', overflowY: 'auto',
                 background: 'linear-gradient(135deg, #2a0000, #140000)',
                 border: '1.5px solid #FFD700',
                 borderRadius: 16,
@@ -559,6 +563,14 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
               <h3 className="font-cairo font-bold text-lg mb-1" style={{ color: '#FFE4E4' }}>
                 {unlockPromptFor}
               </h3>
+              {/* The App Store product name is often a neutral one (no brand
+                  or celebrity names, Guideline 5.2), e.g. "أسئلة كرة القدم 1"
+                  for CR7 — show it so App Review can match the two. */}
+              {showStorePrices && storeTitles[getSkuForCategory(unlockPromptFor)] && storeTitles[getSkuForCategory(unlockPromptFor)] !== unlockPromptFor && (
+                <p className="font-tajawal text-xs mb-1" style={{ color: '#FFD700' }}>
+                  {storeTitles[getSkuForCategory(unlockPromptFor)]}
+                </p>
+              )}
               <p className="font-tajawal text-sm mb-4" style={{ color: '#FF9999' }}>
                 فئة مميزة{priceSuffix(getSkuForCategory(unlockPromptFor), getPremiumPriceLabel(unlockPromptFor))}
               </p>
@@ -668,6 +680,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
               dir="rtl"
               style={{
                 width: '100%', maxWidth: 340,
+                maxHeight: '90svh', overflowY: 'auto',
                 background: 'linear-gradient(135deg, #2a0000, #140000)',
                 border: '1.5px solid #FFD700',
                 borderRadius: 16,

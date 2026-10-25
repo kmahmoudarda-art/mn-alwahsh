@@ -54,6 +54,7 @@ function IOSInstallModal({ onClose }) {
           padding: '24px 20px',
           width: '100%',
           maxWidth: 420,
+          maxHeight: '90svh', overflowY: 'auto',
           boxShadow: '0 0 50px rgba(204,0,0,0.3)',
         }}
         dir="rtl"
@@ -387,7 +388,10 @@ export default function GameNameScreen({ onEnter }) {
             transition={{ duration: 0.6, delay: 0.15, type: 'spring', stiffness: 110 }}
             className="gns-title font-bouya"
             style={{
-              fontSize: 'clamp(72px, 18vw, 200px)',
+              // Capped by height as well as width: on iPad landscape 18vw alone
+              // made the title so tall its drips covered the buttons below.
+              fontSize: 'clamp(56px, min(18vw, 17vh), 200px)',
+              paddingBottom: '0.25em',
               color: '#CC0000',
               animation: 'titleFlicker 4s ease-in-out infinite',
               lineHeight: 0.92,
@@ -591,6 +595,7 @@ export default function GameNameScreen({ onEnter }) {
           position: 'fixed', inset: 0, zIndex: 99999,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(6px)',
+          padding: 16,
         }}>
           <div style={{
             background: 'linear-gradient(160deg, #1a0000 0%, #0d0000 100%)',
@@ -598,7 +603,8 @@ export default function GameNameScreen({ onEnter }) {
             borderRadius: 16, padding: '32px 36px',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20,
             boxShadow: '0 0 40px rgba(180,0,0,0.3)',
-            minWidth: 280,
+            minWidth: 'min(280px, 100%)',
+            maxHeight: '90svh', overflowY: 'auto', boxSizing: 'border-box',
           }}>
             <span style={{ fontSize: 40 }}>🚪</span>
             <p style={{
@@ -650,6 +656,7 @@ export default function GameNameScreen({ onEnter }) {
           position: 'fixed', inset: 0, zIndex: 99999,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(6px)',
+          padding: 16,
         }}>
           <div style={{
             background: 'linear-gradient(160deg, #1a0000 0%, #0d0000 100%)',
@@ -657,7 +664,8 @@ export default function GameNameScreen({ onEnter }) {
             borderRadius: 16, padding: '32px 36px',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20,
             boxShadow: '0 0 40px rgba(180,0,0,0.3)',
-            minWidth: 280, maxWidth: 340,
+            minWidth: 'min(280px, 100%)', maxWidth: 340,
+            maxHeight: '90svh', overflowY: 'auto', boxSizing: 'border-box',
           }}>
             {deleteSent ? (
               <>

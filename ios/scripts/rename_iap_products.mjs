@@ -167,10 +167,12 @@ async function main() {
   console.log(`Looking up product ids for app ${APP_ID}...`);
   const existing = await fetchExistingProducts();
 
+  // Missing ones were either never created (create_iap_products.mjs) or
+  // deleted on purpose (delete_unused_iap_products.mjs) — skip them.
   const missing = skus.filter((sku) => !existing.has(sku));
   if (missing.length) {
-    console.error(`These products don't exist yet, run create_iap_products.mjs first: ${missing.join(', ')}`);
-    process.exit(1);
+    console.log(`Skipping products not in App Store Connect: ${missing.join(', ')}`);
+    skus.splice(0, skus.length, ...skus.filter((sku) => existing.has(sku)));
   }
 
   console.log(`Renaming ${skus.length} products...\n`);

@@ -9,6 +9,8 @@ name: iOS in-app purchase setup
 #     (ios/scripts/set_iap_availability.mjs)
 #   - replaces brand/celebrity names in product names with neutral ones
 #     (ios/scripts/rename_iap_products.mjs, Guideline 5.2)
+#   - optionally PERMANENTLY deletes products whose categories never appear
+#     in the app (ios/scripts/delete_unused_iap_products.mjs, Guideline 2.1)
 #
 # Reuses the same App Store Connect API key secrets as the TestFlight
 # upload in ios-build.yml (see ios/README.md). The key needs the Admin or
@@ -29,6 +31,10 @@ on:
         description: "Replace brand/celebrity names in in-app purchase names with neutral ones"
         type: boolean
         default: true
+      delete_unused:
+        description: "PERMANENTLY delete in-app purchases whose categories never appear in the app (cannot be undone)"
+        type: boolean
+        default: false
 
 jobs:
   setup:
@@ -72,3 +78,7 @@ jobs:
         # Independent of the other steps — run it even if one of them failed.
         if: ${{ !cancelled() && inputs.rename_products }}
         run: node ios/scripts/rename_iap_products.mjs
+
+      - name: Delete products for categories that never appear
+        if: ${{ !cancelled() && inputs.delete_unused }}
+        run: node ios/scripts/delete_unused_iap_products.mjs
