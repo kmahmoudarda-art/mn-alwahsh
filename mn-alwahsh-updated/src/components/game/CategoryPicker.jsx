@@ -7,6 +7,7 @@ import { isPremiumCategory, getPremiumPriceLabel, isTestAccount, ALL_CATEGORIES_
 import { isSignedIn, getCurrentUser } from '../../utils/authClient';
 import { fetchUnlockedCategories } from '../../utils/entitlements';
 import { getSkuForCategory, ALL_CATEGORIES_SKU, TRIAL_SKU } from '../../utils/playProducts';
+import { getAppStoreCategoryName } from '../../utils/appStoreCategoryNames';
 import { isPlayBillingAvailable, buyAndGrant } from '../../utils/playBillingClient';
 import { isStoreKitBillingAvailable, buyAndGrantWithStoreKit, restoreStoreKitPurchases, getStoreKitProductDetails } from '../../utils/storeKitBillingClient';
 import { isRunningInAndroidApp, isRunningInIOSApp, isLikelyIOSDevice } from '../../utils/platform';
@@ -510,6 +511,21 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                                 <Lock className="w-3 h-3" style={{ color: '#FFD700' }} />
                               </div>
                             )}
+                            {locked && getAppStoreCategoryName(getSkuForCategory(name)) && (
+                              // Small secondary label matching this category's
+                              // registered App Store Connect / Play Console
+                              // product name (see appStoreCategoryNames.js) —
+                              // purely so the purchasable-product name a store
+                              // reviewer looks for is visible somewhere on the
+                              // tile that sells it. Deliberately subtle: real
+                              // players use the name above (`name`), not this.
+                              <span
+                                className="font-tajawal text-center leading-tight px-1"
+                                style={{ fontSize: 8, color: 'rgba(255,228,228,0.45)' }}
+                              >
+                                {getAppStoreCategoryName(getSkuForCategory(name))}
+                              </span>
+                            )}
                           </motion.button>
                         );
                       })}
@@ -559,9 +575,18 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
               <h3 className="font-cairo font-bold text-lg mb-1" style={{ color: '#FFE4E4' }}>
                 {unlockPromptFor}
               </h3>
-              <p className="font-tajawal text-sm mb-4" style={{ color: '#FF9999' }}>
+              <p className="font-tajawal text-sm mb-1" style={{ color: '#FF9999' }}>
                 فئة مميزة{priceSuffix(getSkuForCategory(unlockPromptFor), getPremiumPriceLabel(unlockPromptFor))}
               </p>
+              {getAppStoreCategoryName(getSkuForCategory(unlockPromptFor)) && (
+                // Registered product name for this purchase (see
+                // appStoreCategoryNames.js) — shown on the actual purchase
+                // screen so it's discoverable during store review, same as
+                // on the tile above.
+                <p className="font-tajawal text-xs mb-3" style={{ color: 'rgba(255,153,153,0.55)' }}>
+                  {getAppStoreCategoryName(getSkuForCategory(unlockPromptFor))}
+                </p>
+              )}
 
               {isSignedIn() ? (
                 <>
@@ -596,6 +621,9 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                       </button>
                       <p className="font-tajawal text-xs mb-2" style={{ color: 'rgba(255,150,150,0.7)' }}>
                         التجربة تفتح الفئة لهذه اللعبة فقط، وتُقفل مرة أخرى بعدها
+                      </p>
+                      <p className="font-tajawal text-center" style={{ fontSize: 10, color: 'rgba(255,228,228,0.4)', marginTop: -4, marginBottom: 8 }}>
+                        {getAppStoreCategoryName(TRIAL_SKU)}
                       </p>
                     </>
                   ) : (
