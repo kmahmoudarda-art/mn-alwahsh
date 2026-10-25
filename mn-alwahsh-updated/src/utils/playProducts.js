@@ -5,9 +5,10 @@
 //
 // One SKU can map to MULTIPLE category strings only when those strings are
 // true case/typo duplicates of the exact same category (see the small
-// `variants` arrays below) — e.g. 'guess fashion' vs 'Guess Fashion' are the
-// same real category stored under different casing in Supabase, so buying
-// one SKU unlocks all of its variants at once. Distinct categories that
+// `variants` arrays below) — e.g. 'guess fashion easy' vs 'Guess Fashion
+// Easy' are the same real category stored under different casing in
+// Supabase, so buying one SKU unlocks all of its variants at once.
+// Distinct categories that
 // happen to cover similar content (e.g. برشلونة vs Barcelona) are separate
 // question tables and therefore separate SKUs on purpose.
 //
@@ -15,7 +16,6 @@
 // In-app products) BEFORE a purchase for them will work — see
 // PLAY_BILLING_SETUP.md for the full list to create there, with prices.
 export const PLAY_PRODUCT_MAP = {
-  cat001: { categories: ["football logo", "football Logo", "Football Logo", "FOOTBALL LOGO"], price: 11, label: "football logo" },
   cat002: { categories: ["CR7"], price: 15, label: "CR7" },
   cat003: { categories: ["ميسي"], price: 15, label: "ميسي" },
   cat004: { categories: ["كأس العرب"], price: 13, label: "كأس العرب" },
@@ -57,27 +57,18 @@ export const PLAY_PRODUCT_MAP = {
   cat040: { categories: ["أعلام العالم"], price: 7, label: "أعلام العالم" },
   cat041: { categories: ["الأردن"], price: 7, label: "الأردن" },
   cat042: { categories: ["دبي"], price: 9, label: "دبي" },
-  cat043: { categories: ["براندات"], price: 9, label: "براندات" },
   cat044: { categories: ["أسئلة إنجليزية"], price: 7, label: "أسئلة إنجليزية" },
   cat045: { categories: ["هواتف ذكية"], price: 9, label: "هواتف ذكية" },
   cat046: { categories: ["سيارات"], price: 9, label: "سيارات" },
   cat047: { categories: ["سبيستون"], price: 9, label: "سبيستون" },
   cat048: { categories: ["Sephora"], price: 13, label: "Sephora" },
   cat049: { categories: ["سيفورا"], price: 13, label: "سيفورا" },
-  cat050: { categories: ["guess fashion", "Guess Fashion", "GUESS FASHION", "Guess fashion"], price: 11, label: "guess fashion" },
   cat051: { categories: ["Dubai Bling"], price: 15, label: "Dubai Bling" },
   cat052: { categories: ["guess fashion easy", "Guess Fashion Easy", "Guess fashion easy", "GUESS FASHION EASY"], price: 9, label: "guess fashion easy" },
-  cat053: { categories: ["ديزني"], price: 13, label: "ديزني" },
-  cat054: { categories: ["Disney"], price: 13, label: "Disney" },
-  cat055: { categories: ["بيبي شارك"], price: 9, label: "بيبي شارك" },
-  cat056: { categories: ["Baby Shark"], price: 9, label: "Baby Shark" },
-  cat057: { categories: ["سبونج بوب"], price: 11, label: "سبونج بوب" },
-  cat058: { categories: ["SpongeBob"], price: 11, label: "SpongeBob" },
   cat059: { categories: ["من الشخصية ؟"], price: 9, label: "من الشخصية ؟" },
   cat060: { categories: ["IQ"], price: 15, label: "IQ" },
   cat061: { categories: ["رياضيات"], price: 9, label: "رياضيات" },
   cat062: { categories: ["الغاز محيرة"], price: 13, label: "الغاز محيرة" },
-  cat063: { categories: ["Logos"], price: 11, label: "Logos" },
   cat064: { categories: ["فلسفة"], price: 9, label: "فلسفة" },
   cat065: { categories: ["محاسبة"], price: 7, label: "محاسبة" },
   cat066: { categories: ["حيوانات"], price: 7, label: "حيوانات" },

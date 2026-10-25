@@ -26,6 +26,15 @@
 // the app, without changing the primary (real, specific) category name
 // shown to players.
 //
+// This table intentionally has no entry for cat001, cat043, cat050,
+// cat053, cat054, cat055, cat056, cat057, cat058, or cat063 — those were
+// removed from playProducts.js / premiumConfig.js entirely (not just
+// hidden) because they're also in HIDDEN_CATEGORIES (hiddenCategories.js)
+// and so never render as a selectable tile in any build: there was no
+// in-app screen Apple's reviewer could ever have found them on, naming
+// mismatch or not. Remove the matching In-App Purchase from App Store
+// Connect's submission too before resubmitting.
+//
 // Keep this file and App Store Connect's actual product names in sync —
 // see ios/scripts/sync_iap_names.mjs, which pushes exactly this table to
 // App Store Connect via its API (reference name + ar-SA localization) so
@@ -33,7 +42,6 @@
 // new catNNN in playProducts.js, add/update its entry here too, then
 // re-run that script.
 export const APP_STORE_CATEGORY_NAMES = {
-  cat001: 'football logo',
   cat002: 'أسئلة كرة القدم 1',
   cat003: 'أسئلة كرة القدم 2',
   cat004: 'أسئلة كرة القدم 3',
@@ -75,27 +83,18 @@ export const APP_STORE_CATEGORY_NAMES = {
   cat040: 'أعلام العالم',
   cat041: 'الأردن',
   cat042: 'دبي',
-  cat043: 'براندات', // HIDDEN_CATEGORIES — never shown in-app, see hiddenCategories.js
   cat044: 'أسئلة إنجليزية',
   cat045: 'هواتف ذكية',
   cat046: 'سيارات',
   cat047: 'أسئلة كرتون وأطفال 1',
   cat048: 'أسئلة موضة وجمال 1',
   cat049: 'أسئلة موضة وجمال 2',
-  cat050: 'أسئلة موضة وجمال 3', // HIDDEN_CATEGORIES
   cat051: 'أسئلة موضة وجمال 4',
   cat052: 'أسئلة موضة وجمال 5',
-  cat053: 'أسئلة كرتون وأطفال 2', // HIDDEN_CATEGORIES
-  cat054: 'أسئلة كرتون وأطفال 3', // HIDDEN_CATEGORIES
-  cat055: 'أسئلة كرتون وأطفال 4', // HIDDEN_CATEGORIES
-  cat056: 'أسئلة كرتون وأطفال 5', // HIDDEN_CATEGORIES
-  cat057: 'أسئلة كرتون وأطفال 6', // HIDDEN_CATEGORIES
-  cat058: 'أسئلة كرتون وأطفال 7', // HIDDEN_CATEGORIES
   cat059: 'من الشخصية ؟',
   cat060: 'IQ',
   cat061: 'رياضيات',
   cat062: 'الغاز محيرة',
-  cat063: 'Logos', // HIDDEN_CATEGORIES
   cat064: 'فلسفة',
   cat065: 'محاسبة',
   cat066: 'حيوانات',

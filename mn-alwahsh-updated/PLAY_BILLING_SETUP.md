@@ -17,7 +17,7 @@ Add these in the Netlify dashboard (Site settings → Environment variables), sa
 
 ## 2. Create the in-app products
 
-**Recommended — bulk-create via script (skips 71 manual clicks):**
+**Recommended — bulk-create via script (skips 61 manual clicks):**
 
 ```bash
 cd mn-alwahsh-updated
@@ -27,7 +27,7 @@ export ANDROID_PACKAGE_NAME="com.mnalwahsh.twa"
 node scripts/create-play-products.mjs
 ```
 
-Creates all 71 products directly as **active** — the API allows setting
+Creates all 61 products directly as **active** — the API allows setting
 status on creation, so there's no separate "activate" step afterward like
 there is when creating them by hand. Safe to re-run: anything already
 created is skipped, not duplicated or overwritten. The service account
@@ -52,7 +52,6 @@ Then the 69 per-category products:
 
 | SKU | Category (Supabase) | Price |
 |---|---|---|
-| `cat001` | football logo / football Logo / Football Logo / FOOTBALL LOGO | 11 AED |
 | `cat002` | CR7 | 15 AED |
 | `cat003` | ميسي | 15 AED |
 | `cat004` | كأس العرب | 13 AED |
@@ -94,27 +93,18 @@ Then the 69 per-category products:
 | `cat040` | أعلام العالم | 7 AED |
 | `cat041` | الأردن | 7 AED |
 | `cat042` | دبي | 9 AED |
-| `cat043` | براندات | 9 AED |
 | `cat044` | أسئلة إنجليزية | 7 AED |
 | `cat045` | هواتف ذكية | 9 AED |
 | `cat046` | سيارات | 9 AED |
 | `cat047` | سبيستون | 9 AED |
 | `cat048` | Sephora | 13 AED |
 | `cat049` | سيفورا | 13 AED |
-| `cat050` | guess fashion / Guess Fashion / GUESS FASHION / Guess fashion | 11 AED |
 | `cat051` | Dubai Bling | 15 AED |
 | `cat052` | guess fashion easy / Guess Fashion Easy / Guess fashion easy / GUESS FASHION EASY | 9 AED |
-| `cat053` | ديزني | 13 AED |
-| `cat054` | Disney | 13 AED |
-| `cat055` | بيبي شارك | 9 AED |
-| `cat056` | Baby Shark | 9 AED |
-| `cat057` | سبونج بوب | 11 AED |
-| `cat058` | SpongeBob | 11 AED |
 | `cat059` | من الشخصية ؟ | 9 AED |
 | `cat060` | IQ | 15 AED |
 | `cat061` | رياضيات | 9 AED |
 | `cat062` | الغاز محيرة | 13 AED |
-| `cat063` | Logos | 11 AED |
 | `cat064` | فلسفة | 9 AED |
 | `cat065` | محاسبة | 7 AED |
 | `cat066` | حيوانات | 7 AED |
