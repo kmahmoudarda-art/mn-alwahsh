@@ -15,7 +15,6 @@
 // Prices are in AED, shown directly in the unlock prompt.
 export const PREMIUM_CATEGORIES = {
   // ── ⚽ رياضة (Sports) ──
-  'football logo': 11, 'football Logo': 11, 'Football Logo': 11, 'FOOTBALL LOGO': 11,
   'CR7': 15,
   'ميسي': 15,
   'كأس العرب': 13,
@@ -63,7 +62,6 @@ export const PREMIUM_CATEGORIES = {
   'أعلام العالم': 7,
   'الأردن': 7,
   'دبي': 9,
-  'براندات': 9,
   'أسئلة إنجليزية': 7,
 
   // ── 💻 تكنولوجيا (Tech) ──
@@ -74,24 +72,16 @@ export const PREMIUM_CATEGORIES = {
   'سبيستون': 9,
   'Sephora': 13,
   'سيفورا': 13,
-  'guess fashion': 11, 'Guess Fashion': 11, 'GUESS FASHION': 11, 'Guess fashion': 11,
   'Dubai Bling': 15,
 
   // ── 🧒 أطفال (Kids) — half kept free on purpose, see note in CategoryPicker ──
   'guess fashion easy': 9, 'Guess Fashion Easy': 9, 'Guess fashion easy': 9, 'GUESS FASHION EASY': 9,
-  'ديزني': 13,
-  'Disney': 13,
-  'بيبي شارك': 9,
-  'Baby Shark': 9,
-  'سبونج بوب': 11,
-  'SpongeBob': 11,
   'من الشخصية ؟': 9,
 
   // ── 🧠 تحديات (Challenges) ──
   'IQ': 15,
   'رياضيات': 9,
   'الغاز محيرة': 13,
-  'Logos': 11,
   'فلسفة': 9,
   'محاسبة': 7,
 
