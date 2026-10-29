@@ -629,6 +629,25 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                       <p className="font-tajawal text-center" style={{ fontSize: 10, color: 'rgba(255,228,228,0.4)', marginTop: -4, marginBottom: 8 }}>
                         {getAppStoreCategoryName(TRIAL_SKU)}
                       </p>
+                      {/* Apple (Guideline 3.1.1 / 3.1.2) wants a distinct
+                          Restore button reachable from the purchase screen
+                          itself, not just elsewhere on the page — this is
+                          the modal App Review actually tests against. */}
+                      {isRunningInIOSApp() && (
+                        <>
+                          <button
+                            onClick={handleRestore}
+                            disabled={unlocking}
+                            className="w-full font-cairo font-bold rounded-xl py-3 mb-2 disabled:opacity-50"
+                            style={{ background: 'rgba(255,215,0,0.12)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.4)' }}
+                          >
+                            {unlocking ? '...' : 'استعادة المشتريات السابقة'}
+                          </button>
+                          {restoreMessage && (
+                            <p className="font-tajawal text-xs mb-2" style={{ color: '#FFD700' }}>{restoreMessage}</p>
+                          )}
+                        </>
+                      )}
                     </>
                   ) : (
                     // Purchasing only happens through the native app's own
