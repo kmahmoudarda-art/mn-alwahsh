@@ -373,11 +373,15 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
         </p>
       )}
 
-      {/* Apple (Guideline 3.1.2) requires a way to restore prior purchases.
-          Real entitlements already live in Supabase keyed by account (see
-          entitlements.js), so this mainly re-syncs a device that somehow
-          missed a grant — never the only way to get back paid categories. */}
-      {isRunningInIOSApp() && isSignedIn() && (
+      {/* Apple (Guideline 3.1.2 / 3.1.1) requires a distinct, reachable
+          "Restore" button. Real entitlements already live in Supabase keyed
+          by account (see entitlements.js), so this mainly re-syncs a device
+          that somehow missed a grant — never the only way to get back paid
+          categories. Must stay visible even when signed out (App Review
+          tests without a real account) — handleRestore() already prompts
+          for sign-in itself if needed, so the button can't be gated behind
+          isSignedIn() here or Review never sees it at all. */}
+      {isRunningInIOSApp() && (
         <div className="mb-3 text-center">
           <button
             onClick={handleRestore}
