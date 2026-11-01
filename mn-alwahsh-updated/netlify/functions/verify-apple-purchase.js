@@ -37,6 +37,10 @@ import { PLAY_PRODUCT_MAP, ALL_CATEGORIES_SKU, TRIAL_SKU } from '../../src/utils
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://cqqeyvhofbnvjemoihca.supabase.co';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxcWV5dmhvZmJudmplbW9paGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MDg5ODIsImV4cCI6MjA5MjQ4NDk4Mn0.y_1B1Gy8EIEFpVrJu9TKX1fPSBfR1jFVrcgO1PA1-hs';
 const APPLE_BUNDLE_ID = process.env.APPLE_BUNDLE_ID || 'com.mnalwahsh.ios';
+// Numeric App Store app id. SignedDataVerifier requires it in the
+// Production environment (throws "appAppleId is required when the
+// environment is Production" otherwise); it is ignored for Sandbox.
+const APPLE_APP_ID = Number(process.env.APPLE_APP_ID || '6814543685');
 
 // Apple's own three root certificates, fetched once per warm function
 // instance and cached in memory rather than vendored into the repo — this
@@ -177,7 +181,10 @@ export default async (req) => {
     const { signedTransactionInfo, environment } = await fetchSignedTransaction(transactionId);
 
     const appleRootCAs = await getAppleRootCAs();
-    const verifier = new SignedDataVerifier(appleRootCAs, true, environment, APPLE_BUNDLE_ID);
+    const verifier = new SignedDataVerifier(
+      appleRootCAs, true, environment, APPLE_BUNDLE_ID,
+      environment === Environment.PRODUCTION ? APPLE_APP_ID : undefined,
+    );
     const transaction = await verifier.verifyAndDecodeTransaction(signedTransactionInfo);
 
     // Belt-and-braces checks beyond signature verification — a valid
