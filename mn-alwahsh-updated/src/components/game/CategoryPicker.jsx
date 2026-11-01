@@ -666,7 +666,7 @@ export default function CategoryPicker({ selected, onToggle, onSetSelected, max 
                           // the app is created in App Store Connect (the
                           // numeric id only exists after that) — see
                           // ios/README.md.
-                          ? 'https://apps.apple.com/app/id0000000000'
+                          ? 'https://apps.apple.com/app/id6814543685'
                           : 'https://play.google.com/store/apps/details?id=com.mnalwahsh.twa'}
                         target="_blank"
                         rel="noopener noreferrer"
