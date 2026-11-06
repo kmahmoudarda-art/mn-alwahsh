@@ -358,12 +358,25 @@ export default function QuestionModal({
   };
 
   const handleReport = async () => {
-    if (!question || question.id == null || reporting || justReported) return;
+    if (!question || reporting || justReported) return;
     const key = `${question.source_table}:${question.id}`;
-    if (reportedIds.has(key)) { toast('تم الإبلاغ عن هذا السؤال من قبل'); return; }
+
+    // Already reported on this device, or a row with no id we can report
+    // against: still swap it out instead of silently doing nothing.
+    if (question.id == null || reportedIds.has(key)) {
+      setReporting(true);
+      let newQ = null;
+      try { newQ = await fetchSwapQuestion(category, points, question.id, question.source_table); } catch {}
+      setReporting(false);
+      if (onReportHandled) onReportHandled(newQ, answered);
+      else if (newQ && onQuestionSwapped) onQuestionSwapped(newQ);
+      toast(newQ ? 'تم الإبلاغ عن هذا السؤال من قبل، وتم تغييره' : 'تم الإبلاغ عن هذا السؤال من قبل');
+      return;
+    }
 
     setReporting(true);
-    const result = await reportQuestion(question);
+    let result = { ok: false };
+    try { result = await reportQuestion(question); } catch {}
 
     if (!result.ok) {
       setReporting(false);

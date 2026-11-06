@@ -524,6 +524,7 @@ export async function reportQuestion(question) {
 
   try {
     const getRes = await fetch(`${SUPABASE_URL}/rest/v1/${source_table}?select=report_count&${filter}&limit=1`, {
+      cache: 'no-store',
       headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' },
     });
     if (!getRes.ok) {
@@ -541,17 +542,26 @@ export async function reportQuestion(question) {
     if (nextCount >= REPORT_THRESHOLD) {
       const delRes = await fetch(`${SUPABASE_URL}/rest/v1/${source_table}?${filter}`, {
         method: 'DELETE',
-        headers: { ...BASE_HEADERS, Prefer: 'return=minimal' },
+        headers: { ...BASE_HEADERS, Prefer: 'return=representation' },
       });
-      return { ok: delRes.ok, deleted: delRes.ok, count: nextCount };
+      // return=minimal reports 204 even when RLS silently matched 0 rows —
+      // ask for the rows back so a blocked write is reported as a failure.
+      const deletedRows = delRes.ok ? await delRes.json().catch(() => []) : [];
+      const deleted = Array.isArray(deletedRows) && deletedRows.length > 0;
+      if (delRes.ok && !deleted) console.error('[reportQuestion] DELETE matched 0 rows (RLS?)', source_table, filter);
+      return { ok: deleted, deleted, count: nextCount };
     }
 
     const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/${source_table}?${filter}`, {
       method: 'PATCH',
-      headers: { ...BASE_HEADERS, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      headers: { ...BASE_HEADERS, 'Content-Type': 'application/json', Prefer: 'return=representation' },
       body: JSON.stringify({ report_count: nextCount }),
     });
-    return { ok: patchRes.ok, deleted: false, count: nextCount };
+    const updatedRows = patchRes.ok ? await patchRes.json().catch(() => []) : [];
+    const updated = Array.isArray(updatedRows) && updatedRows.length > 0;
+    if (!patchRes.ok) console.error('[reportQuestion] PATCH failed', source_table, patchRes.status);
+    else if (!updated) console.error('[reportQuestion] PATCH matched 0 rows (RLS?)', source_table, filter);
+    return { ok: updated, deleted: false, count: nextCount };
   } catch (e) {
     console.error('[reportQuestion] failed', e);
     return { ok: false };
