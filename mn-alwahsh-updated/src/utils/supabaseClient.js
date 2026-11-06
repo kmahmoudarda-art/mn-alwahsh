@@ -43,7 +43,7 @@ try {
     const counts = await Promise.all(allTables.map(async (table) => {
       const res = await fetch(
         `${SUPABASE_URL}/rest/v1/${table}?select=*&limit=1`,
-        { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } }
+        { cache: 'no-store', headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } }
       );
       const count = res.ok ? parseInt(res.headers.get('content-range')?.split('/')[1] || '0', 10) : 0;
       return { table, count };
@@ -83,7 +83,7 @@ async function fetchAllRows(table, select = 'category') {
   let from = 0;
   while (true) {
     const url = `${SUPABASE_URL}/rest/v1/${table}?select=${select}&offset=${from}&limit=${batchSize}`;
-    const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Pragma: 'no-cache' } });
+    const res = await fetch(url, { cache: 'no-store', headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Pragma: 'no-cache' } });
     if (!res.ok) break;
     const data = await res.json();
     if (!data || data.length === 0) break;
@@ -180,7 +180,7 @@ async function resolveUsedFilter(table, encodedCategory, intPoints) {
 
   for (const candidate of ['&used=not.is.true', '&used=neq.true']) {
     const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${candidate}&limit=1`;
-    const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } });
+    const res = await fetch(url, { cache: 'no-store', headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } });
     if (res.ok) {
       tableUsedFilterCache.set(table, candidate);
       return candidate;
@@ -199,7 +199,7 @@ async function getRowCount(table, category, points, idFilter = '') {
   const usedFilter = await resolveUsedFilter(table, encodedCategory, intPoints);
 
   const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}${idFilter}&limit=1`;
-  const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } });
+  const res = await fetch(url, { cache: 'no-store', headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } });
   if (!res.ok) return { total: 0, usedFilter };
   const cr = res.headers.get('content-range');
   const total = cr ? parseInt(cr.split('/')[1], 10) : 0;
@@ -214,7 +214,7 @@ async function fetchOneRandom(table, category, points) {
   // FAM/KIDS: server-side used filter unreliable — fetch batch and filter client-side
   if (table === TABLE_FAM || table === TABLE_KIDS) {
     const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}&limit=50`;
-    const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
+    const res = await fetch(url, { cache: 'no-store', headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
     if (!res.ok) return null;
     const data = await res.json();
     if (!Array.isArray(data)) return null;
@@ -231,7 +231,7 @@ async function fetchOneRandom(table, category, points) {
   if (total === 0) {
     // Check if category is truly absent or just exhausted
     const noFilterUrl = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}&limit=1`;
-    const noFilterRes = await fetch(noFilterUrl, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } });
+    const noFilterRes = await fetch(noFilterUrl, { cache: 'no-store', headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache', Prefer: 'count=exact' } });
     if (noFilterRes.ok) {
       const cr = noFilterRes.headers.get('content-range');
       const noFilterTotal = cr ? parseInt(cr.split('/')[1], 10) : 0;
@@ -242,7 +242,7 @@ async function fetchOneRandom(table, category, points) {
 
   const offset = Math.floor(Math.random() * total);
   const rowUrl = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}${idFilter}&limit=1&offset=${offset}`;
-  const res = await fetch(rowUrl, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
+  const res = await fetch(rowUrl, { cache: 'no-store', headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
   if (!res.ok) return null;
   const data = await res.json();
   if (!Array.isArray(data) || data.length === 0) return null;
@@ -259,7 +259,7 @@ async function fetchRowsFromTable(table, category, points) {
     : await resolveUsedFilter(table, encodedCategory, intPoints);
   const idFilter = reportedIdFilter(table);
   const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}${usedFilter}${idFilter}&limit=20`;
-  const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
+  const res = await fetch(url, { cache: 'no-store', headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
   if (!res.ok) return [];
   const data = await res.json();
   if (table === TABLE_FAM || table === TABLE_KIDS) {
@@ -310,7 +310,7 @@ async function tableHasCategory(table, category, points) {
   const intPoints = parseInt(points, 10);
   const encodedCategory = encodeURIComponent(category);
   const url = `${SUPABASE_URL}/rest/v1/${table}?select=*&points=eq.${intPoints}&category=eq.${encodedCategory}&limit=1`;
-  const res = await fetch(url, { headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
+  const res = await fetch(url, { cache: 'no-store', headers: { ...BASE_HEADERS, 'Cache-Control': 'no-cache' } });
   if (!res.ok) return false;
   const data = await res.json();
   return Array.isArray(data) && data.length > 0;
@@ -348,22 +348,39 @@ export async function fetchQuestion(category, points) {
   return null;
 }
 
-// Fetch a swap question from the same table the original came from
+// Fetch a swap question from the same table the original came from.
+// Uses the same random-offset path as fetchQuestion (not a fixed first-20
+// batch, which kept returning the same rows and could come back stale from
+// the Android WebView HTTP cache), excludes the current question, marks the
+// replacement used so it can't repeat, and recycles the table if exhausted.
 export async function fetchSwapQuestion(category, points, excludeId, sourceTable) {
-  console.log('[Swap] called with', { category, points, excludeId, sourceTable });
   const table = sourceTable || TABLE_MAIN;
-  const rows = await fetchRowsFromTable(table, category, points);
-  console.log('[Swap] rows returned:', rows.length);
-  if (!rows.length) return null;
+  const rowKey = r => r.id ?? r.question_id ?? r.ID ?? r.rowid
+    ?? (r.slot ? `${r.category}|${r.points}|${r.slot}` : null);
+  const isExcluded = r => excludeId != null && String(rowKey(r)) === String(excludeId);
 
-  const filtered = rows.filter(r => {
-    const rowId = r.id ?? r.question_id ?? r.ID ?? r.rowid
-      ?? (r.slot ? `${r.category}|${r.points}|${r.slot}` : null);
-    return rowId == null || String(rowId) !== String(excludeId);
-  });
-  const pool = filtered.length ? filtered : rows;
-  const row = pool[Math.floor(Math.random() * pool.length)];
-  return normalizeRow(row, table);
+  try {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      for (let i = 0; i < 4; i++) {
+        const row = await fetchOneRandom(table, category, points);
+        if (!row) break;
+        if (isExcluded(row)) continue;
+        markQuestionUsed(row, table).catch(() => {});
+        return normalizeRow(row, table);
+      }
+      // Fallback: small batch, pick any row that isn't the current one
+      const rows = (await fetchRowsFromTable(table, category, points)).filter(r => !isExcluded(r));
+      if (rows.length) {
+        const row = rows[Math.floor(Math.random() * rows.length)];
+        markQuestionUsed(row, table).catch(() => {});
+        return normalizeRow(row, table);
+      }
+      if (attempt === 0) await resetTable(table); // exhausted — recycle once
+    }
+  } catch (e) {
+    console.warn('[Swap] failed', e);
+  }
+  return null;
 }
 
 function normalizeRow(row, sourceTable) {

@@ -335,9 +335,18 @@ export default function QuestionModal({
     setTimeout(() => setShowToast(false), 2000);
   };
 
+  const swapInFlight = useRef(false);
   const handleSwap = async () => {
-    if (answered || !question) return;
-    const newQ = await fetchSwapQuestion(category, points, question.id, question.source_table);
+    if (answered || !question || swapInFlight.current) return;
+    swapInFlight.current = true;
+    let newQ = null;
+    try {
+      newQ = await fetchSwapQuestion(category, points, question.id, question.source_table);
+    } catch (e) {
+      console.warn('[Swap] error', e);
+    } finally {
+      swapInFlight.current = false;
+    }
     if (!newQ) { toast('لا يوجد سؤال آخر متاح'); return; }
     setSwapAnimating(true);
     setTimeout(() => {
