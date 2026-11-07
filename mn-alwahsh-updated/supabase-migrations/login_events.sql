@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS login_events (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   logged_at timestamptz NOT NULL DEFAULT now(),
   email text NOT NULL,
-  platform text NOT NULL          -- 'android_app' or 'web'
+  platform text NOT NULL          -- 'android_app', 'ios_app' or 'web'
 );
 
 ALTER TABLE login_events ENABLE ROW LEVEL SECURITY;

@@ -16,7 +16,7 @@
 CREATE TABLE IF NOT EXISTS app_opens (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   opened_at timestamptz NOT NULL DEFAULT now(),
-  platform text NOT NULL,          -- 'android_app' or 'web'
+  platform text NOT NULL,          -- 'android_app', 'ios_app' or 'web'
   user_agent text
 );
 
