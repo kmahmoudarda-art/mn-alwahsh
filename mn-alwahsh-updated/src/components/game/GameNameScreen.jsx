@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import InstructionManual from './InstructionManual';
 import ScreenMirrorButton from './ScreenMirrorButton';
 import AuthForm from './AuthForm';
+import HowToPlayVideo from './HowToPlayVideo';
 import { getCurrentUser, signOut, getValidSession } from '../../utils/authClient';
 import { fetchGameCount } from '@/utils/supabaseClient';
 import { isRunningInIOSApp, isRunningInAndroidApp } from '../../utils/platform';
@@ -244,6 +245,7 @@ export default function GameNameScreen({ onEnter }) {
 
   return (
     <div className="min-h-screen relative overflow-hidden" dir="rtl" style={{ background: '#050000' }}>
+      <HowToPlayVideo />
       <style>{`
         @keyframes titleFlicker {
           0%,100% { text-shadow: 0 0 12px #FF0000, 0 0 40px #CC0000, 0 0 80px #8B0000; }
