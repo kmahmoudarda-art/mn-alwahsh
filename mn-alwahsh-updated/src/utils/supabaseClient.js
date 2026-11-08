@@ -1,4 +1,4 @@
-import { isRunningInAndroidApp } from './platform.js';
+import { platformLabel } from './platform.js';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://cqqeyvhofbnvjemoihca.supabase.co';
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxcWV5dmhvZmJudmplbW9paGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MDg5ODIsImV4cCI6MjA5MjQ4NDk4Mn0.y_1B1Gy8EIEFpVrJu9TKX1fPSBfR1jFVrcgO1PA1-hs';
@@ -596,7 +596,7 @@ export async function logAppOpen() {
       method: 'POST',
       headers: { ...BASE_HEADERS, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
       body: JSON.stringify({
-        platform: isRunningInAndroidApp() ? 'android_app' : 'web',
+        platform: platformLabel(),
         user_agent: navigator.userAgent,
       }),
     });
@@ -615,7 +615,7 @@ export async function logLoginEvent(email) {
       headers: { ...BASE_HEADERS, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
       body: JSON.stringify({
         email,
-        platform: isRunningInAndroidApp() ? 'android_app' : 'web',
+        platform: platformLabel(),
       }),
     });
   } catch {}

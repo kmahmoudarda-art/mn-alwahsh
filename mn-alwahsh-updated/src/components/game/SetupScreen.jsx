@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Play, UserCircle2, ArrowRight } from 'lucide-react';
@@ -117,12 +117,29 @@ export default function SetupScreen({ onStartGame, onBack, gameName }) {
 
   const isValid = team1Categories.length === 3 && team2Categories.length === 3;
 
+  const startedRef = useRef(false);
   const handleStart = () => {
-    if (!isValid) return;
+    if (!isValid || startedRef.current) return;
+    startedRef.current = true;
     onStartGame({
       team1: { name: team1Name.trim() || 'وحش أحمر', categories: team1Categories },
       team2: { name: team2Name.trim() || 'وحش أزرق', categories: team2Categories },
     });
+  };
+
+  const touchStart = useRef(null);
+  const startTapProps = {
+    onClick: handleStart,
+    onTouchStart: (e) => { const t = e.touches[0]; touchStart.current = { x: t.clientX, y: t.clientY }; },
+    onTouchEnd: (e) => {
+      const s0 = touchStart.current; touchStart.current = null;
+      if (!s0) return;
+      const t = e.changedTouches[0];
+      if (Math.abs(t.clientX - s0.x) < 30 && Math.abs(t.clientY - s0.y) < 30) {
+        e.preventDefault(); // stop the follow-up click from double-firing
+        handleStart();
+      }
+    },
   };
 
   return (
@@ -256,7 +273,7 @@ export default function SetupScreen({ onStartGame, onBack, gameName }) {
           whileTap={{ scale: isValid ? 0.98 : 1 }}
         >
           <Button
-            onClick={handleStart}
+            {...startTapProps}
             disabled={!isValid}
             className="text-xl font-cairo font-bold px-12 py-6 rounded-xl gap-3 disabled:opacity-40 transition-all"
             style={{
@@ -264,6 +281,7 @@ export default function SetupScreen({ onStartGame, onBack, gameName }) {
               color: '#FFE4E4',
               border: '1px solid #CC0000',
               boxShadow: isValid ? '0 0 20px rgba(139,0,0,0.6), 0 0 40px rgba(139,0,0,0.3)' : 'none',
+              touchAction: 'manipulation', minHeight: 64, minWidth: 240,
             }}
             size="lg"
           >
@@ -298,7 +316,7 @@ export default function SetupScreen({ onStartGame, onBack, gameName }) {
           whileTap={{ scale: isValid ? 0.98 : 1 }}
         >
           <Button
-            onClick={handleStart}
+            {...startTapProps}
             disabled={!isValid}
             className="text-xl font-cairo font-bold px-12 py-6 rounded-xl gap-3 disabled:opacity-40 transition-all"
             style={{
@@ -306,6 +324,7 @@ export default function SetupScreen({ onStartGame, onBack, gameName }) {
               color: '#FFE4E4',
               border: '1px solid #CC0000',
               boxShadow: isValid ? '0 0 20px rgba(139,0,0,0.6), 0 0 40px rgba(139,0,0,0.3)' : 'none',
+              touchAction: 'manipulation', minHeight: 64, minWidth: 240,
             }}
             size="lg"
           >

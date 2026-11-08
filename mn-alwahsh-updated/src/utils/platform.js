@@ -15,7 +15,11 @@
 // starting with "android-app://" is kept as a fallback for the older TWA
 // build, in case that referrer ever shows up again.
 export function isRunningInAndroidApp() {
-  if (typeof window !== 'undefined' && typeof window.AndroidBilling !== 'undefined') {
+  if (typeof window !== 'undefined' &&
+      (typeof window.AndroidBilling !== 'undefined' ||
+       // The native interface exists from page start; window.AndroidBilling
+       // is only injected once the page finishes loading.
+       typeof window.AndroidBillingNative !== 'undefined')) {
     return true;
   }
   try {
@@ -30,7 +34,19 @@ export function isRunningInAndroidApp() {
 // loads (see storeKitBillingClient.js), so its presence is a reliable
 // signal we're inside the packaged iOS app rather than Mobile Safari.
 export function isRunningInIOSApp() {
-  return typeof window !== 'undefined' && typeof window.WebkitBilling !== 'undefined';
+  if (typeof window === 'undefined') return false;
+  if (typeof window.WebkitBilling !== 'undefined') return true;
+  // The message handler is registered before the page loads, whereas
+  // window.WebkitBilling is only injected after it finishes — so early
+  // checks (e.g. logAppOpen on startup) need this.
+  try { return !!window.webkit?.messageHandlers?.WebkitBillingNative; } catch { return false; }
+}
+
+// Label used in analytics tables (app_opens, login_events).
+export function platformLabel() {
+  if (isRunningInIOSApp()) return 'ios_app';
+  if (isRunningInAndroidApp()) return 'android_app';
+  return 'web';
 }
 
 // Best-effort "this device is an iPhone/iPad" check, used only to decide
