@@ -2,7 +2,7 @@ import json,time,os,sys
 exec(open('fast_retier.py').read())
 from collections import defaultdict,Counter
 os.makedirs('backups',exist_ok=True)
-SKIP={'حمو بيكا'}
+SKIP={'حمو بيكا','سبيستون'}
 def cats():
     rows=[];off=0
     while True:
