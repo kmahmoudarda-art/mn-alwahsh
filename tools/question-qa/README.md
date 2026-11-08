@@ -2,7 +2,7 @@
 
 Python scripts used to audit, rewrite and top up the Supabase question tables.
 
-- `validate.py` – rules: no empty/duplicate options, equal word counts, an answer word found in the question must appear in every option.
+- `validate.py` – rules: no empty/duplicate options, word counts within 1 of each other and the correct answer never the longest option, an answer word found in the question must appear in every option.
 - `fill.py` – `replace_invalid(table, cat, newqs, target=180)` keeps valid rows, adds new validated ones, deletes only as many invalid rows as it adds.
 - `status.py` – `status(table, cat)` -> (rows, valid).
 - `newcat.py` – `insert_new(cat, list)` for brand-new categories.

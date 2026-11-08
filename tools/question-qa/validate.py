@@ -6,7 +6,9 @@ def problems(q, opts):
     p=[]
     if len(opts)!=4 or any(not str(o).strip() for o in opts): p.append('empty option')
     if len({_n(o).strip() for o in opts})<4: p.append('duplicate options')
-    if len({len(str(o).split()) for o in opts})>1: p.append('unequal word count')
+    wcs=[len(str(o).split()) for o in opts]
+    # relaxed: options may differ by at most one word, and the correct answer (opts[0]) must not be the strictly longest
+    if max(wcs)-min(wcs)>1 or wcs[0]>max(wcs[1:]): p.append('unequal word count')
     qs={_stem(w) for w in _n(q).split() if len(_stem(w))>=3}
     for w in _n(opts[0]).split():
         s=_stem(w)
