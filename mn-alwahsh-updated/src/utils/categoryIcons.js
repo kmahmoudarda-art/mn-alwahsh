@@ -1,4 +1,8 @@
 const CATEGORY_ICONS = {
+  'عواصم ودول': '🏙️', 'عملات العالم': '💱', 'لغة عربية': '📝', 'شعر عربي': '🪶', 'أمثال شعبية': '💬',
+  'الفضاء والكواكب': '🪐', 'جسم الإنسان': '🫀', 'اختراعات ومخترعون': '💡', 'رمضان': '🌙', 'أرقام قياسية': '🏆',
+  'أكلات العالم': '🍣', 'السعودية': '🇸🇦', 'الكويت': '🇰🇼', 'عُمان': '🇴🇲', 'فلسطين': '🇵🇸', 'سوريا': '🇸🇾', 'لبنان': '🇱🇧',
+  'حقائق مجنونة': '🤯', 'كائنات البحر': '🐙',
   'سبيستون':           '🚀',
   'محاسبة':            '🧾',
   'كأس آسيا':          '🏆',
@@ -112,3 +116,13 @@ export function getIcon(name) {
 }
 
 export default CATEGORY_ICONS;
+
+// Display-only names. The stored category key stays the same so existing
+// purchases (which reference the key) keep working.
+const DISPLAY_NAMES = {
+  'WildRift': 'LOL Champions',
+  'وايلد ريفت': 'LOL Champions',
+};
+export function displayName(cat) {
+  return DISPLAY_NAMES[cat] || cat;
+}

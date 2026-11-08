@@ -1,3 +1,4 @@
+import { displayName } from '../../utils/categoryIcons';
 import { useState, useRef } from 'react';
 import FirstTimeTips, { SETUP_TIPS } from './FirstTimeTips';
 import { useNavigate } from 'react-router-dom';
@@ -72,7 +73,7 @@ function SelectedCategoryColumn({ categories, teamName, side, onRemove }) {
                 fontSize: 9, color: '#FFE4E4', fontFamily: 'var(--font-cairo)',
                 fontWeight: 600, lineHeight: 1.2, wordBreak: 'break-word',
               }}>
-                {categories[i]}
+                {displayName(categories[i])}
               </span>
               <span style={{
                 position: 'absolute', top: 3, left: 3,
