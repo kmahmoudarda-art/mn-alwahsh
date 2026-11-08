@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import FirstTimeTips, { SETUP_TIPS } from './FirstTimeTips';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Play, UserCircle2, ArrowRight } from 'lucide-react';
@@ -265,6 +266,8 @@ export default function SetupScreen({ onStartGame, onBack, gameName }) {
             </p>
           )}
         </div>
+
+        <FirstTimeTips storageKey="mn_tips_setup_v1" tips={SETUP_TIPS} />
 
         {/* Start button — TOP */}
         <motion.div

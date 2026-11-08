@@ -15,6 +15,7 @@ import WinnerScreen from '../components/game/WinnerScreen';
 import SpecialCards from '../components/game/SpecialCards';
 import GameNameScreen from '../components/game/GameNameScreen';
 import LuckyDoublePopup from '../components/game/LuckyDoublePopup';
+import FirstTimeTips, { BOARD_TIPS } from '../components/game/FirstTimeTips';
 
 const TOTAL_TILES = 36;
 const POINT_VALUES = [200, 400, 600];
@@ -887,6 +888,8 @@ export default function Game() {
       }} />
 
       {showLuckyPopup && <LuckyDoublePopup teamName={luckyCell ? teams[luckyCell.losingTeam]?.name : ''} />}
+
+      {!modalOpen && <FirstTimeTips storageKey="mn_tips_board_v1" tips={BOARD_TIPS} />}
 
       <ScoreBar team1={teams[1]} team2={teams[2]} currentTeam={currentTeam} onAdjust={handleAdjustScore} onBack={handleExit} modalOpen={modalOpen} />
 

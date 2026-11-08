@@ -126,12 +126,12 @@ function TeamScore({ teamNum, name, score, isActive, scoreKey, reverse, onAdjust
     setTimeout(() => {
       setBlastScore(null);
       if (newBadge) setBlastBadge(newBadge);
-    }, 800);
+    }, 400);
 
     setTimeout(() => {
       setBlastBadge(null);
       setShaking(false);
-    }, 2800);
+    }, 1600);
   }, [modalOpen]);
 
   // Score blast: full-screen overlay (avoids fixed+transform issue), number aligned to team's side
@@ -162,7 +162,7 @@ function TeamScore({ teamNum, name, score, isActive, scoreKey, reverse, onAdjust
           initial={{ scale: 0.1, opacity: 0, y: 40 }}
           animate={{ scale: [0.1, 1.5, 1.2], opacity: [0, 1, 1], y: [40, 0, 0] }}
           exit={{ scale: 2, opacity: 0, y: -30 }}
-          transition={{ duration: 0.65, times: [0, 0.5, 1] }}
+          transition={{ duration: 0.4, times: [0, 0.5, 1] }}
           style={{
             fontFamily: 'var(--font-cairo)', fontWeight: 900,
             fontSize: 'clamp(60px, 14vw, 180px)',
@@ -200,7 +200,7 @@ function TeamScore({ teamNum, name, score, isActive, scoreKey, reverse, onAdjust
             y:      [0,   0,  -25,  0,   -18,   0,   -12,  0,   0  ],
           }}
           exit={{ scale: 2.2, opacity: 0, transition: { duration: 0.35 } }}
-          transition={{ duration: 2, times: [0, 0.12, 0.28, 0.42, 0.56, 0.68, 0.80, 0.90, 1.0], ease: 'easeInOut' }}
+          transition={{ duration: 1.1, times: [0, 0.12, 0.28, 0.42, 0.56, 0.68, 0.80, 0.90, 1.0], ease: 'easeInOut' }}
           style={{
             fontFamily: 'var(--font-cairo)', fontWeight: 900,
             fontSize: 'clamp(56px, 14vw, 140px)',
@@ -227,7 +227,7 @@ function TeamScore({ teamNum, name, score, isActive, scoreKey, reverse, onAdjust
       <motion.div
         layout
         animate={shaking ? { x: [0, -14, 14, -12, 12, -8, 8, -4, 4, 0] } : {}}
-        transition={shaking ? { duration: 1.5, ease: 'easeInOut' } : {}}
+        transition={shaking ? { duration: 0.8, ease: 'easeInOut' } : {}}
         className="flex-1 max-w-[330px] rounded-2xl overflow-hidden"
         style={
           isActive
