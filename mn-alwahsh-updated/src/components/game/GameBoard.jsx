@@ -1,3 +1,4 @@
+import { displayName } from '../../utils/categoryIcons';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -263,7 +264,7 @@ export default function GameBoard({ categories, answeredTiles, onTileClick, team
                               whiteSpace: 'normal',
                               lineHeight: 1.25,
                             }}>
-                            {cat}
+                            {displayName(cat)}
                           </p>
                         </motion.div>
 

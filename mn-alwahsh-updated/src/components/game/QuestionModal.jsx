@@ -1,3 +1,4 @@
+import { displayName } from '../../utils/categoryIcons';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -496,7 +497,7 @@ export default function QuestionModal({
           position: 'relative',
         }}>
           <div>
-            <p style={{ fontFamily: 'var(--font-cairo)', fontWeight: 800, color: '#CC0000', fontSize: 15, margin: 0 }}>{category}</p>
+            <p style={{ fontFamily: 'var(--font-cairo)', fontWeight: 800, color: '#CC0000', fontSize: 15, margin: 0 }}>{displayName(category)}</p>
             <p style={{ fontFamily: 'var(--font-tajawal)', color: '#666', fontSize: 11, margin: 0, fontWeight: 600 }}>
               {points} نقطة
             </p>
