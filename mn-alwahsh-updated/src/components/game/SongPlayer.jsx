@@ -17,6 +17,7 @@ export default function SongPlayer({ itunesId, onStarted }) {
   const onStartedRef = useRef(onStarted);
   onStartedRef.current = onStarted;
   const [status, setStatus] = useState('loading'); // loading | ready | playing | error
+  const [errCode, setErrCode] = useState(0); // 1 lookup failed, 2 no preview, 3 audio failed, 4 play blocked
   const fireStarted = () => {
     if (startedRef.current) return;
     startedRef.current = true;
@@ -27,11 +28,22 @@ export default function SongPlayer({ itunesId, onStarted }) {
     let cancelled = false;
     startedRef.current = false;
     const fallback = setTimeout(fireStarted, MAX_WAIT_MS);
-    fetch(`https://itunes.apple.com/lookup?id=${encodeURIComponent(itunesId)}`)
-      .then(r => r.json())
-      .then(d => {
-        const url = d?.results?.[0]?.previewUrl;
-        if (!url) throw new Error('no preview');
+    const lookup = async (url) => {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error('lookup-' + r.status);
+      return (await r.json())?.results?.[0]?.previewUrl || null;
+    };
+    const viaServer = async () => {
+      const r = await fetch(`/.netlify/functions/itunes-preview?id=${encodeURIComponent(itunesId)}`);
+      if (!r.ok) throw new Error('fn-' + r.status);
+      return (await r.json())?.previewUrl || null;
+    };
+    // Server lookup first (works regardless of the player's region/ad blocker),
+    // then Apple directly as a fallback.
+    viaServer().catch(() => null)
+      .then(u => u || lookup(`https://itunes.apple.com/lookup?id=${encodeURIComponent(itunesId)}`).catch(() => null))
+      .then(url => {
+        if (!url) { const e = new Error('no-preview'); e.code = 2; throw e; }
         if (cancelled) return;
         const a = new Audio(url);
         a.preload = 'auto';
@@ -42,11 +54,11 @@ export default function SongPlayer({ itunesId, onStarted }) {
         };
         a.onpause = () => setStatus('ready');
         a.onended = () => setStatus('ready');
-        a.onerror = () => { setStatus('error'); fireStarted(); };
+        a.onerror = () => { setErrCode(3); setStatus('error'); fireStarted(); };
         audioRef.current = a;
         setStatus('ready');
       })
-      .catch(() => { if (!cancelled) { setStatus('error'); fireStarted(); } }); // don't freeze the game
+      .catch((e) => { if (!cancelled) { setErrCode(e?.code || 1); setStatus('error'); fireStarted(); } }); // don't freeze the game
     return () => {
       cancelled = true;
       clearTimeout(fallback);
@@ -62,11 +74,11 @@ export default function SongPlayer({ itunesId, onStarted }) {
     if (!a) return;
     if (!a.paused) { a.pause(); return; }
     a.currentTime = 0;
-    a.play().catch(() => setStatus('error'));
+    a.play().catch(() => { setErrCode(4); setStatus('error'); });
   };
 
   const label = status === 'loading' ? '⏳ جاري التحميل…'
-    : status === 'error' ? '⚠️ تعذّر تشغيل المقطع'
+    : status === 'error' ? `⚠️ تعذّر تشغيل المقطع (${errCode})`
     : status === 'playing' ? '⏸️ إيقاف' : (startedRef.current ? '🔁 أعد المقطع' : '🎧 شغّل المقطع');
 
   return (
