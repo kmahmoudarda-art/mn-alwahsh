@@ -24,6 +24,14 @@
   "needs_attribution": true
  },
  {
+  "title": "Statue of Liberty",
+  "file": "Statue of Liberty and a sightseeing boat, Liberty Island, New York.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Christian David",
+  "page": "https://commons.wikimedia.org/wiki/File:Statue_of_Liberty_and_a_sightseeing_boat,_Liberty_Island,_New_York.jpg",
+  "needs_attribution": true
+ },
+ {
   "title": "Colosseum",
   "file": "Colosseo 2020.jpg",
   "license": "CC BY-SA 4.0",
@@ -37,6 +45,46 @@
   "license": "CC BY-SA 4.0",
   "artist": "Christian David",
   "page": "https://commons.wikimedia.org/wiki/File:Elizabeth_Tower_and_the_north_front_of_the_Palace_of_Westminster,_London.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Burj Khalifa",
+  "file": "Dubai skyline 2015 (crop).jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Tim.Reckmann",
+  "page": "https://commons.wikimedia.org/wiki/File:Dubai_skyline_2015_(crop).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Sydney Opera House",
+  "file": "Sydney Opera House Sails.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "No machine-readable author provided. Roybb95~commonswiki assumed (based on copyright claim",
+  "page": "https://commons.wikimedia.org/wiki/File:Sydney_Opera_House_Sails.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Great Wall of China",
+  "file": "The Great Wall of China at Jinshanling-edit.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Severin.stalder",
+  "page": "https://commons.wikimedia.org/wiki/File:The_Great_Wall_of_China_at_Jinshanling-edit.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Leaning Tower of Pisa",
+  "file": "Campanile Dôme - Pise (IT52) - 2022-08-31 - 20.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Chabe01",
+  "page": "https://commons.wikimedia.org/wiki/File:Campanile_D%C3%B4me_-_Pise_(IT52)_-_2022-08-31_-_20.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Great Sphinx of Giza",
+  "file": "Great Sphinx of Giza May 2015.JPG",
+  "license": "CC BY-SA 3.0",
+  "artist": "MusikAnimal",
+  "page": "https://commons.wikimedia.org/wiki/File:Great_Sphinx_of_Giza_May_2015.JPG",
   "needs_attribution": true
  },
  {
@@ -64,11 +112,35 @@
   "needs_attribution": true
  },
  {
+  "title": "Empire State Building",
+  "file": "Empire State Building (aerial view).jpg",
+  "license": "Public domain",
+  "artist": "Sam Valadi",
+  "page": "https://commons.wikimedia.org/wiki/File:Empire_State_Building_(aerial_view).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Louvre",
+  "file": "Cour Napoléon at night - Louvre.jpg",
+  "license": "CC BY 2.5",
+  "artist": "Benh LIEU SONG",
+  "page": "https://commons.wikimedia.org/wiki/File:Cour_Napol%C3%A9on_at_night_-_Louvre.jpg",
+  "needs_attribution": true
+ },
+ {
   "title": "Arc de Triomphe",
   "file": "Arc de Triomphe - Août 2026.jpg",
   "license": "CC BY-SA 4.0",
   "artist": "ZeusUpsistos",
   "page": "https://commons.wikimedia.org/wiki/File:Arc_de_Triomphe_-_Ao%C3%BBt_2026.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Notre-Dame de Paris",
+  "file": "Notre-Dame de Paris 2013-07-24.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "P e z i",
+  "page": "https://commons.wikimedia.org/wiki/File:Notre-Dame_de_Paris_2013-07-24.jpg",
   "needs_attribution": true
  },
  {
@@ -80,11 +152,35 @@
   "needs_attribution": true
  },
  {
+  "title": "Saint Basil's Cathedral",
+  "file": "00 0568 Saint Basil's Cathedral - Moscow.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "W. Bulach",
+  "page": "https://commons.wikimedia.org/wiki/File:00_0568_Saint_Basil%27s_Cathedral_-_Moscow.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Stonehenge",
+  "file": "Stonehenge Total.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Stefan Kühn",
+  "page": "https://commons.wikimedia.org/wiki/File:Stonehenge_Total.jpg",
+  "needs_attribution": true
+ },
+ {
   "title": "Parthenon",
   "file": "The Parthenon in Athens.jpg",
   "license": "CC BY 2.0",
   "artist": "Steve Swayne",
   "page": "https://commons.wikimedia.org/wiki/File:The_Parthenon_in_Athens.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Trevi Fountain",
+  "file": "Trevi Fountain - Roma.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "NikonZ7II",
+  "page": "https://commons.wikimedia.org/wiki/File:Trevi_Fountain_-_Roma.jpg",
   "needs_attribution": true
  },
  {
@@ -96,11 +192,35 @@
   "needs_attribution": true
  },
  {
+  "title": "Burj Al Arab",
+  "file": "Burj Al Arab and Jumeirah Beach (9601659067).jpg",
+  "license": "CC BY 2.0",
+  "artist": "Yacine Hary",
+  "page": "https://commons.wikimedia.org/wiki/File:Burj_Al_Arab_and_Jumeirah_Beach_(9601659067).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Al-Aqsa Mosque",
+  "file": "Jerusalem-2013-Temple Mount-Al-Aqsa Mosque (NE exposure).jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Godot13",
+  "page": "https://commons.wikimedia.org/wiki/File:Jerusalem-2013-Temple_Mount-Al-Aqsa_Mosque_(NE_exposure).jpg",
+  "needs_attribution": true
+ },
+ {
   "title": "Sultan Ahmed Mosque",
   "file": "Exterior of Sultan Ahmed I Mosque in Istanbul, Turkey 002.jpg",
   "license": "CC BY-SA 3.0",
   "artist": "Moonik",
   "page": "https://commons.wikimedia.org/wiki/File:Exterior_of_Sultan_Ahmed_I_Mosque_in_Istanbul,_Turkey_002.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Mount Fuji",
+  "file": "Kodaki fuji frm shojinko refurb.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "名古屋太郎, (edited by Hannes_24)",
+  "page": "https://commons.wikimedia.org/wiki/File:Kodaki_fuji_frm_shojinko_refurb.jpg",
   "needs_attribution": true
  },
  {
@@ -144,11 +264,83 @@
   "needs_attribution": true
  },
  {
+  "title": "United States Capitol",
+  "file": "United States Capitol west front edit2.jpg",
+  "license": "Public domain",
+  "artist": "United_States_Capitol_-_west_front.jpg: Architect of the Capitol\nderivative work: O.J.",
+  "page": "https://commons.wikimedia.org/wiki/File:United_States_Capitol_west_front_edit2.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Forbidden City",
+  "file": "Hall of Supreme Harmony (20241127120000).jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "N509FZ",
+  "page": "https://commons.wikimedia.org/wiki/File:Hall_of_Supreme_Harmony_(20241127120000).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Cairo Tower",
+  "file": "The Cairo Tower.jpg",
+  "license": "CC BY 4.0",
+  "artist": "Mohamedusrii",
+  "page": "https://commons.wikimedia.org/wiki/File:The_Cairo_Tower.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Abu Simbel temples",
+  "file": "Großer Tempel (Abu Simbel) 31.jpg",
+  "license": "Public domain",
+  "artist": "Olaf Tausch",
+  "page": "https://commons.wikimedia.org/wiki/File:Gro%C3%9Fer_Tempel_(Abu_Simbel)_31.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "Hollywood Sign",
   "file": "Hollywood Sign (Zuschnitt).jpg",
   "license": "CC BY-SA 3.0",
   "artist": "Thomas Wolf, www.foto-tw.de",
   "page": "https://commons.wikimedia.org/wiki/File:Hollywood_Sign_(Zuschnitt).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Palm Jumeirah",
+  "file": "Artificial Archipelagos, Dubai, United Arab Emirates ISS022-E-024940 lrg (cropped).jpg",
+  "license": "Public domain",
+  "artist": "Member of the Expedition 22 crew.",
+  "page": "https://commons.wikimedia.org/wiki/File:Artificial_Archipelagos,_Dubai,_United_Arab_Emirates_ISS022-E-024940_lrg_(cropped).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Marina Bay Sands",
+  "file": "Marina Bay Sands Hotel 3 (31345110894).jpg",
+  "license": "CC BY 2.0",
+  "artist": "Tony Hisgett from Birmingham, UK",
+  "page": "https://commons.wikimedia.org/wiki/File:Marina_Bay_Sands_Hotel_3_(31345110894).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Merlion",
+  "file": "Singapore Merlion BCT.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Bjørn Christian Tørrissen",
+  "page": "https://commons.wikimedia.org/wiki/File:Singapore_Merlion_BCT.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Oriental Pearl Tower",
+  "file": "Oriental Pearl Tower 2012.jpg",
+  "license": "CC BY 2.0",
+  "artist": "Dottie Day",
+  "page": "https://commons.wikimedia.org/wiki/File:Oriental_Pearl_Tower_2012.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Milan Cathedral",
+  "file": "20110724 Milan Cathedral 5260.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Jakub Hałun",
+  "page": "https://commons.wikimedia.org/wiki/File:20110724_Milan_Cathedral_5260.jpg",
   "needs_attribution": true
  },
  {
@@ -160,6 +352,22 @@
   "needs_attribution": true
  },
  {
+  "title": "Windsor Castle",
+  "file": "Windsor Castle at Sunset - Nov 2006.jpg",
+  "license": "CC BY 2.5",
+  "artist": "Diliff",
+  "page": "https://commons.wikimedia.org/wiki/File:Windsor_Castle_at_Sunset_-_Nov_2006.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "London Eye",
+  "file": "London Eye seen from the north bank of the Thames, London.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Christian David",
+  "page": "https://commons.wikimedia.org/wiki/File:London_Eye_seen_from_the_north_bank_of_the_Thames,_London.jpg",
+  "needs_attribution": true
+ },
+ {
   "title": "Palace of Versailles",
   "file": "Vue aérienne du domaine de Versailles par ToucanWings - Creative Commons By Sa 3.0 - 083.jpg",
   "license": "CC BY-SA 3.0",
@@ -168,51 +376,115 @@
   "needs_attribution": true
  },
  {
-  "title": "Suez Canal",
-  "file": "Suez Canal, Egypt (31596166706).jpg",
+  "title": "Alcatraz Island",
+  "file": "Alcatraz Island as seen from the East.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Frank Schulenburg",
+  "page": "https://commons.wikimedia.org/wiki/File:Alcatraz_Island_as_seen_from_the_East.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Dead Sea",
+  "file": "Dead Sea by David Shankbone.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "David Shankbone",
+  "page": "https://commons.wikimedia.org/wiki/File:Dead_Sea_by_David_Shankbone.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Table Mountain (South Africa)",
+  "file": "Table Mountain DanieVDM.jpg",
   "license": "CC BY 2.0",
-  "artist": "Pierre Markuse from Hamm, Germany",
-  "page": "https://commons.wikimedia.org/wiki/File:Suez_Canal,_Egypt_(31596166706).jpg",
+  "artist": "Danie van der Merwe from Cape Town, South Africa",
+  "page": "https://commons.wikimedia.org/wiki/File:Table_Mountain_DanieVDM.jpg",
   "needs_attribution": true
  },
  {
-  "title": "Red Square",
-  "file": "Kremlin and Red Square.1.jpg",
-  "license": "CC BY 4.0",
-  "artist": "mos.ru",
-  "page": "https://commons.wikimedia.org/wiki/File:Kremlin_and_Red_Square.1.jpg",
+  "title": "Iguazu Falls",
+  "file": "Aerial Foz de Iguaçu 26 Nov 2005.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Mariordo (Mario Roberto Durán Ortiz)",
+  "page": "https://commons.wikimedia.org/wiki/File:Aerial_Foz_de_Igua%C3%A7u_26_Nov_2005.jpg",
   "needs_attribution": true
  },
  {
-  "title": "Berlin Wall",
-  "file": "Berlin Wall Potsdamer Platz November 1975 looking east crop.jpg",
-  "license": "CC BY-SA 2.0",
-  "artist": "Edward Valachovic https://www.flickr.com/people/fauxaddress/",
-  "page": "https://commons.wikimedia.org/wiki/File:Berlin_Wall_Potsdamer_Platz_November_1975_looking_east_crop.jpg",
+  "title": "Moulin Rouge",
+  "file": "Moulin Rouge, 17 April 2011.jpg",
+  "license": "CC BY 2.0",
+  "artist": "Juanedc from Zaragoza, España",
+  "page": "https://commons.wikimedia.org/wiki/File:Moulin_Rouge,_17_April_2011.jpg",
   "needs_attribution": true
  },
  {
-  "title": "Lincoln Memorial",
-  "file": "Aerial view of Lincoln Memorial - east side EDIT.jpeg",
+  "title": "Trafalgar Square",
+  "file": "Trafalgar Square, London 2 - Jun 2009.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Diliff",
+  "page": "https://commons.wikimedia.org/wiki/File:Trafalgar_Square,_London_2_-_Jun_2009.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Sistine Chapel",
+  "file": "Sistina-interno.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "The original uploader was Snowdog at Italian Wikipedia.",
+  "page": "https://commons.wikimedia.org/wiki/File:Sistina-interno.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Pompeii",
+  "file": "Pompeii (4873744179).jpg",
+  "license": "CC BY 2.0",
+  "artist": "Glen Scarborough from The Central Coast, Australia",
+  "page": "https://commons.wikimedia.org/wiki/File:Pompeii_(4873744179).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Santorini",
+  "file": "Santoríni aerial.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "kallerna",
+  "page": "https://commons.wikimedia.org/wiki/File:Santor%C3%ADni_aerial.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Abraj Al Bait",
+  "file": "Abraj-al-Bait-Towers.JPG",
+  "license": "CC BY-SA 3.0",
+  "artist": "King Eliot",
+  "page": "https://commons.wikimedia.org/wiki/File:Abraj-al-Bait-Towers.JPG",
+  "needs_attribution": true
+ },
+ {
+  "title": "Uluru",
+  "file": "Sunset at Uluru on July 30, 2005.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Thomas Schoch",
+  "page": "https://commons.wikimedia.org/wiki/File:Sunset_at_Uluru_on_July_30,_2005.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Great Barrier Reef",
+  "file": "GreatBarrierReef-EO.JPG",
   "license": "Public domain",
-  "artist": "Aerial_view_of_Lincoln_Memorial_-_east_side.jpg: Carol M. Highsmith\nderivative work: upsta",
-  "page": "https://commons.wikimedia.org/wiki/File:Aerial_view_of_Lincoln_Memorial_-_east_side_EDIT.jpeg",
+  "artist": "NASA, by MISR",
+  "page": "https://commons.wikimedia.org/wiki/File:GreatBarrierReef-EO.JPG",
   "needs_attribution": false
  },
  {
-  "title": "Mount Vesuvius",
-  "file": "Il cratere del Vulcano - panoramio.jpg",
-  "license": "CC BY 3.0",
-  "artist": "pietro scerrato",
-  "page": "https://commons.wikimedia.org/wiki/File:Il_cratere_del_Vulcano_-_panoramio.jpg",
+  "title": "Mount Kilimanjaro",
+  "file": "Mt. Kilimanjaro 12.2006.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "",
+  "page": "https://commons.wikimedia.org/wiki/File:Mt._Kilimanjaro_12.2006.jpg",
   "needs_attribution": true
  },
  {
-  "title": "Matterhorn",
-  "file": "0 106 Walliser Alpen - Matterhorn.jpg",
+  "title": "Sagrada Família",
+  "file": "SF maig 2026.jpg",
   "license": "CC BY-SA 4.0",
-  "artist": "W. Bulach",
-  "page": "https://commons.wikimedia.org/wiki/File:0_106_Walliser_Alpen_-_Matterhorn.jpg",
+  "artist": "Canaan",
+  "page": "https://commons.wikimedia.org/wiki/File:SF_maig_2026.jpg",
   "needs_attribution": true
  },
  {
@@ -224,6 +496,14 @@
   "needs_attribution": true
  },
  {
+  "title": "Neuschwanstein Castle",
+  "file": "Neuschwanstein Castle 2024-02.jpg",
+  "license": "CC0",
+  "artist": "Wilfredor",
+  "page": "https://commons.wikimedia.org/wiki/File:Neuschwanstein_Castle_2024-02.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "Petronas Towers",
   "file": "Kuala Lumpur - panoramio (18).jpg",
   "license": "CC BY-SA 3.0",
@@ -232,11 +512,91 @@
   "needs_attribution": true
  },
  {
+  "title": "Brandenburg Gate",
+  "file": "Brandenburger Tor morgens.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Thomas Wolf, www.foto-tw.de",
+  "page": "https://commons.wikimedia.org/wiki/File:Brandenburger_Tor_morgens.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Sheikh Zayed Grand Mosque",
+  "file": "Sheikh Zayed Mosque Silhouette.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "PotatoWitch",
+  "page": "https://commons.wikimedia.org/wiki/File:Sheikh_Zayed_Mosque_Silhouette.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Hassan II Mosque",
+  "file": "Sunshine on mosque Hassan II in Casablanca, Morocco - Flickr - Milamber's portfolio.jpg",
+  "license": "CC BY 2.0",
+  "artist": "Milamber's portfolio",
+  "page": "https://commons.wikimedia.org/wiki/File:Sunshine_on_mosque_Hassan_II_in_Casablanca,_Morocco_-_Flickr_-_Milamber%27s_portfolio.jpg",
+  "needs_attribution": true
+ },
+ {
   "title": "Hagia Sophia",
   "file": "Hagia Sophia Mars 2013.jpg",
   "license": "CC BY-SA 3.0",
   "artist": "Arild Vågen",
   "page": "https://commons.wikimedia.org/wiki/File:Hagia_Sophia_Mars_2013.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Alhambra",
+  "file": "Alhambra detail.jpg",
+  "license": "CC0",
+  "artist": "Jebulon",
+  "page": "https://commons.wikimedia.org/wiki/File:Alhambra_detail.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Al-Khazneh",
+  "file": "Al Khazneh Petra edit 2.jpg",
+  "license": "CC BY-SA 2.0",
+  "artist": "Al_Khazneh_Petra.jpg: Graham Racher from London, UK\nderivative work: MrPanyGoff",
+  "page": "https://commons.wikimedia.org/wiki/File:Al_Khazneh_Petra_edit_2.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Mount Rushmore",
+  "file": "Mount Rushmore detail view (100MP).jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Thomas Wolf, www.foto-tw.de",
+  "page": "https://commons.wikimedia.org/wiki/File:Mount_Rushmore_detail_view_(100MP).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Chichen Itza",
+  "file": "Chichen Itza 3.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Daniel Schwen",
+  "page": "https://commons.wikimedia.org/wiki/File:Chichen_Itza_3.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Tower of London",
+  "file": "Tower of London viewed from the River Thames.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Bob Collowan",
+  "page": "https://commons.wikimedia.org/wiki/File:Tower_of_London_viewed_from_the_River_Thames.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Edinburgh Castle",
+  "file": "Edinburgh Castle from the Grassmarket.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Stephencdickson",
+  "page": "https://commons.wikimedia.org/wiki/File:Edinburgh_Castle_from_the_Grassmarket.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Cologne Cathedral",
+  "file": "Kölner Dom von Osten.jpg",
+  "license": "CC BY-SA 3.0 de",
+  "artist": "Thomas Wolf, www.foto-tw.de",
+  "page": "https://commons.wikimedia.org/wiki/File:K%C3%B6lner_Dom_von_Osten.jpg",
   "needs_attribution": true
  },
  {
@@ -256,11 +616,43 @@
   "needs_attribution": true
  },
  {
+  "title": "Taipei 101",
+  "file": "Taipei 101 from Xiangshan 20250731.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "User:Sinsyuan",
+  "page": "https://commons.wikimedia.org/wiki/File:Taipei_101_from_Xiangshan_20250731.jpg",
+  "needs_attribution": true
+ },
+ {
   "title": "Space Needle",
   "file": "Seattle, October 6, 2023 - 60.jpg",
   "license": "CC BY-SA 4.0",
   "artist": "Another Believer",
   "page": "https://commons.wikimedia.org/wiki/File:Seattle,_October_6,_2023_-_60.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Golden Temple",
+  "file": "Hamandir Sahib (Golden Temple).jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "This picture has been taken by Oleg Yunakov. Contact e-mail: yunakovgmail.com. Image can b",
+  "page": "https://commons.wikimedia.org/wiki/File:Hamandir_Sahib_(Golden_Temple).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Qutb Minar",
+  "file": "Madrasa and tomb of Alauddin Khalji 2.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Akbarzoda",
+  "page": "https://commons.wikimedia.org/wiki/File:Madrasa_and_tomb_of_Alauddin_Khalji_2.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Hawa Mahal",
+  "file": "East facade Hawa Mahal Jaipur from ground level (July 2022) - img 01.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Chainwit.",
+  "page": "https://commons.wikimedia.org/wiki/File:East_facade_Hawa_Mahal_Jaipur_from_ground_level_(July_2022)_-_img_01.jpg",
   "needs_attribution": true
  },
  {
@@ -272,11 +664,187 @@
   "needs_attribution": true
  },
  {
+  "title": "Pyramid of the Sun",
+  "file": "2020-02-11 Teotihuacan la Avenida de los Muertos y la Pirámide del Sol.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Burkhard Mücke",
+  "page": "https://commons.wikimedia.org/wiki/File:2020-02-11_Teotihuacan_la_Avenida_de_los_Muertos_y_la_Pir%C3%A1mide_del_Sol.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Luxor Temple",
+  "file": "Pylons and obelisk Luxor temple.JPG",
+  "license": "CC BY-SA 3.0",
+  "artist": "Ad Meskens",
+  "page": "https://commons.wikimedia.org/wiki/File:Pylons_and_obelisk_Luxor_temple.JPG",
+  "needs_attribution": true
+ },
+ {
+  "title": "Karnak",
+  "file": "Luxor, Egypt, Karnak.jpg",
+  "license": "CC BY 4.0",
+  "artist": "Vyacheslav Argenberg",
+  "page": "https://commons.wikimedia.org/wiki/File:Luxor,_Egypt,_Karnak.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Valley of the Kings",
+  "file": "Luxor, Tal der Könige (1995, 860x605).jpg",
+  "license": "CC BY-SA 2.0",
+  "artist": "Fotograf/Photographer: Peter J. Bubenik (1995)",
+  "page": "https://commons.wikimedia.org/wiki/File:Luxor,_Tal_der_K%C3%B6nige_(1995,_860x605).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Citadel of Cairo",
+  "file": "Flickr - HuTect ShOts - Citadel of Salah El.Din and Masjid Muhammad Ali قلعة صلاح الدين الأيوبي ومسجد محمد علي - Cairo - Egypt - 17 04 2010 (4).jpg",
+  "license": "CC BY-SA 2.0",
+  "artist": "Ahmed Al.Badawy from Cairo, Egypt",
+  "page": "https://commons.wikimedia.org/wiki/File:Flickr_-_HuTect_ShOts_-_Citadel_of_Salah_El.Din_and_Masjid_Muhammad_Ali_%D9%82%D9%84%D8%B9%D8%A9_%D8%B5%D9%84%D8%A7%D8%AD_%D8%A7%D9%84%D8%AF%D9%8A%D9%86_%D8%A7%D9%84%D8%A3%D9%8A%D9%88%D8%A8%D9%8A_%D9%88%D9%85%D8%B3%D8%AC%D8%AF_%D9%85%D8%AD%D9%85%D8%AF_%D8%B9%D9%84%D9%8A_-_Cairo_-_Egypt_-_17_04_2010_(4).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Bibliotheca Alexandrina",
+  "file": "Bibliotheca Alexandrina (Alexandrie bibliothèque).jpg",
+  "license": "CC0",
+  "artist": "René Dinkel",
+  "page": "https://commons.wikimedia.org/wiki/File:Bibliotheca_Alexandrina_(Alexandrie_biblioth%C3%A8que).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Prophet's Mosque",
+  "file": "Madeena masjid nabavi 12122008230.jpg",
+  "license": "Public domain",
+  "artist": "Bluemangoa2z at Malayalam Wikipedia",
+  "page": "https://commons.wikimedia.org/wiki/File:Madeena_masjid_nabavi_12122008230.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "Umayyad Mosque",
   "file": "Ommayyad masjed.jpg",
   "license": "Public domain",
   "artist": "",
   "page": "https://commons.wikimedia.org/wiki/File:Ommayyad_masjed.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Palmyra",
+  "file": "Palmira al capvespre (2495033007).jpg",
+  "license": "CC BY-SA 2.0",
+  "artist": "Quim Bahí from Catalunya",
+  "page": "https://commons.wikimedia.org/wiki/File:Palmira_al_capvespre_(2495033007).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Krak des Chevaliers",
+  "file": "Krak des Chevaliers 01.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Bernard Gagnon",
+  "page": "https://commons.wikimedia.org/wiki/File:Krak_des_Chevaliers_01.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Baalbek",
+  "file": "Temple of Bacchus.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Saadedine AL SAIDI",
+  "page": "https://commons.wikimedia.org/wiki/File:Temple_of_Bacchus.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Jeita Grotto",
+  "file": "Upper Jeita Grotto.jpg",
+  "license": "CC BY 2.0",
+  "artist": "kcakduman",
+  "page": "https://commons.wikimedia.org/wiki/File:Upper_Jeita_Grotto.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Wadi Rum",
+  "file": "Wadi Rum in December.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Raya Sharbain",
+  "page": "https://commons.wikimedia.org/wiki/File:Wadi_Rum_in_December.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Jerash",
+  "file": "Jerash City.jpg",
+  "license": "CC BY-SA 2.5",
+  "artist": "The original uploader was Freedom's Falcon at Arabic Wikipedia.",
+  "page": "https://commons.wikimedia.org/wiki/File:Jerash_City.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Church of the Holy Sepulchre",
+  "file": "The Church of the Holy Sepulchre-Jerusalem.JPG",
+  "license": "CC BY 2.0",
+  "artist": "https://www.flickr.com/photos/jlascar/",
+  "page": "https://commons.wikimedia.org/wiki/File:The_Church_of_the_Holy_Sepulchre-Jerusalem.JPG",
+  "needs_attribution": true
+ },
+ {
+  "title": "Church of the Nativity",
+  "file": "Church of the Nativity (7703592746).jpg",
+  "license": "CC BY 2.0",
+  "artist": "Neil Ward",
+  "page": "https://commons.wikimedia.org/wiki/File:Church_of_the_Nativity_(7703592746).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Sultan Qaboos Grand Mosque",
+  "file": "Sultan Qaboos Grand Mosque (1).jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Mostafameraji",
+  "page": "https://commons.wikimedia.org/wiki/File:Sultan_Qaboos_Grand_Mosque_(1).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Museum of Islamic Art, Doha",
+  "file": "IslamicArtMuseumDohaSkyline.jpg",
+  "license": "CC BY 2.0",
+  "artist": "Mohamod Fasil",
+  "page": "https://commons.wikimedia.org/wiki/File:IslamicArtMuseumDohaSkyline.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Louvre Abu Dhabi",
+  "file": "LouvreAD tree.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Boubloub",
+  "page": "https://commons.wikimedia.org/wiki/File:LouvreAD_tree.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Dubai Frame",
+  "file": "DONIS Dubai Frame Nighttime.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Sachimo",
+  "page": "https://commons.wikimedia.org/wiki/File:DONIS_Dubai_Frame_Nighttime.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Kingdom Centre",
+  "file": "Kingdomcentreinriyadhsaudiarabia.JPG",
+  "license": "CC BY-SA 3.0",
+  "artist": "King Eliot",
+  "page": "https://commons.wikimedia.org/wiki/File:Kingdomcentreinriyadhsaudiarabia.JPG",
+  "needs_attribution": true
+ },
+ {
+  "title": "Jeddah Tower",
+  "file": "Jeddah Tower August 2019 S.Nitzold.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "S.Nitzold",
+  "page": "https://commons.wikimedia.org/wiki/File:Jeddah_Tower_August_2019_S.Nitzold.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Masmak Fortress",
+  "file": "Masmak castle.jpg",
+  "license": "Public domain",
+  "artist": "Baptiste Marcel",
+  "page": "https://commons.wikimedia.org/wiki/File:Masmak_castle.jpg",
   "needs_attribution": false
  },
  {
@@ -304,11 +872,147 @@
   "needs_attribution": true
  },
  {
-  "title": "Gateway Arch",
-  "file": "St Louis Gateway Arch.jpg",
-  "license": "CC BY 2.0",
-  "artist": "[https://www.flickr.com/photos/11399912@N00  B0iwehijro2i0-\n]\n\n`1l]] from Davis, CA, USA",
-  "page": "https://commons.wikimedia.org/wiki/File:St_Louis_Gateway_Arch.jpg",
+  "title": "Park Güell",
+  "file": "Güell BCN edited.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Canaan",
+  "page": "https://commons.wikimedia.org/wiki/File:G%C3%BCell_BCN_edited.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Mosque–Cathedral of Córdoba",
+  "file": "Mezquita de Córdoba desde el aire (Córdoba, España).jpg",
+  "license": "CC BY-SA 2.0",
+  "artist": "Toni Castillo Quero",
+  "page": "https://commons.wikimedia.org/wiki/File:Mezquita_de_C%C3%B3rdoba_desde_el_aire_(C%C3%B3rdoba,_Espa%C3%B1a).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Prague Castle",
+  "file": "Castillo de Praga, Praga, República Checa, 2022-07-02, DD 209.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Diego Delso",
+  "page": "https://commons.wikimedia.org/wiki/File:Castillo_de_Praga,_Praga,_Rep%C3%BAblica_Checa,_2022-07-02,_DD_209.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Schönbrunn Palace",
+  "file": "Wien - Schloss Schönbrunn.JPG",
+  "license": "CC BY-SA 4.0",
+  "artist": "C.Stadler/Bwag",
+  "page": "https://commons.wikimedia.org/wiki/File:Wien_-_Schloss_Sch%C3%B6nbrunn.JPG",
+  "needs_attribution": true
+ },
+ {
+  "title": "Hungarian Parliament Building",
+  "file": "Budapest-Parliament-0001.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Source: User:Godot13  Derivative: User:MathKnight",
+  "page": "https://commons.wikimedia.org/wiki/File:Budapest-Parliament-0001.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Atomium",
+  "file": "Laeken Atomium 06.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Zairon",
+  "page": "https://commons.wikimedia.org/wiki/File:Laeken_Atomium_06.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "The Little Mermaid (statue)",
+  "file": "Petite sirène de Copenhague (conforme à la loi danoise).JPG",
+  "license": "CC0",
+  "artist": "Benoît Prieur",
+  "page": "https://commons.wikimedia.org/wiki/File:Petite_sir%C3%A8ne_de_Copenhague_(conforme_%C3%A0_la_loi_danoise).JPG",
+  "needs_attribution": false
+ },
+ {
+  "title": "Sydney Harbour Bridge",
+  "file": "SydneyHarbourBridge1 gobeirne.jpg",
+  "license": "CC BY 2.5",
+  "artist": "Photograph by Greg O'Beirne",
+  "page": "https://commons.wikimedia.org/wiki/File:SydneyHarbourBridge1_gobeirne.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Temple of Heaven",
+  "file": "Temple of Heaven 20160323 01.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Shujianyang",
+  "page": "https://commons.wikimedia.org/wiki/File:Temple_of_Heaven_20160323_01.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Himeji Castle",
+  "file": "Himeji castle in may 2015.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Nikos Kitsakis",
+  "page": "https://commons.wikimedia.org/wiki/File:Himeji_castle_in_may_2015.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Ponte Vecchio",
+  "file": "Ponte Vecchio sobre el río Arno, Florencia, Italia, 2022-09-19, DD 02.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Diego Delso",
+  "page": "https://commons.wikimedia.org/wiki/File:Ponte_Vecchio_sobre_el_r%C3%ADo_Arno,_Florencia,_Italia,_2022-09-19,_DD_02.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Meteora",
+  "file": "Mystic land METEORA.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Ioannis Ioannidis",
+  "page": "https://commons.wikimedia.org/wiki/File:Mystic_land_METEORA.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Mont-Saint-Michel",
+  "file": "Mont St Michel 3, Brittany, France - July 2011.jpg",
+  "license": "Public domain",
+  "artist": "Diliff",
+  "page": "https://commons.wikimedia.org/wiki/File:Mont_St_Michel_3,_Brittany,_France_-_July_2011.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Borobudur",
+  "file": "Borobudur-Nothwest-view.jpg",
+  "license": "Public domain",
+  "artist": "Gunawan Kartapranata",
+  "page": "https://commons.wikimedia.org/wiki/File:Borobudur-Nothwest-view.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Potala Palace",
+  "file": "Potala.jpg",
+  "license": "CC BY 2.5",
+  "artist": "Ondřej Žváček",
+  "page": "https://commons.wikimedia.org/wiki/File:Potala.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Rock-Hewn Churches, Lalibela",
+  "file": "Lalibela, san giorgio, esterno 07.jpg",
+  "license": "CC BY 3.0",
+  "artist": "Sailko",
+  "page": "https://commons.wikimedia.org/wiki/File:Lalibela,_san_giorgio,_esterno_07.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Persepolis",
+  "file": "Gate of All Nations, Persepolis.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Alborzagros",
+  "page": "https://commons.wikimedia.org/wiki/File:Gate_of_All_Nations,_Persepolis.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Sigiriya",
+  "file": "Beauty of Sigiriya by Binuka.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Binuka poojan",
+  "page": "https://commons.wikimedia.org/wiki/File:Beauty_of_Sigiriya_by_Binuka.jpg",
   "needs_attribution": true
  },
  {
@@ -320,12 +1024,204 @@
   "needs_attribution": true
  },
  {
+  "title": "Cinque Terre",
+  "file": "Manarola NW Cemetery Corniglia Monterosso Cinque Terre Sep23 A7C 06872.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "This Photo was taken by Timothy A. Gonsalves.  Feel free to use my photos, but please ment",
+  "page": "https://commons.wikimedia.org/wiki/File:Manarola_NW_Cemetery_Corniglia_Monterosso_Cinque_Terre_Sep23_A7C_06872.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Zhangjiajie National Forest Park",
+  "file": "Yangjiajie.jpg",
+  "license": "CC BY-SA 2.5",
+  "artist": "Yoo Chung",
+  "page": "https://commons.wikimedia.org/wiki/File:Yangjiajie.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Ha Long Bay",
+  "file": "Halong ensemble (colour corrected).jpg",
+  "license": "Public domain",
+  "artist": "Thierry Boriecolour adjusted by Lycaon",
+  "page": "https://commons.wikimedia.org/wiki/File:Halong_ensemble_(colour_corrected).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Wat Rong Khun",
+  "file": "Chiang Rai - Wat Rong Khun วัดร่องขุ่น (2026) - img 11.jpg",
+  "license": "CC BY 4.0",
+  "artist": "Chainwit.",
+  "page": "https://commons.wikimedia.org/wiki/File:Chiang_Rai_-_Wat_Rong_Khun_%E0%B8%A7%E0%B8%B1%E0%B8%94%E0%B8%A3%E0%B9%88%E0%B8%AD%E0%B8%87%E0%B8%82%E0%B8%B8%E0%B9%88%E0%B8%99_(2026)_-_img_11.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Shwedagon Pagoda",
+  "file": "Yangon - Shwedagon Pagoda 03.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Stefan Fussan",
+  "page": "https://commons.wikimedia.org/wiki/File:Yangon_-_Shwedagon_Pagoda_03.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Paro Taktsang",
+  "file": "Paro Taktsang, Bhutan (edited).jpg",
+  "license": "CC BY 2.0",
+  "artist": "Original:  Nina R from Africa\n\nDerivative work:  UnpetitproleX",
+  "page": "https://commons.wikimedia.org/wiki/File:Paro_Taktsang,_Bhutan_(edited).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Sugarloaf Mountain",
+  "file": "Vista do Morro Dona Marta.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Ccarelo",
+  "page": "https://commons.wikimedia.org/wiki/File:Vista_do_Morro_Dona_Marta.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Salar de Uyuni",
+  "file": "Salar de Uyuni - panoramio (10).jpg",
+  "license": "CC BY 3.0",
+  "artist": "Pavel Špindler",
+  "page": "https://commons.wikimedia.org/wiki/File:Salar_de_Uyuni_-_panoramio_(10).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Milford Sound",
+  "file": "00 1371 New Zealand - Milford Sound.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "W. Bulach",
+  "page": "https://commons.wikimedia.org/wiki/File:00_1371_New_Zealand_-_Milford_Sound.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Great Mosque of Djenné",
+  "file": "Great Mosque of Djenné 1.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Andy Gilham",
+  "page": "https://commons.wikimedia.org/wiki/File:Great_Mosque_of_Djenn%C3%A9_1.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Koutoubia Mosque",
+  "file": "Mosquée de la Koutoubia - marakesh.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Baca12",
+  "page": "https://commons.wikimedia.org/wiki/File:Mosqu%C3%A9e_de_la_Koutoubia_-_marakesh.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Chefchaouen",
+  "file": "Chefcha'ouen City , Morocco.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Ismailbrk",
+  "page": "https://commons.wikimedia.org/wiki/File:Chefcha%27ouen_City_,_Morocco.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Great Mosque of Kairouan",
+  "file": "Grande Mosquée de Kairouan, vue d'ensemble.jpg",
+  "license": "CC BY-SA 2.0",
+  "artist": "weetoon66",
+  "page": "https://commons.wikimedia.org/wiki/File:Grande_Mosqu%C3%A9e_de_Kairouan,_vue_d%27ensemble.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Pamukkale",
+  "file": "Pamukkale, Denizli 2026 68.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Biologg",
+  "page": "https://commons.wikimedia.org/wiki/File:Pamukkale,_Denizli_2026_68.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Shibam",
+  "file": "مدينة شبام حضرموت.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Bkar6190",
+  "page": "https://commons.wikimedia.org/wiki/File:%D9%85%D8%AF%D9%8A%D9%86%D8%A9_%D8%B4%D8%A8%D8%A7%D9%85_%D8%AD%D8%B6%D8%B1%D9%85%D9%88%D8%AA.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Socotra",
+  "file": "Socotra satview.jpg",
+  "license": "Public domain",
+  "artist": "",
+  "page": "https://commons.wikimedia.org/wiki/File:Socotra_satview.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Aït Benhaddou",
+  "file": "Ksar Aït Benhaddou, Marocco (أيت بن حدو، المغرب, ⴰⵢⵜ ⵃⴰⴷⴷⵓ).jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Petar Milošević",
+  "page": "https://commons.wikimedia.org/wiki/File:Ksar_A%C3%AFt_Benhaddou,_Marocco_(%D8%A3%D9%8A%D8%AA_%D8%A8%D9%86_%D8%AD%D8%AF%D9%88%D8%8C_%D8%A7%D9%84%D9%85%D8%BA%D8%B1%D8%A8,_%E2%B4%B0%E2%B5%A2%E2%B5%9C_%E2%B5%83%E2%B4%B0%E2%B4%B7%E2%B4%B7%E2%B5%93).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Lake Retba",
+  "file": "Lac Rose in Senegal.jpg",
+  "license": "CC BY-SA 2.0",
+  "artist": "Arnault",
+  "page": "https://commons.wikimedia.org/wiki/File:Lac_Rose_in_Senegal.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Meroë",
+  "file": "Sudan Meroe Pyramids 2001.JPG",
+  "license": "CC BY-SA 1.0",
+  "artist": "Photographer: B N Chagny",
+  "page": "https://commons.wikimedia.org/wiki/File:Sudan_Meroe_Pyramids_2001.JPG",
+  "needs_attribution": true
+ },
+ {
+  "title": "Göbekli Tepe",
+  "file": "Göbekli Tepe, Urfa.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Teomancimit",
+  "page": "https://commons.wikimedia.org/wiki/File:G%C3%B6bekli_Tepe,_Urfa.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Sumela Monastery",
+  "file": "Sümela Manastır.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Rotadefterim",
+  "page": "https://commons.wikimedia.org/wiki/File:S%C3%BCmela_Manast%C4%B1r.jpg",
+  "needs_attribution": true
+ },
+ {
   "title": "Ephesus",
   "file": "Ephesus Celsus Library Façade.jpg",
   "license": "CC BY-SA 3.0",
   "artist": "Benh LIEU SONG",
   "page": "https://commons.wikimedia.org/wiki/File:Ephesus_Celsus_Library_Fa%C3%A7ade.jpg",
   "needs_attribution": true
+ },
+ {
+  "title": "Sheikh Lotfollah Mosque",
+  "file": "مسجد شیخ لطف الله II.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "شهاب الدین علیشاهی",
+  "page": "https://commons.wikimedia.org/wiki/File:%D9%85%D8%B3%D8%AC%D8%AF_%D8%B4%DB%8C%D8%AE_%D9%84%D8%B7%D9%81_%D8%A7%D9%84%D9%84%D9%87_II.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Nasir al-Mulk Mosque",
+  "file": "Nasr ol Molk mosque2.jpg",
+  "license": "CC BY-SA 2.0",
+  "artist": "dynamosquito",
+  "page": "https://commons.wikimedia.org/wiki/File:Nasr_ol_Molk_mosque2.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Registan",
+  "file": "Registan 01.jpg",
+  "license": "CC0",
+  "artist": "Bernard Gagnon",
+  "page": "https://commons.wikimedia.org/wiki/File:Registan_01.jpg",
+  "needs_attribution": false
  },
  {
   "title": "Gur-e-Amir",
@@ -336,11 +1232,115 @@
   "needs_attribution": true
  },
  {
+  "title": "Humayun's Tomb",
+  "file": "Humayun Tomb UNESCO world heritage site.jpg",
+  "license": "CC0",
+  "artist": "Anshrastogi1",
+  "page": "https://commons.wikimedia.org/wiki/File:Humayun_Tomb_UNESCO_world_heritage_site.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Meenakshi Temple",
+  "file": "Meenakshi Temple, Gopuram, Madurai, India.jpg",
+  "license": "CC BY 4.0",
+  "artist": "Vyacheslav Argenberg",
+  "page": "https://commons.wikimedia.org/wiki/File:Meenakshi_Temple,_Gopuram,_Madurai,_India.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Konark Sun Temple",
+  "file": "Konark Sun Temple Architecture9.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Dhruv Raj Kashyap",
+  "page": "https://commons.wikimedia.org/wiki/File:Konark_Sun_Temple_Architecture9.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Tanah Lot",
+  "file": "Bali - Pura Tanah Lot, 20220827 1005 1141.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Jakub Hałun",
+  "page": "https://commons.wikimedia.org/wiki/File:Bali_-_Pura_Tanah_Lot,_20220827_1005_1141.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Prambanan",
+  "file": "Prambanan Complex 1.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Gunawan Kartapranata",
+  "page": "https://commons.wikimedia.org/wiki/File:Prambanan_Complex_1.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Bagan",
+  "file": "Old Bagan, Myanmar, Bagan plains at sunset.jpg",
+  "license": "CC BY 4.0",
+  "artist": "Vyacheslav Argenberg",
+  "page": "https://commons.wikimedia.org/wiki/File:Old_Bagan,_Myanmar,_Bagan_plains_at_sunset.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Wat Arun",
+  "file": "Wat Arun from Chao Phraya River.jpg",
+  "license": "CC BY 2.5",
+  "artist": "Diliff",
+  "page": "https://commons.wikimedia.org/wiki/File:Wat_Arun_from_Chao_Phraya_River.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Grand Palace",
+  "file": "0005574-พระบรมมหาราชวังและวัดพระศรีรัตนราศดาราม.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Preecha.MJ",
+  "page": "https://commons.wikimedia.org/wiki/File:0005574-%E0%B8%9E%E0%B8%A3%E0%B8%B0%E0%B8%9A%E0%B8%A3%E0%B8%A1%E0%B8%A1%E0%B8%AB%E0%B8%B2%E0%B8%A3%E0%B8%B2%E0%B8%8A%E0%B8%A7%E0%B8%B1%E0%B8%87%E0%B9%81%E0%B8%A5%E0%B8%B0%E0%B8%A7%E0%B8%B1%E0%B8%94%E0%B8%9E%E0%B8%A3%E0%B8%B0%E0%B8%A8%E0%B8%A3%E0%B8%B5%E0%B8%A3%E0%B8%B1%E0%B8%95%E0%B8%99%E0%B8%A3%E0%B8%B2%E0%B8%A8%E0%B8%94%E0%B8%B2%E0%B8%A3%E0%B8%B2%E0%B8%A1.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Bayon",
+  "file": "Trusty Tuk Tuk .jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Trusty Tuk Tuk",
+  "page": "https://commons.wikimedia.org/wiki/File:Trusty_Tuk_Tuk_.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Ta Prohm",
+  "file": "Ta Prohm.JPG",
+  "license": "CC BY-SA 4.0",
+  "artist": "Dmitry A. Mottl",
+  "page": "https://commons.wikimedia.org/wiki/File:Ta_Prohm.JPG",
+  "needs_attribution": true
+ },
+ {
+  "title": "Kinkaku-ji",
+  "file": "Water reflection of Kinkaku-ji Temple a sunny day, Kyoto, Japan.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Basile Morin",
+  "page": "https://commons.wikimedia.org/wiki/File:Water_reflection_of_Kinkaku-ji_Temple_a_sunny_day,_Kyoto,_Japan.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Itsukushima Shrine",
+  "file": "Itsukushima Gate.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "JordyMeow",
+  "page": "https://commons.wikimedia.org/wiki/File:Itsukushima_Gate.jpg",
+  "needs_attribution": true
+ },
+ {
   "title": "Shirakawa-go",
   "file": "Ogi Shirakawa-gō, Gifu, Japan.jpg",
   "license": "CC BY 2.5",
   "artist": "663highland",
   "page": "https://commons.wikimedia.org/wiki/File:Ogi_Shirakawa-g%C5%8D,_Gifu,_Japan.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Alberobello",
+  "file": "Alberobello con il drone.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "ParisTaras",
+  "page": "https://commons.wikimedia.org/wiki/File:Alberobello_con_il_drone.jpg",
   "needs_attribution": true
  },
  {
@@ -368,11 +1368,59 @@
   "needs_attribution": true
  },
  {
+  "title": "Bran Castle",
+  "file": "Bran Castle TB1.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Todor Bozhinov",
+  "page": "https://commons.wikimedia.org/wiki/File:Bran_Castle_TB1.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Eilean Donan",
+  "file": "Eilean Donan Castle, Scotland - Jan 2011.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Diliff",
+  "page": "https://commons.wikimedia.org/wiki/File:Eilean_Donan_Castle,_Scotland_-_Jan_2011.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Giant's Causeway",
+  "file": "Giant's Causeway (36834542085).jpg",
+  "license": "CC BY 2.0",
+  "artist": "Lindy Buckley from Nanjing, China",
+  "page": "https://commons.wikimedia.org/wiki/File:Giant%27s_Causeway_(36834542085).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Cliffs of Moher",
+  "file": "Ireland Cliffs of Moher BW 2025-09-11 14-27-51.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Berthold Werner",
+  "page": "https://commons.wikimedia.org/wiki/File:Ireland_Cliffs_of_Moher_BW_2025-09-11_14-27-51.jpg",
+  "needs_attribution": true
+ },
+ {
   "title": "Preikestolen",
   "file": "Preikestolen Norge.jpg",
   "license": "CC BY-SA 3.0",
   "artist": "Stefan Krause, Germany",
   "page": "https://commons.wikimedia.org/wiki/File:Preikestolen_Norge.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Plitvice Lakes National Park",
+  "file": "Plitvice Lakes National Park (2).jpg",
+  "license": "CC BY 2.0",
+  "artist": "Pablo BM from London, England",
+  "page": "https://commons.wikimedia.org/wiki/File:Plitvice_Lakes_National_Park_(2).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Lake Bled",
+  "file": "Aerial image of Lake Bled (view from the southwest).jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Carsten Steger",
+  "page": "https://commons.wikimedia.org/wiki/File:Aerial_image_of_Lake_Bled_(view_from_the_southwest).jpg",
   "needs_attribution": true
  },
  {
@@ -384,11 +1432,11 @@
   "needs_attribution": true
  },
  {
-  "title": "Teotihuacan",
-  "file": "ZA77 Teotihuacán edo de mex Herberto de la rosa.jpg",
+  "title": "Belém Tower",
+  "file": "Belem Tower - April 2019 (2).jpg",
   "license": "CC BY-SA 4.0",
-  "artist": "Hdlrosa",
-  "page": "https://commons.wikimedia.org/wiki/File:ZA77_Teotihuac%C3%A1n_edo_de_mex_Herberto_de_la_rosa.jpg",
+  "artist": "Rehman Abubakr",
+  "page": "https://commons.wikimedia.org/wiki/File:Belem_Tower_-_April_2019_(2).jpg",
   "needs_attribution": true
  }
 ]
