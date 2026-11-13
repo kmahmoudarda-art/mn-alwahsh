@@ -40,8 +40,9 @@ export const HIDDEN_CATEGORIES = [
   'ديزني', 'Disney', 'بيبي شارك', 'Baby Shark', 'سبونج بوب', 'SpongeBob',
   'رسوم متحركة', 'كرتون',
 
-  // Brand/logo guessing — literally trademarked logos
-  'براندات', 'Logos',
+  // Logo guessing — literally trademarked logos.
+  // ('براندات' was unhidden on request: it is text-only trivia, no logo images.)
+  'Logos',
 ];
 
 export function isHiddenCategory(name) {
