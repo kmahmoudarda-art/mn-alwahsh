@@ -1,0 +1,243 @@
+## EASY
+Eiffel Tower|برج إيفل|tower|فرنسا
+Giza pyramid complex|أهرامات الجيزة|ancient|مصر
+Taj Mahal|تاج محل|monument|الهند
+Statue of Liberty|تمثال الحرية|monument|الولايات المتحدة
+Colosseum|الكولوسيوم|ancient|إيطاليا
+Big Ben|بيغ بن|tower|المملكة المتحدة
+Burj Khalifa|برج خليفة|tower|الإمارات
+Sydney Opera House|دار أوبرا سيدني|modern|أستراليا
+Great Wall of China|سور الصين العظيم|ancient|الصين
+Leaning Tower of Pisa|برج بيزا المائل|tower|إيطاليا
+Great Sphinx of Giza|أبو الهول|monument|مصر
+Christ the Redeemer (statue)|تمثال المسيح الفادي|monument|البرازيل
+Golden Gate Bridge|جسر البوابة الذهبية|bridge|الولايات المتحدة
+Tower Bridge|جسر البرج|bridge|المملكة المتحدة
+Empire State Building|مبنى إمباير ستيت|modern|الولايات المتحدة
+Louvre|متحف اللوفر|museum|فرنسا
+Arc de Triomphe|قوس النصر|monument|فرنسا
+Notre-Dame de Paris|كاتدرائية نوتردام|church|فرنسا
+Buckingham Palace|قصر باكنغهام|palace|المملكة المتحدة
+Saint Basil's Cathedral|كاتدرائية القديس باسيل|church|روسيا
+Stonehenge|ستونهنج|ancient|المملكة المتحدة
+Parthenon|البارثينون|ancient|اليونان
+Trevi Fountain|نافورة تريفي|monument|إيطاليا
+St. Peter's Basilica|كاتدرائية القديس بطرس|church|الفاتيكان
+Burj Al Arab|برج العرب|modern|الإمارات
+Al-Aqsa Mosque|المسجد الأقصى|mosque|فلسطين
+Dome of the Rock|قبة الصخرة|mosque|فلسطين
+Sultan Ahmed Mosque|الجامع الأزرق|mosque|تركيا
+Mount Fuji|جبل فوجي|nature|اليابان
+Niagara Falls|شلالات نياغارا|nature|كندا
+Grand Canyon|غراند كانيون|nature|الولايات المتحدة
+Mount Everest|جبل إيفرست|nature|نيبال
+Victoria Falls|شلالات فيكتوريا|nature|زيمبابوي
+Times Square|تايمز سكوير|city|الولايات المتحدة
+White House|البيت الأبيض|palace|الولايات المتحدة
+United States Capitol|مبنى الكابيتول|monument|الولايات المتحدة
+CN Tower|برج سي إن|tower|كندا
+Forbidden City|المدينة المحرمة|palace|الصين
+Cairo Tower|برج القاهرة|tower|مصر
+Abu Simbel temples|معبد أبو سمبل|ancient|مصر
+Hollywood Sign|علامة هوليوود|monument|الولايات المتحدة
+Brooklyn Bridge|جسر بروكلين|bridge|الولايات المتحدة
+Palm Jumeirah|نخلة جميرا|modern|الإمارات
+Marina Bay Sands|مارينا باي ساندز|modern|سنغافورة
+Merlion|ميرليون|monument|سنغافورة
+Oriental Pearl Tower|برج اللؤلؤة الشرقية|tower|الصين
+Gateway of India|بوابة الهند|monument|الهند
+Milan Cathedral|كاتدرائية ميلانو|church|إيطاليا
+Rialto Bridge|جسر ريالتو|bridge|إيطاليا
+Windsor Castle|قلعة وندسور|castle|المملكة المتحدة
+London Eye|عين لندن|modern|المملكة المتحدة
+Palace of Versailles|قصر فرساي|palace|فرنسا
+Alcatraz Island|جزيرة ألكاتراز|other|الولايات المتحدة
+Dead Sea|البحر الميت|nature|الأردن
+Table Mountain (South Africa)|جبل الطاولة|nature|جنوب أفريقيا
+Iguazu Falls|شلالات إيغوازو|nature|الأرجنتين
+Moulin Rouge|مولان روج|other|فرنسا
+Trafalgar Square|ميدان ترافالغار|city|المملكة المتحدة
+Sistine Chapel|كنيسة سيستين|church|الفاتيكان
+Pompeii|بومبي|ancient|إيطاليا
+Venice|البندقية|city|إيطاليا
+Santorini|سانتوريني|city|اليونان
+Abraj Al Bait|أبراج البيت|tower|السعودية
+Uluru|أولورو|nature|أستراليا
+Great Barrier Reef|الحاجز المرجاني العظيم|nature|أستراليا
+Mount Kilimanjaro|جبل كليمنجارو|nature|تنزانيا
+Tiananmen Square|ميدان تيانانمن|city|الصين
+Terracotta Army|جيش الطين|ancient|الصين
+Panama Canal|قناة بنما|other|بنما
+Suez Canal|قناة السويس|other|مصر
+Hoover Dam|سد هوفر|modern|الولايات المتحدة
+Moscow Kremlin|الكرملين|castle|روسيا
+Red Square|الساحة الحمراء|city|روسيا
+Berlin Wall|جدار برلين|monument|ألمانيا
+Washington Monument|نصب واشنطن|monument|الولايات المتحدة
+Lincoln Memorial|نصب لينكولن التذكاري|monument|الولايات المتحدة
+Mount Vesuvius|جبل فيزوف|nature|إيطاليا
+Kuwait Towers|أبراج الكويت|tower|الكويت
+Mont Blanc|جبل مون بلان|nature|فرنسا
+Matterhorn|ماترهورن|nature|سويسرا
+## MEDIUM
+Sagrada Família|ساغرادا فاميليا|church|إسبانيا
+Angkor Wat|أنغكور وات|temple|كمبوديا
+Machu Picchu|ماتشو بيتشو|ancient|بيرو
+Neuschwanstein Castle|قلعة نويشفانشتاين|castle|ألمانيا
+Petronas Towers|أبراج بتروناس|tower|ماليزيا
+Brandenburg Gate|بوابة براندنبورغ|monument|ألمانيا
+Sheikh Zayed Grand Mosque|جامع الشيخ زايد الكبير|mosque|الإمارات
+Hassan II Mosque|مسجد الحسن الثاني|mosque|المغرب
+Hagia Sophia|آيا صوفيا|mosque|تركيا
+Alhambra|قصر الحمراء|palace|إسبانيا
+Al-Khazneh|الخزنة|ancient|الأردن
+Mount Rushmore|جبل راشمور|monument|الولايات المتحدة
+Chichen Itza|تشيتشن إيتزا|ancient|المكسيك
+Tower of London|برج لندن|castle|المملكة المتحدة
+Edinburgh Castle|قلعة إدنبرة|castle|المملكة المتحدة
+Cologne Cathedral|كاتدرائية كولونيا|church|ألمانيا
+Tokyo Skytree|برج سكاي تري|tower|اليابان
+Tokyo Tower|برج طوكيو|tower|اليابان
+Taipei 101|تايبيه 101|tower|تايوان
+Space Needle|سبيس نيدل|tower|الولايات المتحدة
+Shanghai Tower|برج شنغهاي|tower|الصين
+Lotus Temple|معبد اللوتس|temple|الهند
+Golden Temple|المعبد الذهبي|temple|الهند
+Red Fort|القلعة الحمراء|castle|الهند
+Qutb Minar|قطب منار|tower|الهند
+Hawa Mahal|هوا محل|palace|الهند
+Moai|تماثيل الموآي|monument|تشيلي
+Pyramid of the Sun|هرم الشمس|ancient|المكسيك
+Luxor Temple|معبد الأقصر|ancient|مصر
+Karnak|معبد الكرنك|ancient|مصر
+Valley of the Kings|وادي الملوك|ancient|مصر
+Citadel of Cairo|قلعة صلاح الدين|castle|مصر
+Bibliotheca Alexandrina|مكتبة الإسكندرية|museum|مصر
+Prophet's Mosque|المسجد النبوي|mosque|السعودية
+Umayyad Mosque|الجامع الأموي|mosque|سوريا
+Palmyra|تدمر|ancient|سوريا
+Krak des Chevaliers|قلعة الحصن|castle|سوريا
+Baalbek|بعلبك|ancient|لبنان
+Raouche Rocks|صخرة الروشة|nature|لبنان
+Jeita Grotto|مغارة جعيتا|nature|لبنان
+Wadi Rum|وادي رم|nature|الأردن
+Jerash|جرش|ancient|الأردن
+Church of the Holy Sepulchre|كنيسة القيامة|church|فلسطين
+Church of the Nativity|كنيسة المهد|church|فلسطين
+Sultan Qaboos Grand Mosque|جامع السلطان قابوس الأكبر|mosque|عمان
+Museum of Islamic Art, Doha|متحف الفن الإسلامي|museum|قطر
+Louvre Abu Dhabi|متحف اللوفر أبوظبي|museum|الإمارات
+Dubai Frame|إطار دبي|modern|الإمارات
+Kingdom Centre|برج المملكة|tower|السعودية
+Jeddah Tower|برج جدة|tower|السعودية
+Masmak Fortress|قلعة المصمك|castle|السعودية
+Topkapı Palace|قصر توب كابي|palace|تركيا
+Süleymaniye Mosque|جامع السليمانية|mosque|تركيا
+Galata Tower|برج غلطة|tower|تركيا
+Pantheon, Rome|البانثيون|ancient|إيطاليا
+Park Güell|حديقة غويل|other|إسبانيا
+Mosque–Cathedral of Córdoba|مسجد قرطبة|mosque|إسبانيا
+Prague Castle|قلعة براغ|castle|التشيك
+Charles Bridge|جسر كارل|bridge|التشيك
+Schönbrunn Palace|قصر شونبرون|palace|النمسا
+Hungarian Parliament Building|مبنى البرلمان المجري|palace|المجر
+Atomium|أتوميوم|modern|بلجيكا
+The Little Mermaid (statue)|الحورية الصغيرة|monument|الدنمارك
+Sydney Harbour Bridge|جسر ميناء سيدني|bridge|أستراليا
+Temple of Heaven|معبد السماء|temple|الصين
+Himeji Castle|قلعة هيميجي|castle|اليابان
+Ponte Vecchio|بونتي فيكيو|bridge|إيطاليا
+Chrysler Building|مبنى كرايسلر|modern|الولايات المتحدة
+Gateway Arch|قوس البوابة|monument|الولايات المتحدة
+Sky Tower (Auckland)|سكاي تاور|tower|نيوزيلندا
+Cappadocia|كابادوكيا|nature|تركيا
+St Mark's Basilica|كاتدرائية القديس مرقس|church|إيطاليا
+Sacré-Cœur, Paris|كنيسة القلب المقدس|church|فرنسا
+Westminster Abbey|وستمنستر آبي|church|المملكة المتحدة
+Al-Fateh Grand Mosque|جامع الفاتح الكبير|mosque|البحرين
+Faisal Mosque|مسجد الفيصل|mosque|باكستان
+Badshahi Mosque|المسجد البادشاهي|mosque|باكستان
+Reichstag building|مبنى الرايخستاغ|modern|ألمانيا
+Kinderdijk|طواحين كيندردايك|other|هولندا
+Royal Palace of Madrid|القصر الملكي في مدريد|palace|إسبانيا
+## HARD
+Meteora|ميتيورا|church|اليونان
+Mont-Saint-Michel|مون سان ميشيل|castle|فرنسا
+Borobudur|بوروبودور|temple|إندونيسيا
+Potala Palace|قصر بوتالا|palace|الصين
+Rock-Hewn Churches, Lalibela|كنائس لاليبيلا|church|إثيوبيا
+Persepolis|برسيبوليس|ancient|إيران
+Sigiriya|سيجيريا|ancient|سريلانكا
+Hallstatt|هالشتات|city|النمسا
+Cinque Terre|تشينكوي تيري|city|إيطاليا
+Zhangjiajie National Forest Park|زهانغجياجيه|nature|الصين
+Ha Long Bay|خليج ها لونغ|nature|فيتنام
+Wat Rong Khun|المعبد الأبيض|temple|تايلاند
+Shwedagon Pagoda|باغودة شويداغون|temple|ميانمار
+Paro Taktsang|دير تاكتسانغ|temple|بوتان
+Sugarloaf Mountain|جبل الرغيف|nature|البرازيل
+Salar de Uyuni|سالار دي أويوني|nature|بوليفيا
+Milford Sound|ميلفورد ساوند|nature|نيوزيلندا
+Great Mosque of Djenné|جامع جيني الكبير|mosque|مالي
+Koutoubia Mosque|جامع الكتبية|mosque|المغرب
+Chefchaouen|شفشاون|city|المغرب
+Great Mosque of Kairouan|جامع القيروان الكبير|mosque|تونس
+Amphitheatre of El Jem|مسرح الجم|ancient|تونس
+Pamukkale|باموكالي|nature|تركيا
+Hegra (Saudi Arabia)|مدائن صالح|ancient|السعودية
+Shibam|شبام حضرموت|city|اليمن
+Socotra|سقطرى|nature|اليمن
+Aït Benhaddou|آيت بن حدو|ancient|المغرب
+Timgad|تيمقاد|ancient|الجزائر
+Lake Retba|بحيرة ريتبا|nature|السنغال
+Meroë|أهرامات مروي|ancient|السودان
+Göbekli Tepe|غوبكلي تبه|ancient|تركيا
+Mount Nemrut|جبل نمرود|ancient|تركيا
+Sumela Monastery|دير سوميلا|church|تركيا
+Ephesus|أفسس|ancient|تركيا
+Shah Mosque|مسجد الشاه|mosque|إيران
+Naqsh-e Jahan Square|ميدان نقش جهان|city|إيران
+Sheikh Lotfollah Mosque|مسجد الشيخ لطف الله|mosque|إيران
+Nasir al-Mulk Mosque|مسجد نصير الملك|mosque|إيران
+Registan|ريغستان|ancient|أوزبكستان
+Gur-e-Amir|ضريح غور أمير|monument|أوزبكستان
+Humayun's Tomb|ضريح همايون|monument|الهند
+Amer Fort|قلعة آمير|castle|الهند
+Meenakshi Temple|معبد مينالكشي|temple|الهند
+Konark Sun Temple|معبد كونارك|temple|الهند
+Tanah Lot|تاناه لوت|temple|إندونيسيا
+Prambanan|برامبانان|temple|إندونيسيا
+Bagan|باغان|ancient|ميانمار
+Wat Arun|وات أرون|temple|تايلاند
+Grand Palace|القصر الكبير|palace|تايلاند
+Bayon|معبد بايون|temple|كمبوديا
+Ta Prohm|تا بروم|temple|كمبوديا
+Kinkaku-ji|كينكاكو جي|temple|اليابان
+Itsukushima Shrine|ضريح إيتسوكوشيما|temple|اليابان
+Fushimi Inari-taisha|ضريح فوشيمي إيناري|temple|اليابان
+Shirakawa-go|شيراكاوا-غو|city|اليابان
+Gyeongbokgung|قصر غيونغبوك|palace|كوريا الجنوبية
+Alberobello|ألبيروبيلو|city|إيطاليا
+Matera|ماتيرا|city|إيطاليا
+Pont du Gard|جسر غارد|ancient|فرنسا
+Carcassonne|قلعة كاركاسون|castle|فرنسا
+Bran Castle|قلعة بران|castle|رومانيا
+Eilean Donan|قلعة إيلين دونان|castle|المملكة المتحدة
+Giant's Causeway|جسر العمالقة|nature|المملكة المتحدة
+Cliffs of Moher|جروف موهير|nature|أيرلندا
+Preikestolen|بريكستولن|nature|النرويج
+Plitvice Lakes National Park|بحيرات بليتفيتش|nature|كرواتيا
+Lake Bled|بحيرة بليد|nature|سلوفينيا
+Church of the Savior on Blood|كنيسة المخلص على الدم المسال|church|روسيا
+Pena Palace|قصر بينا|palace|البرتغال
+Belém Tower|برج بيليم|tower|البرتغال
+Teotihuacan|تيوتيهواكان|ancient|المكسيك
+Tikal|تيكال|ancient|غواتيمالا
+Antelope Canyon|أنتيلوب كانيون|nature|الولايات المتحدة
+Monument Valley|وادي النصب|nature|الولايات المتحدة
+Delicate Arch|القوس الحساس|nature|الولايات المتحدة
+Perito Moreno Glacier|نهر بيريتو مورينو الجليدي|nature|الأرجنتين
+Leptis Magna|لبدة الكبرى|ancient|ليبيا
+Sidi Bou Said|سيدي بوسعيد|city|تونس
+Angel Falls|شلالات أنخل|nature|فنزويلا
+Bahla Fort|قلعة بهلاء|castle|عمان
