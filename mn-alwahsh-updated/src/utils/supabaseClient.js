@@ -353,7 +353,12 @@ export async function fetchQuestion(category, points) {
 // batch, which kept returning the same rows and could come back stale from
 // the Android WebView HTTP cache), excludes the current question, marks the
 // replacement used so it can't repeat, and recycles the table if exhausted.
-export async function fetchSwapQuestion(category, points, excludeId, sourceTable) {
+// Finds a replacement row WITHOUT marking it used. Split out so the question
+// modal can look one up in the background while the current question is on
+// screen, then use it instantly when "change repeated question" is pressed.
+// allowReset=false for those background lookups: recycling an exhausted table
+// wipes every used-flag, which must only ever happen on a real swap.
+async function findSwapCandidate(category, points, excludeId, sourceTable, allowReset) {
   const table = sourceTable || TABLE_MAIN;
   const rowKey = r => r.id ?? r.question_id ?? r.ID ?? r.rowid
     ?? (r.slot ? `${r.category}|${r.points}|${r.slot}` : null);
@@ -365,22 +370,35 @@ export async function fetchSwapQuestion(category, points, excludeId, sourceTable
         const row = await fetchOneRandom(table, category, points);
         if (!row) break;
         if (isExcluded(row)) continue;
-        markQuestionUsed(row, table).catch(() => {});
-        return normalizeRow(row, table);
+        return { row, table };
       }
       // Fallback: small batch, pick any row that isn't the current one
       const rows = (await fetchRowsFromTable(table, category, points)).filter(r => !isExcluded(r));
-      if (rows.length) {
-        const row = rows[Math.floor(Math.random() * rows.length)];
-        markQuestionUsed(row, table).catch(() => {});
-        return normalizeRow(row, table);
-      }
+      if (rows.length) return { row: rows[Math.floor(Math.random() * rows.length)], table };
+      if (!allowReset) return null;
       if (attempt === 0) await resetTable(table); // exhausted — recycle once
     }
   } catch (e) {
     console.warn('[Swap] failed', e);
   }
   return null;
+}
+
+// Background lookup for the modal — marks nothing, never resets the table.
+export function prefetchSwapCandidate(category, points, excludeId, sourceTable) {
+  return findSwapCandidate(category, points, excludeId, sourceTable, false);
+}
+
+// Turns a candidate into the question actually shown: marks it used (in the
+// background, as before) and shuffles its options.
+export function commitSwapCandidate(candidate) {
+  markQuestionUsed(candidate.row, candidate.table).catch(() => {});
+  return normalizeRow(candidate.row, candidate.table);
+}
+
+export async function fetchSwapQuestion(category, points, excludeId, sourceTable) {
+  const candidate = await findSwapCandidate(category, points, excludeId, sourceTable, true);
+  return candidate ? commitSwapCandidate(candidate) : null;
 }
 
 function normalizeRow(row, sourceTable) {

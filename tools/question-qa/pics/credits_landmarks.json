@@ -1,0 +1,394 @@
+[
+ {
+  "title": "Eiffel Tower",
+  "file": "Tour Eiffel Wikimedia Commons.jpg",
+  "license": "Public domain",
+  "artist": "Benh LIEU SONG",
+  "page": "https://commons.wikimedia.org/wiki/File:Tour_Eiffel_Wikimedia_Commons.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Giza pyramid complex",
+  "file": "Pyramids of the Giza Necropolis.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "KennyOMG",
+  "page": "https://commons.wikimedia.org/wiki/File:Pyramids_of_the_Giza_Necropolis.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Taj Mahal",
+  "file": "Taj Mahal, Agra, India edit3.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Taj_Mahal,_Agra,_India_edit2.jpg: Yann; edited by King of Hearts\nderivative work: Jbarta (",
+  "page": "https://commons.wikimedia.org/wiki/File:Taj_Mahal,_Agra,_India_edit3.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Colosseum",
+  "file": "Colosseo 2020.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "FeaturedPics",
+  "page": "https://commons.wikimedia.org/wiki/File:Colosseo_2020.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Big Ben",
+  "file": "Elizabeth Tower and the north front of the Palace of Westminster, London.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Christian David",
+  "page": "https://commons.wikimedia.org/wiki/File:Elizabeth_Tower_and_the_north_front_of_the_Palace_of_Westminster,_London.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Christ the Redeemer (statue)",
+  "file": "Christ the Redeemer - Cristo Redentor.jpg",
+  "license": "CC BY-SA 3.0 de",
+  "artist": "Arne Müseler",
+  "page": "https://commons.wikimedia.org/wiki/File:Christ_the_Redeemer_-_Cristo_Redentor.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Golden Gate Bridge",
+  "file": "GoldenGateBridge-001.jpg",
+  "license": "CC BY 2.5",
+  "artist": "Rich Niewiroski Jr.",
+  "page": "https://commons.wikimedia.org/wiki/File:GoldenGateBridge-001.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Tower Bridge",
+  "file": "London - London Tower Bridge - 140806 171049.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Barcex",
+  "page": "https://commons.wikimedia.org/wiki/File:London_-_London_Tower_Bridge_-_140806_171049.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Arc de Triomphe",
+  "file": "Arc de Triomphe - Août 2026.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "ZeusUpsistos",
+  "page": "https://commons.wikimedia.org/wiki/File:Arc_de_Triomphe_-_Ao%C3%BBt_2026.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Buckingham Palace",
+  "file": "Buckingham Palace, London - April 2009.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Diliff",
+  "page": "https://commons.wikimedia.org/wiki/File:Buckingham_Palace,_London_-_April_2009.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Parthenon",
+  "file": "The Parthenon in Athens.jpg",
+  "license": "CC BY 2.0",
+  "artist": "Steve Swayne",
+  "page": "https://commons.wikimedia.org/wiki/File:The_Parthenon_in_Athens.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "St. Peter's Basilica",
+  "file": "Basilica di San Pietro in Vaticano September 2015-1a.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Alvesgaspar",
+  "page": "https://commons.wikimedia.org/wiki/File:Basilica_di_San_Pietro_in_Vaticano_September_2015-1a.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Sultan Ahmed Mosque",
+  "file": "Exterior of Sultan Ahmed I Mosque in Istanbul, Turkey 002.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Moonik",
+  "page": "https://commons.wikimedia.org/wiki/File:Exterior_of_Sultan_Ahmed_I_Mosque_in_Istanbul,_Turkey_002.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Grand Canyon",
+  "file": "Grand Canyon view from Pima Point 2010.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Chensiyuan",
+  "page": "https://commons.wikimedia.org/wiki/File:Grand_Canyon_view_from_Pima_Point_2010.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Mount Everest",
+  "file": "Mount Everest as seen from Drukair2 PLW edit.jpg",
+  "license": "CC BY-SA 2.0",
+  "artist": "Mount_Everest_as_seen_from_Drukair2.jpg: shrimpo1967\nderivative work: Papa Lima Whiskey 2 ",
+  "page": "https://commons.wikimedia.org/wiki/File:Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Victoria Falls",
+  "file": "Cataratas Victoria, Zambia-Zimbabue, 2018-07-27, DD 05.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Diego Delso",
+  "page": "https://commons.wikimedia.org/wiki/File:Cataratas_Victoria,_Zambia-Zimbabue,_2018-07-27,_DD_05.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Times Square",
+  "file": "New york times square-terabass.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Terabass",
+  "page": "https://commons.wikimedia.org/wiki/File:New_york_times_square-terabass.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "White House",
+  "file": "WhiteHouseSouthFacade.JPG",
+  "license": "CC BY-SA 3.0",
+  "artist": "This image or media was taken or created by Matt H. Wade. To see his entire portfolio, cli",
+  "page": "https://commons.wikimedia.org/wiki/File:WhiteHouseSouthFacade.JPG",
+  "needs_attribution": true
+ },
+ {
+  "title": "Hollywood Sign",
+  "file": "Hollywood Sign (Zuschnitt).jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Thomas Wolf, www.foto-tw.de",
+  "page": "https://commons.wikimedia.org/wiki/File:Hollywood_Sign_(Zuschnitt).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Rialto Bridge",
+  "file": "Rialto 2025 4.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "kallerna",
+  "page": "https://commons.wikimedia.org/wiki/File:Rialto_2025_4.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Palace of Versailles",
+  "file": "Vue aérienne du domaine de Versailles par ToucanWings - Creative Commons By Sa 3.0 - 083.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "ToucanWings",
+  "page": "https://commons.wikimedia.org/wiki/File:Vue_a%C3%A9rienne_du_domaine_de_Versailles_par_ToucanWings_-_Creative_Commons_By_Sa_3.0_-_083.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Suez Canal",
+  "file": "Suez Canal, Egypt (31596166706).jpg",
+  "license": "CC BY 2.0",
+  "artist": "Pierre Markuse from Hamm, Germany",
+  "page": "https://commons.wikimedia.org/wiki/File:Suez_Canal,_Egypt_(31596166706).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Red Square",
+  "file": "Kremlin and Red Square.1.jpg",
+  "license": "CC BY 4.0",
+  "artist": "mos.ru",
+  "page": "https://commons.wikimedia.org/wiki/File:Kremlin_and_Red_Square.1.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Berlin Wall",
+  "file": "Berlin Wall Potsdamer Platz November 1975 looking east crop.jpg",
+  "license": "CC BY-SA 2.0",
+  "artist": "Edward Valachovic https://www.flickr.com/people/fauxaddress/",
+  "page": "https://commons.wikimedia.org/wiki/File:Berlin_Wall_Potsdamer_Platz_November_1975_looking_east_crop.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Lincoln Memorial",
+  "file": "Aerial view of Lincoln Memorial - east side EDIT.jpeg",
+  "license": "Public domain",
+  "artist": "Aerial_view_of_Lincoln_Memorial_-_east_side.jpg: Carol M. Highsmith\nderivative work: upsta",
+  "page": "https://commons.wikimedia.org/wiki/File:Aerial_view_of_Lincoln_Memorial_-_east_side_EDIT.jpeg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Mount Vesuvius",
+  "file": "Il cratere del Vulcano - panoramio.jpg",
+  "license": "CC BY 3.0",
+  "artist": "pietro scerrato",
+  "page": "https://commons.wikimedia.org/wiki/File:Il_cratere_del_Vulcano_-_panoramio.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Matterhorn",
+  "file": "0 106 Walliser Alpen - Matterhorn.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "W. Bulach",
+  "page": "https://commons.wikimedia.org/wiki/File:0_106_Walliser_Alpen_-_Matterhorn.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Machu Picchu",
+  "file": "Machu Picchu, 2023 (012).jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Draceane",
+  "page": "https://commons.wikimedia.org/wiki/File:Machu_Picchu,_2023_(012).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Petronas Towers",
+  "file": "Kuala Lumpur - panoramio (18).jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "AwOiSoAk KaOsIoWa",
+  "page": "https://commons.wikimedia.org/wiki/File:Kuala_Lumpur_-_panoramio_(18).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Hagia Sophia",
+  "file": "Hagia Sophia Mars 2013.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Arild Vågen",
+  "page": "https://commons.wikimedia.org/wiki/File:Hagia_Sophia_Mars_2013.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Tokyo Skytree",
+  "file": "Tokyo Skytree 2023.jpg",
+  "license": "CC0",
+  "artist": "Akonnchiroll",
+  "page": "https://commons.wikimedia.org/wiki/File:Tokyo_Skytree_2023.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Tokyo Tower",
+  "file": "Tokyo Tower 2023.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Akonnchiroll",
+  "page": "https://commons.wikimedia.org/wiki/File:Tokyo_Tower_2023.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Space Needle",
+  "file": "Seattle, October 6, 2023 - 60.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Another Believer",
+  "page": "https://commons.wikimedia.org/wiki/File:Seattle,_October_6,_2023_-_60.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Moai",
+  "file": "Ahu Tongariki.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Rivi",
+  "page": "https://commons.wikimedia.org/wiki/File:Ahu_Tongariki.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Umayyad Mosque",
+  "file": "Ommayyad masjed.jpg",
+  "license": "Public domain",
+  "artist": "",
+  "page": "https://commons.wikimedia.org/wiki/File:Ommayyad_masjed.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Topkapı Palace",
+  "file": "Topkapi Palace Seen From Harem.JPG",
+  "license": "CC BY-SA 3.0",
+  "artist": "Bjørn Christian Tørrissen",
+  "page": "https://commons.wikimedia.org/wiki/File:Topkapi_Palace_Seen_From_Harem.JPG",
+  "needs_attribution": true
+ },
+ {
+  "title": "Süleymaniye Mosque",
+  "file": "SüleymaniyeMosqueIstanbul (cropped).jpg",
+  "license": "CC0",
+  "artist": "Hunanuk",
+  "page": "https://commons.wikimedia.org/wiki/File:S%C3%BCleymaniyeMosqueIstanbul_(cropped).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Pantheon, Rome",
+  "file": "Pantheon (Rome) - Right side and front.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "NikonZ7II",
+  "page": "https://commons.wikimedia.org/wiki/File:Pantheon_(Rome)_-_Right_side_and_front.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Gateway Arch",
+  "file": "St Louis Gateway Arch.jpg",
+  "license": "CC BY 2.0",
+  "artist": "[https://www.flickr.com/photos/11399912@N00  B0iwehijro2i0-\n]\n\n`1l]] from Davis, CA, USA",
+  "page": "https://commons.wikimedia.org/wiki/File:St_Louis_Gateway_Arch.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Hallstatt",
+  "file": "Hallstatt - Zentrum .JPG",
+  "license": "CC BY-SA 4.0",
+  "artist": "C.Stadler/Bwag",
+  "page": "https://commons.wikimedia.org/wiki/File:Hallstatt_-_Zentrum_.JPG",
+  "needs_attribution": true
+ },
+ {
+  "title": "Ephesus",
+  "file": "Ephesus Celsus Library Façade.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Benh LIEU SONG",
+  "page": "https://commons.wikimedia.org/wiki/File:Ephesus_Celsus_Library_Fa%C3%A7ade.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Gur-e-Amir",
+  "file": "Вечерний Гур-Эмир.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Arina Pan",
+  "page": "https://commons.wikimedia.org/wiki/File:%D0%92%D0%B5%D1%87%D0%B5%D1%80%D0%BD%D0%B8%D0%B9_%D0%93%D1%83%D1%80-%D0%AD%D0%BC%D0%B8%D1%80.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Shirakawa-go",
+  "file": "Ogi Shirakawa-gō, Gifu, Japan.jpg",
+  "license": "CC BY 2.5",
+  "artist": "663highland",
+  "page": "https://commons.wikimedia.org/wiki/File:Ogi_Shirakawa-g%C5%8D,_Gifu,_Japan.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Matera",
+  "file": "Cittadimatera1.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "",
+  "page": "https://commons.wikimedia.org/wiki/File:Cittadimatera1.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Pont du Gard",
+  "file": "Pont du Gard BLS.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Benh LIEU SONG (Flickr)",
+  "page": "https://commons.wikimedia.org/wiki/File:Pont_du_Gard_BLS.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Carcassonne",
+  "file": "1 carcassonne aerial 2016.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Chensiyuan",
+  "page": "https://commons.wikimedia.org/wiki/File:1_carcassonne_aerial_2016.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Preikestolen",
+  "file": "Preikestolen Norge.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Stefan Krause, Germany",
+  "page": "https://commons.wikimedia.org/wiki/File:Preikestolen_Norge.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Pena Palace",
+  "file": "Sintra - Palacio da Pena (20332995770).jpg",
+  "license": "CC BY 2.0",
+  "artist": "Singa Hitam",
+  "page": "https://commons.wikimedia.org/wiki/File:Sintra_-_Palacio_da_Pena_(20332995770).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Teotihuacan",
+  "file": "ZA77 Teotihuacán edo de mex Herberto de la rosa.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Hdlrosa",
+  "page": "https://commons.wikimedia.org/wiki/File:ZA77_Teotihuac%C3%A1n_edo_de_mex_Herberto_de_la_rosa.jpg",
+  "needs_attribution": true
+ }
+]

@@ -1,0 +1,74 @@
+[
+ {
+  "title": "Eiffel Tower",
+  "file": "Tour Eiffel Wikimedia Commons.jpg",
+  "license": "Public domain",
+  "artist": "Benh LIEU SONG",
+  "page": "https://commons.wikimedia.org/wiki/File:Tour_Eiffel_Wikimedia_Commons.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Taj Mahal",
+  "file": "Taj Mahal, Agra, India edit3.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Taj_Mahal,_Agra,_India_edit2.jpg: Yann; edited by King of Hearts\nderivative work: Jbarta (",
+  "page": "https://commons.wikimedia.org/wiki/File:Taj_Mahal,_Agra,_India_edit3.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Colosseum",
+  "file": "Colosseo 2020.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "FeaturedPics",
+  "page": "https://commons.wikimedia.org/wiki/File:Colosseo_2020.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Sagrada Família",
+  "file": "SF maig 2026.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Canaan",
+  "page": "https://commons.wikimedia.org/wiki/File:SF_maig_2026.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Neuschwanstein Castle",
+  "file": "Neuschwanstein Castle 2024-02.jpg",
+  "license": "CC0",
+  "artist": "Wilfredor",
+  "page": "https://commons.wikimedia.org/wiki/File:Neuschwanstein_Castle_2024-02.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Petronas Towers",
+  "file": "Kuala Lumpur - panoramio (18).jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "AwOiSoAk KaOsIoWa",
+  "page": "https://commons.wikimedia.org/wiki/File:Kuala_Lumpur_-_panoramio_(18).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Meteora",
+  "file": "Mystic land METEORA.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Ioannis Ioannidis",
+  "page": "https://commons.wikimedia.org/wiki/File:Mystic_land_METEORA.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Borobudur",
+  "file": "Borobudur-Nothwest-view.jpg",
+  "license": "Public domain",
+  "artist": "Gunawan Kartapranata",
+  "page": "https://commons.wikimedia.org/wiki/File:Borobudur-Nothwest-view.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Potala Palace",
+  "file": "Potala.jpg",
+  "license": "CC BY 2.5",
+  "artist": "Ondřej Žváček",
+  "page": "https://commons.wikimedia.org/wiki/File:Potala.jpg",
+  "needs_attribution": true
+ }
+]

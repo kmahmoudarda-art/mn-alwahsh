@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { X } from 'lucide-react';
 import LoadingSpinner from './LoadingSpinner';
 import FlagQuestion from './FlagQuestion';
-import { fetchSwapQuestion, reportQuestion } from '../../utils/supabaseClient';
+import { fetchSwapQuestion, prefetchSwapCandidate, commitSwapCandidate, reportQuestion } from '../../utils/supabaseClient';
 import { getCachedImageUrl, fetchAndCacheImage } from '../../utils/questionGenerator';
 import { LIFELINES } from './LifelinePanel';
 import SongPlayer from './SongPlayer';
@@ -313,6 +313,18 @@ export default function QuestionModal({
 
   useEffect(() => { setSwapCount(0); setJustReported(false); }, [category, points]);
 
+  // Look up the replacement for "change repeated question" in the background
+  // while the current question is on screen, so pressing the button only has
+  // to swap it in. Nothing is marked used until the swap actually happens.
+  const prefetchRef = useRef(null); // { key, promise }
+  useEffect(() => {
+    prefetchRef.current = null;
+    if (!question || answered || isTrapTile || stealMode || !category) return;
+    const key = `${question.source_table}:${question.id}:${category}:${points}`;
+    const promise = prefetchSwapCandidate(category, points, question.id, question.source_table).catch(() => null);
+    prefetchRef.current = { key, promise };
+  }, [question?.id, question?.source_table, question?.question, category, points, answered, isTrapTile, stealMode]);
+
   useEffect(() => {
     setSingerPhotoUrl(null);
     if (!question) return;
@@ -345,7 +357,16 @@ export default function QuestionModal({
     swapInFlight.current = true;
     let newQ = null;
     try {
-      newQ = await fetchSwapQuestion(category, points, question.id, question.source_table);
+      // Use the replacement already fetched in the background (instant);
+      // fall back to a live lookup if it isn't ready or came back empty.
+      const key = `${question.source_table}:${question.id}:${category}:${points}`;
+      const pre = prefetchRef.current;
+      prefetchRef.current = null;
+      if (pre && pre.key === key) {
+        const candidate = await pre.promise;
+        if (candidate) newQ = commitSwapCandidate(candidate);
+      }
+      if (!newQ) newQ = await fetchSwapQuestion(category, points, question.id, question.source_table);
     } catch (e) {
       console.warn('[Swap] error', e);
     } finally {
@@ -358,7 +379,7 @@ export default function QuestionModal({
       setSwapCount(c => c + 1);
       setSwapAnimating(false);
       if (onResetTimer) onResetTimer();
-    }, 250);
+    }, 150);
   };
 
   const handleReport = async () => {
@@ -459,8 +480,8 @@ export default function QuestionModal({
         @keyframes swapIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
         @keyframes swapOut { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(-20px); } }
         @keyframes luckyPulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.7;transform:scale(1.05);} }
-        .swap-in { animation: swapIn 0.25s ease forwards; }
-        .swap-out { animation: swapOut 0.25s ease forwards; }
+        .swap-in { animation: swapIn 0.15s ease forwards; }
+        .swap-out { animation: swapOut 0.15s ease forwards; }
         .lucky-pulse { animation: luckyPulse 1.2s ease-in-out infinite; }
         .ll-scroll::-webkit-scrollbar { display: none; }
         .ll-scroll { scrollbar-width: none; -ms-overflow-style: none; }
