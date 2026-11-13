@@ -9,6 +9,7 @@ import FlagQuestion from './FlagQuestion';
 import { fetchSwapQuestion, reportQuestion } from '../../utils/supabaseClient';
 import { getCachedImageUrl, fetchAndCacheImage } from '../../utils/questionGenerator';
 import { LIFELINES } from './LifelinePanel';
+import SongPlayer from './SongPlayer';
 
 const GOLD = 'hsl(45 90% 42%)';
 const GOLD_BG = 'hsl(45 90% 42% / 0.85)';
@@ -321,6 +322,7 @@ export default function QuestionModal({
       return;
     }
 
+    if (question.youtube_id) return;
     if (question.source_table !== 'Fanan') return;
     const singerName = question.options?.[question.correct];
     const cleanName = cleanSingerName(singerName);
@@ -706,7 +708,8 @@ export default function QuestionModal({
             {(() => {
               const isFanan = question.source_table === 'Fanan';
               const isLogo = question.source_table === 'logo1';
-              const hasImage = question.image_url && question.image_url !== '';
+              const hasSong = !!question.youtube_id;
+              const hasImage = !hasSong && question.image_url && question.image_url !== '';
               const rawHeroUrl = hasImage
                 ? isFanan ? (singerPhotoUrl || question.image_url) : question.image_url
                 : null;
@@ -1028,6 +1031,12 @@ export default function QuestionModal({
                     alignItems:'center', justifyContent:'center',
                     padding:'10px 16px', overflow:'hidden',
                   }}>
+                    {hasSong && (
+                      <SongPlayer key={question.id ?? question.youtube_id}
+                        videoId={question.youtube_id}
+                        start={question.audio_start}
+                        duration={question.audio_duration} />
+                    )}
                     <p style={{ fontFamily:'var(--font-cairo)', fontWeight:800,
                       color:'#1a1a1a', fontSize: qFontSize > 14 ? qFontSize + 4 : qFontSize + 4,
                       lineHeight:1.6, textAlign:'right', direction:'rtl', margin:0 }}>

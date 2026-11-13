@@ -422,6 +422,9 @@ function normalizeRow(row, sourceTable) {
     explanation: row.explanation || '',
     points: row.points,
     image_url: row.image_url || null,
+    youtube_id: row.youtube_id || null,
+    audio_start: Number(row.audio_start) || 0,
+    audio_duration: Number(row.audio_duration) || 12,
   };
 }
 
