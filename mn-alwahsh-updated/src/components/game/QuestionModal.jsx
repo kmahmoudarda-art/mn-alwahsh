@@ -323,7 +323,7 @@ export default function QuestionModal({
       return;
     }
 
-    if (question.youtube_id) return;
+    if (question.itunes_id) return;
     if (question.source_table !== 'Fanan') return;
     const singerName = question.options?.[question.correct];
     const cleanName = cleanSingerName(singerName);
@@ -709,7 +709,7 @@ export default function QuestionModal({
             {(() => {
               const isFanan = question.source_table === 'Fanan';
               const isLogo = question.source_table === 'logo1';
-              const hasSong = !!question.youtube_id;
+              const hasSong = !!question.itunes_id;
               const hasImage = !hasSong && question.image_url && question.image_url !== '';
               const rawHeroUrl = hasImage
                 ? isFanan ? (singerPhotoUrl || question.image_url) : question.image_url
@@ -1033,10 +1033,8 @@ export default function QuestionModal({
                     padding:'10px 16px', overflow:'hidden',
                   }}>
                     {hasSong && (
-                      <SongPlayer key={question.id ?? question.youtube_id}
-                        videoId={question.youtube_id}
-                        start={question.audio_start}
-                        duration={question.audio_duration}
+                      <SongPlayer key={question.id ?? question.itunes_id}
+                        itunesId={question.itunes_id}
                         onStarted={onSongStarted} />
                     )}
                     <p style={{ fontFamily:'var(--font-cairo)', fontWeight:800,

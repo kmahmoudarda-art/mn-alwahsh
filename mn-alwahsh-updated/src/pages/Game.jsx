@@ -106,7 +106,7 @@ export default function Game() {
   // (after any YouTube ad). SongPlayer calls handleSongStarted.
   const pendingTimerRef = useRef(null);
   const beginQuestionTimer = useCallback((q, seconds) => {
-    if (q && q.youtube_id) {
+    if (q && q.itunes_id) {
       clearInterval(timerRef.current);
       pendingTimerRef.current = seconds;
       setTimerSeconds(null);
