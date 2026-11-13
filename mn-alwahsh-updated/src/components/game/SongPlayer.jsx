@@ -17,6 +17,7 @@ export default function SongPlayer({ itunesId, onStarted }) {
   const onStartedRef = useRef(onStarted);
   onStartedRef.current = onStarted;
   const [status, setStatus] = useState('loading'); // loading | ready | playing | error
+  const [attempt, setAttempt] = useState(0); // bumped to retry loading after an error
   const [errCode, setErrCode] = useState(0); // 1 lookup failed, 2 no preview, 3 audio failed, 4 play blocked
   const fireStarted = () => {
     if (startedRef.current) return;
@@ -26,6 +27,7 @@ export default function SongPlayer({ itunesId, onStarted }) {
 
   useEffect(() => {
     let cancelled = false;
+    setStatus('loading');
     startedRef.current = false;
     const fallback = setTimeout(fireStarted, MAX_WAIT_MS);
     const lookup = async (url) => {
@@ -47,14 +49,21 @@ export default function SongPlayer({ itunesId, onStarted }) {
         if (cancelled) return;
         const a = new Audio(url);
         a.preload = 'auto';
+        let startPos = 0;
         a.onplaying = () => {
+          startPos = a.currentTime;
           setStatus('playing'); fireStarted();
           clearTimeout(stopTimerRef.current);
           stopTimerRef.current = setTimeout(() => a.pause(), CLIP_SECONDS * 1000);
         };
+        // second, independent way to stop at 5s (in case the timer is throttled)
+        a.ontimeupdate = () => { if (!a.paused && a.currentTime - startPos >= CLIP_SECONDS) a.pause(); };
         a.onpause = () => setStatus('ready');
         a.onended = () => setStatus('ready');
-        a.onerror = () => { setErrCode(3); setStatus('error'); fireStarted(); };
+        a.onerror = () => {
+          if (attempt === 0) { setAttempt(1); return; } // one silent retry
+          setErrCode(3); setStatus('error'); fireStarted();
+        };
         audioRef.current = a;
         setStatus('ready');
       })
@@ -64,12 +73,13 @@ export default function SongPlayer({ itunesId, onStarted }) {
       clearTimeout(fallback);
       clearTimeout(stopTimerRef.current);
       const a = audioRef.current;
-      if (a) { a.onplaying = a.onpause = a.onended = a.onerror = null; a.pause(); }
+      if (a) { a.onplaying = a.onpause = a.onended = a.onerror = a.ontimeupdate = null; a.pause(); }
       audioRef.current = null;
     };
-  }, [itunesId]);
+  }, [itunesId, attempt]);
 
   const toggle = () => {
+    if (status === 'error') { setStatus('loading'); setAttempt(n => n + 1); return; } // tap to retry
     const a = audioRef.current;
     if (!a) return;
     if (!a.paused) { a.pause(); return; }
@@ -78,15 +88,15 @@ export default function SongPlayer({ itunesId, onStarted }) {
   };
 
   const label = status === 'loading' ? '⏳ جاري التحميل…'
-    : status === 'error' ? `⚠️ تعذّر تشغيل المقطع (${errCode})`
+    : status === 'error' ? `⚠️ تعذّر التشغيل (${errCode}) · اضغط للمحاولة`
     : status === 'playing' ? '⏸️ إيقاف' : (startedRef.current ? '🔁 أعد المقطع' : '🎧 شغّل المقطع');
 
   return (
     <div style={{ display:'flex', flexDirection:'column', alignItems:'center', marginBottom:12, flexShrink:0 }}>
-      <button onClick={toggle} disabled={status === 'loading' || status === 'error'} style={{
+      <button onClick={toggle} disabled={status === 'loading'} style={{
         fontFamily:'var(--font-cairo)', fontWeight:800, fontSize:18, padding:'14px 28px', borderRadius:40,
         border:'2px solid #1a1a1a', background: status === 'playing' ? '#fde68a' : '#fff', color:'#1a1a1a',
-        cursor: status === 'loading' || status === 'error' ? 'default' : 'pointer', minWidth:200,
+        cursor: status === 'loading' ? 'default' : 'pointer', minWidth:200,
       }}>{label}</button>
       <span style={{ fontFamily:'var(--font-cairo)', fontSize:11, color:'#555', marginTop:6 }}>
         مقطع قصير (٥ ثوانٍ) · العدّاد يبدأ عند التشغيل · ♪ Preview by Apple
