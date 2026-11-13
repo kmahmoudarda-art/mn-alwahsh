@@ -118,7 +118,7 @@ Umayyad Mosque|الجامع الأموي|mosque|سوريا
 Palmyra|تدمر|ancient|سوريا
 Krak des Chevaliers|قلعة الحصن|castle|سوريا
 Baalbek|بعلبك|ancient|لبنان
-Raouche Rocks|صخرة الروشة|nature|لبنان
+Pigeons' Rock|صخرة الروشة|nature|لبنان
 Jeita Grotto|مغارة جعيتا|nature|لبنان
 Wadi Rum|وادي رم|nature|الأردن
 Jerash|جرش|ancient|الأردن
@@ -154,7 +154,7 @@ Cappadocia|كابادوكيا|nature|تركيا
 St Mark's Basilica|كاتدرائية القديس مرقس|church|إيطاليا
 Sacré-Cœur, Paris|كنيسة القلب المقدس|church|فرنسا
 Westminster Abbey|وستمنستر آبي|church|المملكة المتحدة
-Al-Fateh Grand Mosque|جامع الفاتح الكبير|mosque|البحرين
+Al Fateh Grand Mosque|جامع الفاتح الكبير|mosque|البحرين
 Faisal Mosque|مسجد الفيصل|mosque|باكستان
 Badshahi Mosque|المسجد البادشاهي|mosque|باكستان
 Reichstag building|مبنى الرايخستاغ|modern|ألمانيا
@@ -184,7 +184,7 @@ Chefchaouen|شفشاون|city|المغرب
 Great Mosque of Kairouan|جامع القيروان الكبير|mosque|تونس
 Amphitheatre of El Jem|مسرح الجم|ancient|تونس
 Pamukkale|باموكالي|nature|تركيا
-Hegra (Saudi Arabia)|مدائن صالح|ancient|السعودية
+Hegra (archaeological site)|مدائن صالح|ancient|السعودية
 Shibam|شبام حضرموت|city|اليمن
 Socotra|سقطرى|nature|اليمن
 Aït Benhaddou|آيت بن حدو|ancient|المغرب

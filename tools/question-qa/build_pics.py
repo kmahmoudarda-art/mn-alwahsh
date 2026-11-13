@@ -64,6 +64,9 @@ for ch in chunks(files,40):
         em=ii.get('extmetadata',{}); g=lambda k:re.sub('<[^>]+>','',em.get(k,{}).get('value','')).strip()
         info[p['title'][5:].replace('_',' ')]=dict(thumb=ii.get('thumburl'),w=ii.get('width'),h=ii.get('height'),mime=ii.get('mime'),license=g('LicenseShortName'),artist=g('Artist')[:90],page=ii.get('descriptionurl'))
     time.sleep(2.5)
+def clean_url(u):
+    u=re.sub(r'^https://thumb\.wikimedia\.org/','https://upload.wikimedia.org/',u or '')
+    return u.split('?')[0]
 def lic_class(l):
     L=l.lower()
     if 'public domain' in L or L.startswith('pd') or 'cc0' in L or 'cc-zero' in L: return 'free'
@@ -79,7 +82,7 @@ for it in items:
     lc=lic_class(ii['license'])
     if not lc: drop['license not free']+=1; continue
     if ii['mime'] not in('image/jpeg','image/png') or (ii['w'] or 0)<500 or not (0.45<=(ii['w']/max(ii['h'],1))<=2.6): drop['too small / odd shape / not jpg-png']+=1; continue
-    it['img']=ii; it['lic']=lc; good.append(it)
+    ii['thumb']=clean_url(ii['thumb']); it['img']=ii; it['lic']=lc; good.append(it)
 # ---------- 4. check the thumbnails really load; one image per file ----------
 usedfile=set(); ok=[]
 for it in good:
