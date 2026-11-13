@@ -19,12 +19,20 @@ for a_ in sys.argv:
     if a_.startswith('--list='): CFG['file']=a_[7:]
 PER_TIER=int(next((a_[6:] for a_ in sys.argv if a_.startswith('--per=')),60)); UA={'User-Agent':'mnalwahsh-quiz-tools/1.0 (admin; image build)'}
 def call(url):
-    for i in range(8):
+    for i in range(14):
         try: return json.load(urllib.request.urlopen(urllib.request.Request(url,headers=UA),timeout=40))
         except urllib.error.HTTPError as e:
-            if e.code==429: time.sleep(6*(i+1)); continue
+            if e.code==429:
+                wait=int(e.headers.get('Retry-After') or 30)+3+2*i
+                print(f'   rate limited, waiting {wait}s',flush=True); time.sleep(wait); continue
             raise
     raise RuntimeError('rate limited: '+url[:80])
+# resumable memo: every lookup is saved as soon as it is made, so a restart never repeats work
+MEMO_FILE=f"pics/memo_{KIND}.json"
+try: MEMO=json.load(open(MEMO_FILE,encoding='utf-8'))
+except Exception: MEMO={}
+for k_ in ('canon','p18','info','head'): MEMO.setdefault(k_,{})
+def save_memo(): json.dump(MEMO,open(MEMO_FILE,'w',encoding='utf-8'),ensure_ascii=False)
 # ---------- 1. parse the list ----------
 items=[]; tier=None
 for line in open(CFG['file'],encoding='utf-8').read().splitlines():
@@ -42,40 +50,48 @@ items=uniq
 print('items in list:',len(items),{t:sum(1 for i in items if i['tier']==t) for t in('EASY','MEDIUM','HARD')})
 # ---------- 1b. resolve redirects / normalise titles on English Wikipedia ----------
 def chunks(a,n): return [a[i:i+n] for i in range(0,len(a),n)]
-canon={}
-for ch in chunks([i['title'] for i in items],30):
+todo=[i['title'] for i in items if i['title'] not in MEMO['canon']]
+for ch in chunks(todo,30):
     d=call("https://en.wikipedia.org/w/api.php?action=query&format=json&redirects=1&titles="+urllib.parse.quote('|'.join(ch)))
     q=d.get('query',{}); norm={n['from']:n['to'] for n in q.get('normalized',[])}; red={r['from']:r['to'] for r in q.get('redirects',[])}
     for t in ch:
-        x=norm.get(t,t); canon[t]=red.get(x,x)
-    time.sleep(3)
-for it in items: it['wtitle']=canon.get(it['title'],it['title'])
+        x=norm.get(t,t); MEMO['canon'][t]=red.get(x,x)
+    save_memo(); time.sleep(3)
+for it in items: it['wtitle']=MEMO['canon'].get(it['title'],it['title'])
 changed=sum(1 for it in items if it['wtitle']!=it['title'])
-print('titles resolved through Wikipedia redirects:',changed)
+print('titles resolved through Wikipedia redirects:',changed,flush=True)
 # ---------- 2. Wikidata image (P18) ----------
 def chunks(a,n): return [a[i:i+n] for i in range(0,len(a),n)]
-bytitle={}
-for ch in chunks(sorted({i['wtitle'] for i in items}),40):
+todo=sorted({i['wtitle'] for i in items if i['wtitle'].replace('_',' ').lower() not in MEMO['p18']})
+for ch in chunks(todo,40):
     d=call("https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&props=claims|sitelinks&sitefilter=enwiki&sites=enwiki&titles="+urllib.parse.quote('|'.join(ch)))
+    got=set()
     for e in d.get('entities',{}).values():
         sl=e.get('sitelinks',{}).get('enwiki',{}).get('title')
         cl=e.get('claims',{}).get('P18',[])
-        if sl and cl:
-            pref=[c for c in cl if c.get('rank')=='preferred'] or cl
-            bytitle[sl.replace('_',' ').lower()]=pref[0]['mainsnak']['datavalue']['value']
-    time.sleep(2.5)
-for it in items: it['file']=bytitle.get(it['wtitle'].replace('_',' ').lower())
+        if sl:
+            got.add(sl.replace('_',' ').lower())
+            if cl:
+                pref=[c for c in cl if c.get('rank')=='preferred'] or cl
+                MEMO['p18'][sl.replace('_',' ').lower()]=pref[0]['mainsnak']['datavalue']['value']
+    for t in ch: MEMO['p18'].setdefault(t.replace('_',' ').lower(),'')   # '' = asked, no image
+    save_memo(); time.sleep(2.5)
+for it in items: it['file']=MEMO['p18'].get(it['wtitle'].replace('_',' ').lower()) or None
+print('Wikidata images found:',sum(1 for i in items if i['file']),'of',len(items),flush=True)
 # ---------- 3. Commons license + thumbnail ----------
-info={}
 files=sorted({i['file'] for i in items if i['file']})
-for ch in chunks(files,40):
+for ch in chunks([f for f in files if f.replace('_',' ') not in MEMO['info']],40):
     d=call("https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url|size|mime|extmetadata&iiurlwidth=500&titles="+urllib.parse.quote('|'.join('File:'+f for f in ch)))
     for p in d['query']['pages'].values():
         ii=(p.get('imageinfo') or [None])[0]
-        if not ii: continue
+        key=p['title'][5:].replace('_',' ')
+        if not ii: MEMO['info'][key]=None; continue
         em=ii.get('extmetadata',{}); g=lambda k:re.sub('<[^>]+>','',em.get(k,{}).get('value','')).strip()
-        info[p['title'][5:].replace('_',' ')]=dict(thumb=ii.get('thumburl'),w=ii.get('width'),h=ii.get('height'),mime=ii.get('mime'),license=g('LicenseShortName'),artist=g('Artist')[:90],page=ii.get('descriptionurl'))
-    time.sleep(2.5)
+        MEMO['info'][key]=dict(thumb=ii.get('thumburl'),w=ii.get('width'),h=ii.get('height'),mime=ii.get('mime'),license=g('LicenseShortName'),artist=g('Artist')[:90],page=ii.get('descriptionurl'))
+    for f in ch: MEMO['info'].setdefault(f.replace('_',' '),None)
+    save_memo(); time.sleep(2.5)
+info=MEMO['info']
+print('Commons licenses read:',sum(1 for v in info.values() if v),flush=True)
 def clean_url(u):
     u=re.sub(r'^https://thumb\.wikimedia\.org/','https://upload.wikimedia.org/',u or '')
     return u.split('?')[0]
@@ -98,21 +114,27 @@ for it in items:
 # ---------- 4. check the thumbnails really load; one image per file ----------
 usedfile=set(); ok=[]; badcodes={}
 def check(u):
-    # only 404/403/410 mean the picture is really gone; anything else (429, 5xx, timeouts) is retried with backoff
-    for i in range(5):
+    # only 404/403/410 mean the picture is really gone; anything else (429, 5xx, timeouts) is retried, honouring Retry-After
+    if MEMO['head'].get(u)==200: return 200
+    for i in range(8):
         try:
-            return urllib.request.urlopen(urllib.request.Request(u,method='HEAD',headers=UA),timeout=25).status
+            st=urllib.request.urlopen(urllib.request.Request(u,method='HEAD',headers=UA),timeout=25).status
+            MEMO['head'][u]=st; return st
         except urllib.error.HTTPError as e:
             if e.code in (404,403,410): return e.code
-            time.sleep(4*(i+1))
+            time.sleep(int(e.headers.get('Retry-After') or 5)+2*i)
         except Exception:
             time.sleep(3)
     return 0
+n_=0
 for it in good:
     if it['file'] in usedfile: continue
     st=check(it['img']['thumb'])
+    n_+=1
+    if n_%40==0: save_memo(); print('   checked',n_,'of',len(good),'links',flush=True)
     if st!=200: drop['thumbnail did not load']+=1; badcodes[st]=badcodes.get(st,0)+1; continue
-    usedfile.add(it['file']); ok.append(it); time.sleep(0.7)
+    usedfile.add(it['file']); ok.append(it); time.sleep(0.5)
+save_memo()
 if badcodes: print('thumbnail failures by status code:',badcodes)
 print('usable images:',len(ok),{t:sum(1 for i in ok if i['tier']==t) for t in('EASY','MEDIUM','HARD')})
 print('dropped:',drop)
