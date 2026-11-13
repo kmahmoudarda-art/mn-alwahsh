@@ -273,6 +273,7 @@ export default function QuestionModal({
   onQuestionSwapped,
   onReportHandled,
   onResetTimer,
+  onSongStarted,
   bonusTier,
   bonusConf,
   isTrapTile = false,
@@ -1035,7 +1036,8 @@ export default function QuestionModal({
                       <SongPlayer key={question.id ?? question.youtube_id}
                         videoId={question.youtube_id}
                         start={question.audio_start}
-                        duration={question.audio_duration} />
+                        duration={question.audio_duration}
+                        onStarted={onSongStarted} />
                     )}
                     <p style={{ fontFamily:'var(--font-cairo)', fontWeight:800,
                       color:'#1a1a1a', fontSize: qFontSize > 14 ? qFontSize + 4 : qFontSize + 4,

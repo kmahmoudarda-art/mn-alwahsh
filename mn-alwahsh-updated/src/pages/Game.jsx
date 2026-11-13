@@ -98,8 +98,30 @@ export default function Game() {
 
   const stopTimer = useCallback(() => {
     clearInterval(timerRef.current);
+    pendingTimerRef.current = null;
     setTimerSeconds(null);
   }, []);
+
+  // Song questions: hold the countdown until the clip actually starts playing
+  // (after any YouTube ad). SongPlayer calls handleSongStarted.
+  const pendingTimerRef = useRef(null);
+  const beginQuestionTimer = useCallback((q, seconds) => {
+    if (q && q.youtube_id) {
+      clearInterval(timerRef.current);
+      pendingTimerRef.current = seconds;
+      setTimerSeconds(null);
+    } else {
+      pendingTimerRef.current = null;
+      startTimer(seconds);
+    }
+  }, [startTimer]);
+  const handleSongStarted = useCallback(() => {
+    const secs = pendingTimerRef.current;
+    if (secs != null) {
+      pendingTimerRef.current = null;
+      startTimer(secs);
+    }
+  }, [startTimer]);
 
 
 
@@ -414,13 +436,13 @@ export default function Game() {
     setActiveLifeline(prev => {
       if (prev === 'rest') {
         setStealMode(true);
-        startTimer(timerDuration);
+        beginQuestionTimer(q, timerDuration);
       } else {
-        startTimer(timerDuration);
+        beginQuestionTimer(q, timerDuration);
       }
       return prev;
     });
-  }, [currentTile, getQuestion, startTimer, quickTimerActiveFor, trapTile, categories]);
+  }, [currentTile, getQuestion, startTimer, beginQuestionTimer, quickTimerActiveFor, trapTile, categories]);
 
   const handleUseLifeline = useCallback((lifelineId) => {
     setTeamLifelines(prev => ({
@@ -576,7 +598,7 @@ export default function Game() {
       setAnswered(false);
       setSelectedAnswer(null);
       setIsCorrect(false);
-      if (newQ) startTimer(30);
+      if (newQ) beginQuestionTimer(newQ, 30);
     }
     if (newQ) setCurrentQuestion(newQ);
   }, [stopTimer, startTimer]);
@@ -1179,6 +1201,7 @@ export default function Game() {
             onQuestionSwapped={(newQ) => setCurrentQuestion(newQ)}
             onReportHandled={handleQuestionReported}
             onResetTimer={() => startTimer(30)}
+            onSongStarted={handleSongStarted}
             bonusTier={bonusTiles[`${currentTile?.colIndex}-${currentTile?.rowIndex}`] || null}
             bonusConf={BONUS_CONF}
             isTrapTile={trapTile === `${currentTile?.colIndex}-${currentTile?.rowIndex}`}
