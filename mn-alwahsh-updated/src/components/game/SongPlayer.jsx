@@ -8,10 +8,12 @@
 import { useEffect, useRef, useState } from 'react';
 
 const MAX_WAIT_MS = 60000; // never leave the game stuck if play is never pressed
+const CLIP_SECONDS = 5;   // how long each press of play lasts
 
 export default function SongPlayer({ itunesId, onStarted }) {
   const audioRef = useRef(null);
   const startedRef = useRef(false);
+  const stopTimerRef = useRef(null);
   const onStartedRef = useRef(onStarted);
   onStartedRef.current = onStarted;
   const [status, setStatus] = useState('loading'); // loading | ready | playing | error
@@ -33,7 +35,11 @@ export default function SongPlayer({ itunesId, onStarted }) {
         if (cancelled) return;
         const a = new Audio(url);
         a.preload = 'auto';
-        a.onplaying = () => { setStatus('playing'); fireStarted(); };
+        a.onplaying = () => {
+          setStatus('playing'); fireStarted();
+          clearTimeout(stopTimerRef.current);
+          stopTimerRef.current = setTimeout(() => a.pause(), CLIP_SECONDS * 1000);
+        };
         a.onpause = () => setStatus('ready');
         a.onended = () => setStatus('ready');
         a.onerror = () => { setStatus('error'); fireStarted(); };
@@ -44,6 +50,7 @@ export default function SongPlayer({ itunesId, onStarted }) {
     return () => {
       cancelled = true;
       clearTimeout(fallback);
+      clearTimeout(stopTimerRef.current);
       const a = audioRef.current;
       if (a) { a.onplaying = a.onpause = a.onended = a.onerror = null; a.pause(); }
       audioRef.current = null;
@@ -60,7 +67,7 @@ export default function SongPlayer({ itunesId, onStarted }) {
 
   const label = status === 'loading' ? '⏳ جاري التحميل…'
     : status === 'error' ? '⚠️ تعذّر تشغيل المقطع'
-    : status === 'playing' ? '⏸️ إيقاف' : '🎧 شغّل المقطع';
+    : status === 'playing' ? '⏸️ إيقاف' : (startedRef.current ? '🔁 أعد المقطع' : '🎧 شغّل المقطع');
 
   return (
     <div style={{ display:'flex', flexDirection:'column', alignItems:'center', marginBottom:12, flexShrink:0 }}>
@@ -70,7 +77,7 @@ export default function SongPlayer({ itunesId, onStarted }) {
         cursor: status === 'loading' || status === 'error' ? 'default' : 'pointer', minWidth:200,
       }}>{label}</button>
       <span style={{ fontFamily:'var(--font-cairo)', fontSize:11, color:'#555', marginTop:6 }}>
-        العدّاد يبدأ عند تشغيل المقطع · ♪ Preview by Apple
+        مقطع قصير (٥ ثوانٍ) · العدّاد يبدأ عند التشغيل · ♪ Preview by Apple
       </span>
     </div>
   );
