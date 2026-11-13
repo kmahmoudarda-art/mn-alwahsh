@@ -96,15 +96,24 @@ for it in items:
     if ii['mime'] not in('image/jpeg','image/png') or (ii['w'] or 0)<500 or not (0.45<=(ii['w']/max(ii['h'],1))<=2.6): drop['too small / odd shape / not jpg-png']+=1; continue
     ii['thumb']=clean_url(ii['thumb']); it['img']=ii; it['lic']=lc; good.append(it)
 # ---------- 4. check the thumbnails really load; one image per file ----------
-usedfile=set(); ok=[]
+usedfile=set(); ok=[]; badcodes={}
+def check(u):
+    # only 404/403/410 mean the picture is really gone; anything else (429, 5xx, timeouts) is retried with backoff
+    for i in range(5):
+        try:
+            return urllib.request.urlopen(urllib.request.Request(u,method='HEAD',headers=UA),timeout=25).status
+        except urllib.error.HTTPError as e:
+            if e.code in (404,403,410): return e.code
+            time.sleep(4*(i+1))
+        except Exception:
+            time.sleep(3)
+    return 0
 for it in good:
     if it['file'] in usedfile: continue
-    try:
-        r=urllib.request.urlopen(urllib.request.Request(it['img']['thumb'],method='HEAD',headers=UA),timeout=25); st=r.status
-    except urllib.error.HTTPError as e: st=e.code
-    except Exception: st=0
-    if st!=200: drop['thumbnail did not load']+=1; continue
-    usedfile.add(it['file']); ok.append(it); time.sleep(0.25)
+    st=check(it['img']['thumb'])
+    if st!=200: drop['thumbnail did not load']+=1; badcodes[st]=badcodes.get(st,0)+1; continue
+    usedfile.add(it['file']); ok.append(it); time.sleep(0.7)
+if badcodes: print('thumbnail failures by status code:',badcodes)
 print('usable images:',len(ok),{t:sum(1 for i in ok if i['tier']==t) for t in('EASY','MEDIUM','HARD')})
 print('dropped:',drop)
 # ---------- 5. questions ----------
