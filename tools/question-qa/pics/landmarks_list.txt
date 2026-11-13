@@ -184,7 +184,7 @@ Chefchaouen|شفشاون|city|المغرب
 Great Mosque of Kairouan|جامع القيروان الكبير|mosque|تونس
 Amphitheatre of El Jem|مسرح الجم|ancient|تونس
 Pamukkale|باموكالي|nature|تركيا
-Hegra (archaeological site)|مدائن صالح|ancient|السعودية
+Hegra|مدائن صالح|ancient|السعودية
 Shibam|شبام حضرموت|city|اليمن
 Socotra|سقطرى|nature|اليمن
 Aït Benhaddou|آيت بن حدو|ancient|المغرب

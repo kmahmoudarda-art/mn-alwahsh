@@ -40,10 +40,22 @@ for it in items:
     seen.add(k); uniq.append(it)
 items=uniq
 print('items in list:',len(items),{t:sum(1 for i in items if i['tier']==t) for t in('EASY','MEDIUM','HARD')})
+# ---------- 1b. resolve redirects / normalise titles on English Wikipedia ----------
+def chunks(a,n): return [a[i:i+n] for i in range(0,len(a),n)]
+canon={}
+for ch in chunks([i['title'] for i in items],30):
+    d=call("https://en.wikipedia.org/w/api.php?action=query&format=json&redirects=1&titles="+urllib.parse.quote('|'.join(ch)))
+    q=d.get('query',{}); norm={n['from']:n['to'] for n in q.get('normalized',[])}; red={r['from']:r['to'] for r in q.get('redirects',[])}
+    for t in ch:
+        x=norm.get(t,t); canon[t]=red.get(x,x)
+    time.sleep(3)
+for it in items: it['wtitle']=canon.get(it['title'],it['title'])
+changed=sum(1 for it in items if it['wtitle']!=it['title'])
+print('titles resolved through Wikipedia redirects:',changed)
 # ---------- 2. Wikidata image (P18) ----------
 def chunks(a,n): return [a[i:i+n] for i in range(0,len(a),n)]
 bytitle={}
-for ch in chunks([i['title'] for i in items],40):
+for ch in chunks(sorted({i['wtitle'] for i in items}),40):
     d=call("https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&props=claims|sitelinks&sitefilter=enwiki&sites=enwiki&titles="+urllib.parse.quote('|'.join(ch)))
     for e in d.get('entities',{}).values():
         sl=e.get('sitelinks',{}).get('enwiki',{}).get('title')
@@ -52,7 +64,7 @@ for ch in chunks([i['title'] for i in items],40):
             pref=[c for c in cl if c.get('rank')=='preferred'] or cl
             bytitle[sl.replace('_',' ').lower()]=pref[0]['mainsnak']['datavalue']['value']
     time.sleep(2.5)
-for it in items: it['file']=bytitle.get(it['title'].replace('_',' ').lower())
+for it in items: it['file']=bytitle.get(it['wtitle'].replace('_',' ').lower())
 # ---------- 3. Commons license + thumbnail ----------
 info={}
 files=sorted({i['file'] for i in items if i['file']})
