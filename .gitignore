@@ -10,3 +10,5 @@ ios/build/
 backups/
 tools/question-qa/tier_work/
 .vite/
+tools/question-qa/pics/memo_*.json
+tools/question-qa/pics/preview_*.json
