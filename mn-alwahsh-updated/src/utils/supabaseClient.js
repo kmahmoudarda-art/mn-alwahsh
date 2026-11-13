@@ -440,6 +440,7 @@ function normalizeRow(row, sourceTable) {
     explanation: row.explanation || '',
     points: row.points,
     image_url: row.image_url || null,
+    itunes_id: row.itunes_id || null,
   };
 }
 
