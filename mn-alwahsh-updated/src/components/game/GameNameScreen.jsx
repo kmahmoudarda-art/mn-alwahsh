@@ -738,18 +738,36 @@ export default function GameNameScreen({ onEnter }) {
       {/* Privacy policy — discoverable from the entry screen, required by
           Google Play (previously only reachable if you already knew the
           /privacy URL, with no in-app link anywhere). */}
-      <button
-        type="button"
-        onClick={() => navigate('/privacy')}
+      <div
         style={{
           position: 'fixed', bottom: 10, left: '50%', transform: 'translateX(-50%)',
-          zIndex: 9000, background: 'none', border: 'none',
-          color: 'rgba(255,180,180,0.5)', fontFamily: 'var(--font-tajawal)', fontSize: 11,
-          textDecoration: 'underline', cursor: 'pointer',
+          zIndex: 9000, display: 'flex', gap: 14, alignItems: 'center',
         }}
       >
-        سياسة الخصوصية
-      </button>
+        <button
+          type="button"
+          onClick={() => navigate('/privacy')}
+          style={{
+            background: 'none', border: 'none',
+            color: 'rgba(255,180,180,0.5)', fontFamily: 'var(--font-tajawal)', fontSize: 11,
+            textDecoration: 'underline', cursor: 'pointer',
+          }}
+        >
+          سياسة الخصوصية
+        </button>
+        {/* Picture categories use Wikimedia Commons images; CC BY / BY-SA need credit. */}
+        <a
+          href="/image-credits.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            color: 'rgba(255,180,180,0.5)', fontFamily: 'var(--font-tajawal)', fontSize: 11,
+            textDecoration: 'underline',
+          }}
+        >
+          حقوق الصور
+        </a>
+      </div>
     </div>
   );
 }

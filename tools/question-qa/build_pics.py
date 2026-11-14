@@ -177,6 +177,30 @@ json.dump(rows,open(f"pics/preview_{TAG}.json",'w'),ensure_ascii=False)
 if not INSERT or short: sys.exit('DRY RUN: nothing inserted' if not INSERT else 'REFUSED: every tier needs exactly 60')
 for t in ('Fam','Sin-Jim1'):
     if req('GET',f"{urllib.parse.quote(t)}?select=question&category=eq.{urllib.parse.quote(CFG['cat'])}&limit=1"): sys.exit('REFUSED: category already exists in '+t)
+# ---------- 6. copy every image into our own Supabase storage so nothing depends on Wikimedia at play time ----------
+SB=BASE.split('/rest/v1')[0]; BUCKET='quiz-pics'
+def sb(method,path,data=None,ctype='application/json'):
+    h=dict(H); h['Content-Type']=ctype
+    return urllib.request.urlopen(urllib.request.Request(SB+path,data=data,method=method,headers=h),timeout=60)
+try: sb('POST','/storage/v1/bucket',json.dumps({'id':BUCKET,'name':BUCKET,'public':True}).encode())
+except urllib.error.HTTPError as e:
+    if e.code not in (400,409): raise
+def fetch(u):
+    for i in range(8):
+        try: return urllib.request.urlopen(urllib.request.Request(u,headers=UA),timeout=40).read()
+        except urllib.error.HTTPError as e: time.sleep(int(e.headers.get('Retry-After') or 5)+2*i)
+        except Exception: time.sleep(3)
+    return None
+for n,r in enumerate(rows):
+    data=fetch(r['image_url'])
+    if not data: sys.exit('REFUSED: could not download '+r['image_url'])
+    ext='png' if r['image_url'].lower().endswith('.png') else 'jpg'
+    path=f"{KIND}/{r['points']}_{n:03d}.{ext}"
+    h=dict(H); h['Content-Type']='image/png' if ext=='png' else 'image/jpeg'; h['x-upsert']='true'
+    urllib.request.urlopen(urllib.request.Request(f"{SB}/storage/v1/object/{BUCKET}/{path}",data=data,method='POST',headers=h),timeout=60)
+    r['image_url']=f"{SB}/storage/v1/object/public/{BUCKET}/{path}"
+    time.sleep(0.3)
+print('images copied to storage:',len(rows))
 out=[{k:v for k,v in r.items() if k!='_credit'} for r in rows]
 for i in range(0,len(out),90): req('POST','Fam',out[i:i+90])
 print(f"INSERTED {len(out)} rows into Fam / {CFG['cat']}")
