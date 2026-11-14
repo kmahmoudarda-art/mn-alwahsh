@@ -24,6 +24,14 @@
   "needs_attribution": false
  },
  {
+  "title": "The Last Supper (Leonardo)",
+  "file": "Leonardo da Vinci (1452-1519) - The Last Supper (1495-1498).jpg",
+  "license": "Public domain",
+  "artist": "Leonardo da Vinci",
+  "page": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_(1452-1519)_-_The_Last_Supper_(1495-1498).jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "Girl with a Pearl Earring",
   "file": "1665 Girl with a Pearl Earring.jpg",
   "license": "Public domain",
@@ -48,12 +56,36 @@
   "needs_attribution": false
  },
  {
+  "title": "The Great Wave off Kanagawa",
+  "file": "Katsushika Hokusai - The Great Wave off the Coast of Kanagawa LCCN2008660568.jpg",
+  "license": "Public domain",
+  "artist": "Katsushika, Hokusai, 1760-1849, artist",
+  "page": "https://commons.wikimedia.org/wiki/File:Katsushika_Hokusai_-_The_Great_Wave_off_the_Coast_of_Kanagawa_LCCN2008660568.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "Sunflowers (Van Gogh series)",
   "file": "Vincent Willem van Gogh 127.jpg",
   "license": "Public domain",
   "artist": "Vincent van Gogh",
   "page": "https://commons.wikimedia.org/wiki/File:Vincent_Willem_van_Gogh_127.jpg",
   "needs_attribution": false
+ },
+ {
+  "title": "The Creation of Adam",
+  "file": "The Creation of Adam perspective fix.jpg",
+  "license": "Public domain",
+  "artist": "Michelangelo",
+  "page": "https://commons.wikimedia.org/wiki/File:The_Creation_of_Adam_perspective_fix.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Water Lilies (Monet series)",
+  "file": "Claude Monet Seerosen um 1915 Neue Pinakothek-4.jpg",
+  "license": "CC BY-SA 3.0",
+  "artist": "Rufus46",
+  "page": "https://commons.wikimedia.org/wiki/File:Claude_Monet_Seerosen_um_1915_Neue_Pinakothek-4.jpg",
+  "needs_attribution": true
  },
  {
   "title": "Napoleon Crossing the Alps",
@@ -64,11 +96,67 @@
   "needs_attribution": false
  },
  {
+  "title": "The Blue Boy",
+  "file": "Thomas Gainsborough - The Blue Boy (c. 1770).jpg",
+  "license": "Public domain",
+  "artist": "Thomas Gainsborough",
+  "page": "https://commons.wikimedia.org/wiki/File:Thomas_Gainsborough_-_The_Blue_Boy_(c._1770).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Venus of Urbino",
+  "file": "Tiziano's Venere di Urbino (from The History BLog).jpg",
+  "license": "Public domain",
+  "artist": "Titian",
+  "page": "https://commons.wikimedia.org/wiki/File:Tiziano%27s_Venere_di_Urbino_(from_The_History_BLog).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "La maja desnuda",
+  "file": "Maja desnuda (museo del Prado).jpg",
+  "license": "Public domain",
+  "artist": "Francisco Goya",
+  "page": "https://commons.wikimedia.org/wiki/File:Maja_desnuda_(museo_del_Prado).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Saturn Devouring His Son",
+  "file": "Francisco de Goya, Saturno devorando a su hijo (1819-1823).jpg",
+  "license": "Public domain",
+  "artist": "Francisco Goya",
+  "page": "https://commons.wikimedia.org/wiki/File:Francisco_de_Goya,_Saturno_devorando_a_su_hijo_(1819-1823).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Café Terrace at Night",
+  "file": "Van Gogh - Terrace of a Café at Night (Place du Forum) 1888.jpg",
+  "license": "Public domain",
+  "artist": "Vincent van Gogh",
+  "page": "https://commons.wikimedia.org/wiki/File:Van_Gogh_-_Terrace_of_a_Caf%C3%A9_at_Night_(Place_du_Forum)_1888.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "The Fighting Temeraire",
   "file": "Turner, J. M. W. - The Fighting Téméraire tugged to her last Berth to be broken.jpg",
   "license": "Public domain",
   "artist": "J. M. W. Turner",
   "page": "https://commons.wikimedia.org/wiki/File:Turner,_J._M._W._-_The_Fighting_T%C3%A9m%C3%A9raire_tugged_to_her_last_Berth_to_be_broken.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Grande Odalisque",
+  "file": "La grande odalisque - Jean-Auguste Dominique Ingres - Musée du Louvre Peintures RF 1158.jpg",
+  "license": "Public domain",
+  "artist": "Jean-Auguste-Dominique Ingres",
+  "page": "https://commons.wikimedia.org/wiki/File:La_grande_odalisque_-_Jean-Auguste_Dominique_Ingres_-_Mus%C3%A9e_du_Louvre_Peintures_RF_1158.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Le Déjeuner sur l'herbe",
+  "file": "Edouard Manet - Luncheon on the Grass - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Édouard Manet",
+  "page": "https://commons.wikimedia.org/wiki/File:Edouard_Manet_-_Luncheon_on_the_Grass_-_Google_Art_Project.jpg",
   "needs_attribution": false
  },
  {
@@ -104,6 +192,14 @@
   "needs_attribution": false
  },
  {
+  "title": "The Garden of Earthly Delights",
+  "file": "The Garden of Earthly Delights by Bosch High Resolution 2.jpg",
+  "license": "Public domain",
+  "artist": "Hieronymus Bosch",
+  "page": "https://commons.wikimedia.org/wiki/File:The_Garden_of_Earthly_Delights_by_Bosch_High_Resolution_2.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "The School of Athens",
   "file": "\"The School of Athens\" by Raffaello Sanzio da Urbino.jpg",
   "license": "Public domain",
@@ -117,6 +213,22 @@
   "license": "Public domain",
   "artist": "Jan van Eyck",
   "page": "https://commons.wikimedia.org/wiki/File:Van_Eyck_-_Arnolfini_Portrait.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Wanderer Above the Sea of Fog",
+  "file": "Friedrich, Caspar David - Wanderer über dem Nebelmeer.jpg",
+  "license": "Public domain",
+  "artist": "Caspar David Friedrich",
+  "page": "https://commons.wikimedia.org/wiki/File:Friedrich,_Caspar_David_-_Wanderer_%C3%BCber_dem_Nebelmeer.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Anatomy Lesson of Dr. Nicolaes Tulp",
+  "file": "Rembrandt - The Anatomy Lesson of Dr Nicolaes Tulp.jpg",
+  "license": "Public domain",
+  "artist": "Rembrandt",
+  "page": "https://commons.wikimedia.org/wiki/File:Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg",
   "needs_attribution": false
  },
  {
@@ -136,11 +248,27 @@
   "needs_attribution": false
  },
  {
-  "title": "Bal du moulin de la Galette",
-  "file": "Renoir, Pierre-Auguste - Dance at Le Moulin de la Galette, 1876.jpg",
+  "title": "The Gleaners",
+  "file": "Jean-François Millet - Des glaneuses.jpg",
   "license": "Public domain",
-  "artist": "Pierre-Auguste Renoir",
-  "page": "https://commons.wikimedia.org/wiki/File:Renoir,_Pierre-Auguste_-_Dance_at_Le_Moulin_de_la_Galette,_1876.jpg",
+  "artist": "Jean-François Millet",
+  "page": "https://commons.wikimedia.org/wiki/File:Jean-Fran%C3%A7ois_Millet_-_Des_glaneuses.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Angelus (painting)",
+  "file": "JEAN-FRANÇOIS MILLET - El Ángelus (Museo de Orsay, 1857-1859. Óleo sobre lienzo, 55.5 x 66 cm).jpg",
+  "license": "Public domain",
+  "artist": "Jean-François Millet",
+  "page": "https://commons.wikimedia.org/wiki/File:JEAN-FRAN%C3%87OIS_MILLET_-_El_%C3%81ngelus_(Museo_de_Orsay,_1857-1859._%C3%93leo_sobre_lienzo,_55.5_x_66_cm).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Hunters in the Snow",
+  "file": "Pieter Bruegel the Elder - Hunters in the Snow (Winter) - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Pieter Brueghel the Elder",
+  "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_(Winter)_-_Google_Art_Project.jpg",
   "needs_attribution": false
  },
  {
@@ -160,11 +288,67 @@
   "needs_attribution": false
  },
  {
+  "title": "The Tortoise Trainer",
+  "file": "Osman Hamdi Bey - The Tortoise Trainer - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Osman Hamdi Bey",
+  "page": "https://commons.wikimedia.org/wiki/File:Osman_Hamdi_Bey_-_The_Tortoise_Trainer_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Women of Algiers",
+  "file": "Femmes d'Alger dans leur appartement, Eugène Delacroix - Musée du Louvre Peintures INV 3824.jpg",
+  "license": "Public domain",
+  "artist": "Eugène Delacroix",
+  "page": "https://commons.wikimedia.org/wiki/File:Femmes_d%27Alger_dans_leur_appartement,_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_INV_3824.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Flaming June",
+  "file": "Flaming June, by Frederic Lord Leighton (1830-1896).jpg",
+  "license": "Public domain",
+  "artist": "Frederic Leighton",
+  "page": "https://commons.wikimedia.org/wiki/File:Flaming_June,_by_Frederic_Lord_Leighton_(1830-1896).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Lady of Shalott (Waterhouse)",
+  "file": "John William Waterhouse - The Lady of Shalott - Google Art Project (derivative work - AutoContrast edit in LCH space).jpg",
+  "license": "Public domain",
+  "artist": "John William Waterhouse",
+  "page": "https://commons.wikimedia.org/wiki/File:John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project_(derivative_work_-_AutoContrast_edit_in_LCH_space).jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "The Sleeping Gypsy",
   "file": "La Bohémienne endormie.jpg",
   "license": "Public domain",
   "artist": "Henri Rousseau",
   "page": "https://commons.wikimedia.org/wiki/File:La_Boh%C3%A9mienne_endormie.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Landscape with the Fall of Icarus",
+  "file": "Pieter Bruegel the Elder - Landscape with the Fall of Icarus - Brussels, Royal Museums of Fine Arts of Belgium - Google Arts & Culture.jpg",
+  "license": "Public domain",
+  "artist": "After Pieter Brueghel the Elder",
+  "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Landscape_with_the_Fall_of_Icarus_-_Brussels,_Royal_Museums_of_Fine_Arts_of_Belgium_-_Google_Arts_%26_Culture.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Laughing Cavalier",
+  "file": "Frans Hals – The Laughing Cavalier.jpg",
+  "license": "Public domain",
+  "artist": "Frans Hals",
+  "page": "https://commons.wikimedia.org/wiki/File:Frans_Hals_%E2%80%93_The_Laughing_Cavalier.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Portrait of Adele Bloch-Bauer I",
+  "file": "Gustav Klimt, 1907, Adele Bloch-Bauer I, Neue Galerie New York.jpg",
+  "license": "Public domain",
+  "artist": "Gustav Klimt",
+  "page": "https://commons.wikimedia.org/wiki/File:Gustav_Klimt,_1907,_Adele_Bloch-Bauer_I,_Neue_Galerie_New_York.jpg",
   "needs_attribution": false
  },
  {
@@ -184,6 +368,46 @@
   "needs_attribution": false
  },
  {
+  "title": "The Card Players",
+  "file": "Paul Cézanne, Les joueurs de carte (1892-95).jpg",
+  "license": "Public domain",
+  "artist": "Paul Cézanne",
+  "page": "https://commons.wikimedia.org/wiki/File:Paul_C%C3%A9zanne,_Les_joueurs_de_carte_(1892-95).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Irises (painting)",
+  "file": "Irises-Vincent van Gogh.jpg",
+  "license": "Public domain",
+  "artist": "Vincent van Gogh",
+  "page": "https://commons.wikimedia.org/wiki/File:Irises-Vincent_van_Gogh.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "View of Delft",
+  "file": "Johannes Vermeer - View of Delft - 92 - Mauritshuis.jpg",
+  "license": "Public domain",
+  "artist": "Johannes Vermeer",
+  "page": "https://commons.wikimedia.org/wiki/File:Johannes_Vermeer_-_View_of_Delft_-_92_-_Mauritshuis.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Portrait of Madame X",
+  "file": "Sargent MadameX.jpeg",
+  "license": "Public domain",
+  "artist": "John Singer Sargent",
+  "page": "https://commons.wikimedia.org/wiki/File:Sargent_MadameX.jpeg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Swing (Fragonard)",
+  "file": "Fragonard, The Swing.jpg",
+  "license": "Public domain",
+  "artist": "Jean-Honoré Fragonard",
+  "page": "https://commons.wikimedia.org/wiki/File:Fragonard,_The_Swing.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "The Last Judgment (Michelangelo)",
   "file": "Last Judgement (Michelangelo).jpg",
   "license": "Public domain",
@@ -200,6 +424,22 @@
   "needs_attribution": false
  },
  {
+  "title": "Judith Beheading Holofernes (Caravaggio)",
+  "file": "Judith Beheading Holofernes - Caravaggio.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Caravaggio",
+  "page": "https://commons.wikimedia.org/wiki/File:Judith_Beheading_Holofernes_-_Caravaggio.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "Bacchus (Caravaggio)",
+  "file": "Bacchus by Caravaggio 1.jpg",
+  "license": "Public domain",
+  "artist": "Caravaggio",
+  "page": "https://commons.wikimedia.org/wiki/File:Bacchus_by_Caravaggio_1.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "The Ninth Wave",
   "file": "Hovhannes Aivazovsky - The Ninth Wave - Google Art Project.jpg",
   "license": "Public domain",
@@ -208,59 +448,35 @@
   "needs_attribution": false
  },
  {
-  "title": "Oath of the Horatii",
-  "file": "Le Serment des Horaces - Jacques-Louis David - Musée du Louvre Peintures INV 3692 ; MR 1432.jpg",
+  "title": "Composition VII",
+  "file": "Composition VII - Wassily Kandinsky, GAC.jpg",
   "license": "Public domain",
-  "artist": "Jacques-Louis David",
-  "page": "https://commons.wikimedia.org/wiki/File:Le_Serment_des_Horaces_-_Jacques-Louis_David_-_Mus%C3%A9e_du_Louvre_Peintures_INV_3692_;_MR_1432.jpg",
+  "artist": "Wassily Kandinsky",
+  "page": "https://commons.wikimedia.org/wiki/File:Composition_VII_-_Wassily_Kandinsky,_GAC.jpg",
   "needs_attribution": false
  },
  {
-  "title": "Madonna (Munch)",
-  "file": "Edvard Munch - Madonna - Google Art Project.jpg",
+  "title": "The Dream (Rousseau)",
+  "file": "Henri Rousseau 005.jpg",
   "license": "Public domain",
-  "artist": "Edvard Munch",
-  "page": "https://commons.wikimedia.org/wiki/File:Edvard_Munch_-_Madonna_-_Google_Art_Project.jpg",
+  "artist": "Henri Rousseau",
+  "page": "https://commons.wikimedia.org/wiki/File:Henri_Rousseau_005.jpg",
   "needs_attribution": false
  },
  {
-  "title": "Woman with a Parasol – Madame Monet and Her Son",
-  "file": "Claude Monet - Woman with a Parasol - Madame Monet and Her Son - Google Art Project.jpg",
+  "title": "The Turkish Bath",
+  "file": "Le Bain Turc, by Jean Auguste Dominique Ingres, from C2RMFFXD.jpg",
   "license": "Public domain",
-  "artist": "Claude Monet",
-  "page": "https://commons.wikimedia.org/wiki/File:Claude_Monet_-_Woman_with_a_Parasol_-_Madame_Monet_and_Her_Son_-_Google_Art_Project.jpg",
+  "artist": "Jean-Auguste-Dominique Ingres",
+  "page": "https://commons.wikimedia.org/wiki/File:Le_Bain_Turc,_by_Jean_Auguste_Dominique_Ingres,_from_C2RMFFXD.jpg",
   "needs_attribution": false
  },
  {
-  "title": "The Lacemaker (Vermeer)",
-  "file": "Johannes Vermeer - The lacemaker (c.1669-1671).jpg",
+  "title": "The Slave Ship",
+  "file": "Slave-ship.jpg",
   "license": "Public domain",
-  "artist": "Johannes Vermeer",
-  "page": "https://commons.wikimedia.org/wiki/File:Johannes_Vermeer_-_The_lacemaker_(c.1669-1671).jpg",
-  "needs_attribution": false
- },
- {
-  "title": "Judith I",
-  "file": "Judith 1 (cropped).jpg",
-  "license": "Public domain",
-  "artist": "Gustav Klimt",
-  "page": "https://commons.wikimedia.org/wiki/File:Judith_1_(cropped).jpg",
-  "needs_attribution": false
- },
- {
-  "title": "Shahnameh of Shah Tahmasp",
-  "file": "Khalili Collection Islamic Art MSS 1030-731a.jpg",
-  "license": "CC BY-SA 3.0 igo",
-  "artist": "Khalili Collections",
-  "page": "https://commons.wikimedia.org/wiki/File:Khalili_Collection_Islamic_Art_MSS_1030-731a.jpg",
-  "needs_attribution": true
- },
- {
-  "title": "Great Mongol Shahnameh",
-  "file": "Demotte Shahname 003.jpg",
-  "license": "Public domain",
-  "artist": "anonymous",
-  "page": "https://commons.wikimedia.org/wiki/File:Demotte_Shahname_003.jpg",
+  "artist": "J. M. W. Turner",
+  "page": "https://commons.wikimedia.org/wiki/File:Slave-ship.jpg",
   "needs_attribution": false
  },
  {
@@ -272,11 +488,171 @@
   "needs_attribution": false
  },
  {
+  "title": "The Death of Caesar (Gérôme)",
+  "file": "Jean-Léon Gérôme - The Death of Caesar - Walters 37884.jpg",
+  "license": "Public domain",
+  "artist": "Jean-Léon Gérôme",
+  "page": "https://commons.wikimedia.org/wiki/File:Jean-L%C3%A9on_G%C3%A9r%C3%B4me_-_The_Death_of_Caesar_-_Walters_37884.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Monk by the Sea",
+  "file": "Friedrich, Caspar David - Mönch am Meer - Alte Nationalgalerie in Berlin.jpg",
+  "license": "Public domain",
+  "artist": "Caspar David Friedrich",
+  "page": "https://commons.wikimedia.org/wiki/File:Friedrich,_Caspar_David_-_M%C3%B6nch_am_Meer_-_Alte_Nationalgalerie_in_Berlin.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Sea of Ice",
+  "file": "Friedrich, Caspar David - Eismeer.jpg",
+  "license": "Public domain",
+  "artist": "Caspar David Friedrich",
+  "page": "https://commons.wikimedia.org/wiki/File:Friedrich,_Caspar_David_-_Eismeer.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Stone Breakers",
+  "file": "Gustave Courbet 018.jpg",
+  "license": "Public domain",
+  "artist": "Gustave Courbet",
+  "page": "https://commons.wikimedia.org/wiki/File:Gustave_Courbet_018.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "A Burial at Ornans",
+  "file": "Gustave Courbet - A Burial at Ornans - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Gustave Courbet",
+  "page": "https://commons.wikimedia.org/wiki/File:Gustave_Courbet_-_A_Burial_at_Ornans_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Painter's Studio",
+  "file": "Courbet LAtelier du peintre.jpg",
+  "license": "Public domain",
+  "artist": "Gustave Courbet",
+  "page": "https://commons.wikimedia.org/wiki/File:Courbet_LAtelier_du_peintre.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "A Bar at the Folies-Bergère",
+  "file": "Un bar aux Folies-Bergère d'E. Manet (Fondation Vuitton, Paris) (33539037428).jpg",
+  "license": "CC BY 2.0",
+  "artist": "Édouard Manet",
+  "page": "https://commons.wikimedia.org/wiki/File:Un_bar_aux_Folies-Berg%C3%A8re_d%27E._Manet_(Fondation_Vuitton,_Paris)_(33539037428).jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "The Balcony (Manet)",
+  "file": "Edouard Manet - The Balcony - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Édouard Manet",
+  "page": "https://commons.wikimedia.org/wiki/File:Edouard_Manet_-_The_Balcony_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "L'Absinthe",
   "file": "Edgar Degas - In a Café - Google Art Project 2.jpg",
   "license": "Public domain",
   "artist": "Edgar Degas",
   "page": "https://commons.wikimedia.org/wiki/File:Edgar_Degas_-_In_a_Caf%C3%A9_-_Google_Art_Project_2.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Bathers at Asnières",
+  "file": "Baigneurs a Asnieres.jpg",
+  "license": "Public domain",
+  "artist": "Georges Seurat",
+  "page": "https://commons.wikimedia.org/wiki/File:Baigneurs_a_Asnieres.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Paris Street; Rainy Day",
+  "file": "Gustave Caillebotte - Paris Street, Rainy Day - 1964.336 - Art Institute of Chicago.jpg",
+  "license": "Public domain",
+  "artist": "Gustave Caillebotte",
+  "page": "https://commons.wikimedia.org/wiki/File:Gustave_Caillebotte_-_Paris_Street,_Rainy_Day_-_1964.336_-_Art_Institute_of_Chicago.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Les raboteurs de parquet",
+  "file": "Gustave Caillebotte - The Floor Planers - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Gustave Caillebotte",
+  "page": "https://commons.wikimedia.org/wiki/File:Gustave_Caillebotte_-_The_Floor_Planers_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "At the Moulin Rouge",
+  "file": "Henri de Toulouse-Lautrec - At the Moulin Rouge - 1928.610 - Art Institute of Chicago.jpg",
+  "license": "Public domain",
+  "artist": "Henri de Toulouse-Lautrec",
+  "page": "https://commons.wikimedia.org/wiki/File:Henri_de_Toulouse-Lautrec_-_At_the_Moulin_Rouge_-_1928.610_-_Art_Institute_of_Chicago.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Dance at Bougival",
+  "file": "Dance-At-Bougival.jpg",
+  "license": "Public domain",
+  "artist": "Pierre-Auguste Renoir",
+  "page": "https://commons.wikimedia.org/wiki/File:Dance-At-Bougival.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Carnation, Lily, Lily, Rose",
+  "file": "John Singer Sargent - Carnation, Lily, Lily, Rose - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "John Singer Sargent",
+  "page": "https://commons.wikimedia.org/wiki/File:John_Singer_Sargent_-_Carnation,_Lily,_Lily,_Rose_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Gulf Stream (painting)",
+  "file": "Winslow Homer - The Gulf Stream - Metropolitan Museum of Art.jpg",
+  "license": "Public domain",
+  "artist": "Winslow Homer",
+  "page": "https://commons.wikimedia.org/wiki/File:Winslow_Homer_-_The_Gulf_Stream_-_Metropolitan_Museum_of_Art.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Breezing Up (A Fair Wind)",
+  "file": "Winslow Homer - Breezing Up (A Fair Wind).jpg",
+  "license": "Public domain",
+  "artist": "Winslow Homer",
+  "page": "https://commons.wikimedia.org/wiki/File:Winslow_Homer_-_Breezing_Up_(A_Fair_Wind).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Horse Fair",
+  "file": "Rosa Bonheur, The Horse Fair, 1852–55.jpg",
+  "license": "Public domain",
+  "artist": "Rosa Bonheur",
+  "page": "https://commons.wikimedia.org/wiki/File:Rosa_Bonheur,_The_Horse_Fair,_1852%E2%80%9355.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Third-Class Carriage",
+  "file": "Honoré Daumier (French, Marseilles 1808–1879 Valmondois) - The Third-Class Carriage - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Honoré Daumier",
+  "page": "https://commons.wikimedia.org/wiki/File:Honor%C3%A9_Daumier_(French,_Marseilles_1808%E2%80%931879_Valmondois)_-_The_Third-Class_Carriage_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Last Day of Pompeii",
+  "file": "Karl Brullov - The Last Day of Pompeii - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Karl Bryullov",
+  "page": "https://commons.wikimedia.org/wiki/File:Karl_Brullov_-_The_Last_Day_of_Pompeii_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Barge Haulers on the Volga",
+  "file": "Ilya Repin - Barge Haulers on the Volga - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Ilya Repin",
+  "page": "https://commons.wikimedia.org/wiki/File:Ilya_Repin_-_Barge_Haulers_on_the_Volga_-_Google_Art_Project.jpg",
   "needs_attribution": false
  },
  {
@@ -296,11 +672,51 @@
   "needs_attribution": false
  },
  {
+  "title": "Battle of Grunwald (Matejko)",
+  "file": "Jan Matejko, Bitwa pod Grunwaldem.jpg",
+  "license": "Public domain",
+  "artist": "Jan Matejko",
+  "page": "https://commons.wikimedia.org/wiki/File:Jan_Matejko,_Bitwa_pod_Grunwaldem.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Apotheosis of War",
+  "file": "1871 Vereshchagin Apotheose des Krieges anagoria.JPG",
+  "license": "Public domain",
+  "artist": "Vasily Vereshchagin",
+  "page": "https://commons.wikimedia.org/wiki/File:1871_Vereshchagin_Apotheose_des_Krieges_anagoria.JPG",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Kiss (Hayez)",
+  "file": "El Beso (Pinacoteca de Brera, Milán, 1859).jpg",
+  "license": "Public domain",
+  "artist": "Francesco Hayez",
+  "page": "https://commons.wikimedia.org/wiki/File:El_Beso_(Pinacoteca_de_Brera,_Mil%C3%A1n,_1859).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Birth of Venus (Cabanel)",
+  "file": "Alexandre Cabanel - The Birth of Venus - Google Art Project 2.jpg",
+  "license": "Public domain",
+  "artist": "Alexandre Cabanel",
+  "page": "https://commons.wikimedia.org/wiki/File:Alexandre_Cabanel_-_The_Birth_of_Venus_-_Google_Art_Project_2.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "The Birth of Venus (Bouguereau)",
   "file": "William-Adolphe Bouguereau (1825-1905) - The Birth of Venus (1879).jpg",
   "license": "Public domain",
   "artist": "William-Adolphe Bouguereau",
   "page": "https://commons.wikimedia.org/wiki/File:William-Adolphe_Bouguereau_(1825-1905)_-_The_Birth_of_Venus_(1879).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Roses of Heliogabalus",
+  "file": "The Roses of Heliogabalus.jpg",
+  "license": "Public domain",
+  "artist": "Lawrence Alma-Tadema",
+  "page": "https://commons.wikimedia.org/wiki/File:The_Roses_of_Heliogabalus.jpg",
   "needs_attribution": false
  },
  {
@@ -312,6 +728,62 @@
   "needs_attribution": false
  },
  {
+  "title": "The Execution of Lady Jane Grey",
+  "file": "PAUL DELAROCHE - Ejecución de Lady Jane Grey (National Gallery de Londres, 1834).jpg",
+  "license": "Public domain",
+  "artist": "Paul Delaroche",
+  "page": "https://commons.wikimedia.org/wiki/File:PAUL_DELAROCHE_-_Ejecuci%C3%B3n_de_Lady_Jane_Grey_(National_Gallery_de_Londres,_1834).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Awakening Conscience",
+  "file": "William Holman Hunt - The Awakening Conscience - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "William Holman Hunt",
+  "page": "https://commons.wikimedia.org/wiki/File:William_Holman_Hunt_-_The_Awakening_Conscience_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Beata Beatrix",
+  "file": "Dante Gabriel Rossetti - Beata Beatrix - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Dante Gabriel Rossetti",
+  "page": "https://commons.wikimedia.org/wiki/File:Dante_Gabriel_Rossetti_-_Beata_Beatrix_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Death of Chatterton",
+  "file": "Henry Wallis - Chatterton - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Henry Wallis",
+  "page": "https://commons.wikimedia.org/wiki/File:Henry_Wallis_-_Chatterton_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Peasant Wedding",
+  "file": "Pieter Bruegel the Elder - Peasant Wedding - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Pieter Brueghel the Elder",
+  "page": "https://commons.wikimedia.org/wiki/File:Pieter_Bruegel_the_Elder_-_Peasant_Wedding_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Jewish Bride",
+  "file": "Rembrandt Harmensz. van Rijn - Portret van een paar als oudtestamentische figuren, genaamd 'Het Joodse bruidje' - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Rembrandt",
+  "page": "https://commons.wikimedia.org/wiki/File:Rembrandt_Harmensz._van_Rijn_-_Portret_van_een_paar_als_oudtestamentische_figuren,_genaamd_%27Het_Joodse_bruidje%27_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Merry Drinker",
+  "file": "Frans Hals 002.jpg",
+  "license": "Public domain",
+  "artist": "Frans Hals",
+  "page": "https://commons.wikimedia.org/wiki/File:Frans_Hals_002.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "Virgin of the Rocks",
   "file": "Leonardo Da Vinci - Vergine delle Rocce (Louvre).jpg",
   "license": "Public domain",
@@ -320,11 +792,115 @@
   "needs_attribution": false
  },
  {
+  "title": "The Tempest (Giorgione)",
+  "file": "Giorgione - Das Gewitter.jpg",
+  "license": "Public domain",
+  "artist": "Giorgione",
+  "page": "https://commons.wikimedia.org/wiki/File:Giorgione_-_Das_Gewitter.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Bacchus and Ariadne",
+  "file": "Titian Bacchus and Ariadne.jpg",
+  "license": "Public domain",
+  "artist": "Titian",
+  "page": "https://commons.wikimedia.org/wiki/File:Titian_Bacchus_and_Ariadne.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Assumption of the Virgin (Titian)",
+  "file": "Tizian 041.jpg",
+  "license": "Public domain",
+  "artist": "Titian",
+  "page": "https://commons.wikimedia.org/wiki/File:Tizian_041.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Young Hare",
+  "file": "Albrecht Dürer - Hare, 1502 - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Albrecht Dürer",
+  "page": "https://commons.wikimedia.org/wiki/File:Albrecht_D%C3%BCrer_-_Hare,_1502_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Isenheim Altarpiece",
+  "file": "Isenheim Altarpiece - In situ (cropped).jpg",
+  "license": "Public domain",
+  "artist": "Matthias Grünewald / Nikolaus Hagenauer",
+  "page": "https://commons.wikimedia.org/wiki/File:Isenheim_Altarpiece_-_In_situ_(cropped).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Burial of the Count of Orgaz",
+  "file": "El Greco - The Burial of the Count of Orgaz.JPG",
+  "license": "Public domain",
+  "artist": "El Greco",
+  "page": "https://commons.wikimedia.org/wiki/File:El_Greco_-_The_Burial_of_the_Count_of_Orgaz.JPG",
+  "needs_attribution": false
+ },
+ {
+  "title": "View of Toledo",
+  "file": "El Greco View of Toledo.jpg",
+  "license": "Public domain",
+  "artist": "El Greco",
+  "page": "https://commons.wikimedia.org/wiki/File:El_Greco_View_of_Toledo.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Surrender of Breda",
+  "file": "Velazquez-The Surrender of Breda.jpg",
+  "license": "Public domain",
+  "artist": "Diego Velázquez",
+  "page": "https://commons.wikimedia.org/wiki/File:Velazquez-The_Surrender_of_Breda.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Las Hilanderas",
+  "file": "Velazquez-las hilanderas.jpg",
+  "license": "Public domain",
+  "artist": "Diego Velázquez",
+  "page": "https://commons.wikimedia.org/wiki/File:Velazquez-las_hilanderas.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "Rokeby Venus",
   "file": "Diego Velázquez - Rokeby Venus.jpg",
   "license": "Public domain",
   "artist": "Diego Velázquez",
   "page": "https://commons.wikimedia.org/wiki/File:Diego_Vel%C3%A1zquez_-_Rokeby_Venus.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "La maja vestida",
+  "file": "Goya Maja ubrana2.jpg",
+  "license": "Public domain",
+  "artist": "Francisco Goya",
+  "page": "https://commons.wikimedia.org/wiki/File:Goya_Maja_ubrana2.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Dream of the Fisherman's Wife",
+  "file": "Tako to ama retouched.jpg",
+  "license": "Public domain",
+  "artist": "Katsushika Hokusai",
+  "page": "https://commons.wikimedia.org/wiki/File:Tako_to_ama_retouched.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Fine Wind, Clear Morning",
+  "file": "Katsushika Hokusai - Fine Wind, Clear Morning (Gaifū kaisei) - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Katsushika Hokusai",
+  "page": "https://commons.wikimedia.org/wiki/File:Katsushika_Hokusai_-_Fine_Wind,_Clear_Morning_(Gaif%C5%AB_kaisei)_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Danaë (Klimt)",
+  "file": "Gustav Klimt 010.jpg",
+  "license": "Public domain",
+  "artist": "Gustav Klimt",
+  "page": "https://commons.wikimedia.org/wiki/File:Gustav_Klimt_010.jpg",
   "needs_attribution": false
  },
  {
@@ -344,11 +920,43 @@
   "needs_attribution": false
  },
  {
-  "title": "The Scapegoat (painting)",
-  "file": "William Holman Hunt - The Scapegoat.jpg",
+  "title": "Broadway Boogie Woogie",
+  "file": "Piet Mondrian, 1942 - Broadway Boogie Woogie.jpg",
   "license": "Public domain",
-  "artist": "William Holman Hunt",
-  "page": "https://commons.wikimedia.org/wiki/File:William_Holman_Hunt_-_The_Scapegoat.jpg",
+  "artist": "Piet Mondrian",
+  "page": "https://commons.wikimedia.org/wiki/File:Piet_Mondrian,_1942_-_Broadway_Boogie_Woogie.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "White on White",
+  "file": "White on White (Malevich, 1918).png",
+  "license": "Public domain",
+  "artist": "Kazimir Malevich",
+  "page": "https://commons.wikimedia.org/wiki/File:White_on_White_(Malevich,_1918).png",
+  "needs_attribution": false
+ },
+ {
+  "title": "The City Rises",
+  "file": "The City Rises by Umberto Boccioni 1910.jpg",
+  "license": "Public domain",
+  "artist": "Umberto Boccioni",
+  "page": "https://commons.wikimedia.org/wiki/File:The_City_Rises_by_Umberto_Boccioni_1910.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Reclining Nude (Modigliani)",
+  "file": "Amedeo Modigliani Reclining Nude The Metropolitan Museum of Art.jpg",
+  "license": "Public domain",
+  "artist": "Amedeo Modigliani",
+  "page": "https://commons.wikimedia.org/wiki/File:Amedeo_Modigliani_Reclining_Nude_The_Metropolitan_Museum_of_Art.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Child's Bath",
+  "file": "The Child's Bath by Mary Cassatt 1893.jpg",
+  "license": "Public domain",
+  "artist": "Mary Cassatt",
+  "page": "https://commons.wikimedia.org/wiki/File:The_Child%27s_Bath_by_Mary_Cassatt_1893.jpg",
   "needs_attribution": false
  },
  {
@@ -376,11 +984,107 @@
   "needs_attribution": false
  },
  {
-  "title": "The Veteran in a New Field",
-  "file": "The Veteran in a New Field 1865 Winslow Homer.jpg",
+  "title": "The Ambassadors (Holbein)",
+  "file": "Hans Holbein the Younger - The Ambassadors - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Hans Holbein the Younger",
+  "page": "https://commons.wikimedia.org/wiki/File:Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Primavera (Botticelli)",
+  "file": "Sandro Botticelli - La Primavera - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Sandro Botticelli",
+  "page": "https://commons.wikimedia.org/wiki/File:Sandro_Botticelli_-_La_Primavera_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Death of Marat",
+  "file": "Jacques-Louis David - Marat assassinated - Google Art Project 2.jpg",
+  "license": "Public domain",
+  "artist": "Jacques-Louis David",
+  "page": "https://commons.wikimedia.org/wiki/File:Jacques-Louis_David_-_Marat_assassinated_-_Google_Art_Project_2.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Whistler's Mother",
+  "file": "Whistlers Mother high res.jpg",
+  "license": "Public domain",
+  "artist": "James McNeill Whistler",
+  "page": "https://commons.wikimedia.org/wiki/File:Whistlers_Mother_high_res.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Olympia (Manet)",
+  "file": "Edouard Manet - Olympia - Google Art Project 3.jpg",
+  "license": "Public domain",
+  "artist": "Édouard Manet",
+  "page": "https://commons.wikimedia.org/wiki/File:Edouard_Manet_-_Olympia_-_Google_Art_Project_3.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Luncheon of the Boating Party",
+  "file": "Pierre-Auguste Renoir - Luncheon of the Boating Party - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Pierre-Auguste Renoir",
+  "page": "https://commons.wikimedia.org/wiki/File:Pierre-Auguste_Renoir_-_Luncheon_of_the_Boating_Party_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Ophelia (Millais)",
+  "file": "John Everett Millais - Ophelia - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "John Everett Millais",
+  "page": "https://commons.wikimedia.org/wiki/File:John_Everett_Millais_-_Ophelia_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Work (painting)",
+  "file": "Ford Madox Brown - Work - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Ford Madox Brown",
+  "page": "https://commons.wikimedia.org/wiki/File:Ford_Madox_Brown_-_Work_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Boyhood of Raleigh",
+  "file": "John Everett Millais (1829-1896) - The Boyhood of Raleigh - N01691 - National Gallery.jpg",
+  "license": "Public domain",
+  "artist": "John Everett Millais",
+  "page": "https://commons.wikimedia.org/wiki/File:John_Everett_Millais_(1829-1896)_-_The_Boyhood_of_Raleigh_-_N01691_-_National_Gallery.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Snap the Whip",
+  "file": "Winslow Homer - Snap the Whip (Butler Institute of American Art).jpg",
   "license": "Public domain",
   "artist": "Winslow Homer",
-  "page": "https://commons.wikimedia.org/wiki/File:The_Veteran_in_a_New_Field_1865_Winslow_Homer.jpg",
+  "page": "https://commons.wikimedia.org/wiki/File:Winslow_Homer_-_Snap_the_Whip_(Butler_Institute_of_American_Art).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Stag at Sharkey's",
+  "file": "George Bellows (American, 1882-1925) - Stag at Sharkey's - 1922.1133 - Cleveland Museum of Art.jpg",
+  "license": "Public domain",
+  "artist": "George Bellows",
+  "page": "https://commons.wikimedia.org/wiki/File:George_Bellows_(American,_1882-1925)_-_Stag_at_Sharkey%27s_-_1922.1133_-_Cleveland_Museum_of_Art.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Daughters of Edward Darley Boit",
+  "file": "John Singer Sargent 001.jpg",
+  "license": "Public domain",
+  "artist": "John Singer Sargent",
+  "page": "https://commons.wikimedia.org/wiki/File:John_Singer_Sargent_001.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Lady Godiva (painting)",
+  "file": "Lady Godiva (John Collier, c. 1897).jpg",
+  "license": "Public domain",
+  "artist": "John Collier",
+  "page": "https://commons.wikimedia.org/wiki/File:Lady_Godiva_(John_Collier,_c._1897).jpg",
   "needs_attribution": false
  },
  {
@@ -389,6 +1093,46 @@
   "license": "Public domain",
   "artist": "Dante Gabriel Rossetti",
   "page": "https://commons.wikimedia.org/wiki/File:Dante_Gabriel_Rossetti_-_Proserpine_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Mérode Altarpiece",
+  "file": "Robert Campin - Triptych with the Annunciation, known as the \"Merode Altarpiece\" - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Workshop of Robert Campin",
+  "page": "https://commons.wikimedia.org/wiki/File:Robert_Campin_-_Triptych_with_the_Annunciation,_known_as_the_%22Merode_Altarpiece%22_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Cornfield",
+  "file": "Constable - The Cornfield.jpg",
+  "license": "Public domain",
+  "artist": "John Constable",
+  "page": "https://commons.wikimedia.org/wiki/File:Constable_-_The_Cornfield.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Jahangir Preferring a Sufi Shaikh to Kings",
+  "file": "Bichitr - Jahangir Preferring a Sufi Shaikh to Kings, from the St. Petersburg album - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Bichitr",
+  "page": "https://commons.wikimedia.org/wiki/File:Bichitr_-_Jahangir_Preferring_a_Sufi_Shaikh_to_Kings,_from_the_St._Petersburg_album_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Miraj Nameh",
+  "file": "Miraj-BNF-1436.jpg",
+  "license": "Public domain",
+  "artist": "illustrations by the court workshop at Herat",
+  "page": "https://commons.wikimedia.org/wiki/File:Miraj-BNF-1436.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Death of General Wolfe",
+  "file": "Benjamin West 005.jpg",
+  "license": "Public domain",
+  "artist": "Benjamin West",
+  "page": "https://commons.wikimedia.org/wiki/File:Benjamin_West_005.jpg",
   "needs_attribution": false
  },
  {
@@ -416,11 +1160,27 @@
   "needs_attribution": false
  },
  {
+  "title": "The Bridge at Narni",
+  "file": "Le pont de Narni - Jean-Baptiste Camille Corot - Musée du Louvre Peintures RF 1613 - photo 2.jpg",
+  "license": "Public domain",
+  "artist": "Jean-Baptiste Camille Corot",
+  "page": "https://commons.wikimedia.org/wiki/File:Le_pont_de_Narni_-_Jean-Baptiste_Camille_Corot_-_Mus%C3%A9e_du_Louvre_Peintures_RF_1613_-_photo_2.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "Ivan the Terrible and His Son Ivan",
   "file": "Iván el Terrible y su hijo, por Iliá Repin.jpg",
   "license": "Public domain",
   "artist": "Ilya Repin",
   "page": "https://commons.wikimedia.org/wiki/File:Iv%C3%A1n_el_Terrible_y_su_hijo,_por_Ili%C3%A1_Repin.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Demon Seated",
+  "file": "Vrubel Demon.jpg",
+  "license": "Public domain",
+  "artist": "Mikhail Vrubel",
+  "page": "https://commons.wikimedia.org/wiki/File:Vrubel_Demon.jpg",
   "needs_attribution": false
  },
  {
@@ -440,6 +1200,14 @@
   "needs_attribution": false
  },
  {
+  "title": "Prayer in the Mosque",
+  "file": "Prayer in the Mosque.jpg",
+  "license": "Public domain",
+  "artist": "Jean-Léon Gérôme",
+  "page": "https://commons.wikimedia.org/wiki/File:Prayer_in_the_Mosque.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "Adam and Eve (Dürer)",
   "file": "Albrecht Dürer - Adam and Eve (Prado) 2.jpg",
   "license": "Public domain",
@@ -456,11 +1224,83 @@
   "needs_attribution": false
  },
  {
+  "title": "Venus and Mars (Botticelli)",
+  "file": "Botticelli - Venus and Mars2.jpeg",
+  "license": "Public domain",
+  "artist": "Sandro Botticelli",
+  "page": "https://commons.wikimedia.org/wiki/File:Botticelli_-_Venus_and_Mars2.jpeg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Adoration of the Magi (Botticelli)",
+  "file": "Zanobi-Altar.jpg",
+  "license": "Public domain",
+  "artist": "Sandro Botticelli",
+  "page": "https://commons.wikimedia.org/wiki/File:Zanobi-Altar.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Madonna with the Long Neck",
+  "file": "Parmigianino - Madonna and Child with Angels, known as the Madonna with the Long Neck.jpg",
+  "license": "Public domain",
+  "artist": "Parmigianino",
+  "page": "https://commons.wikimedia.org/wiki/File:Parmigianino_-_Madonna_and_Child_with_Angels,_known_as_the_Madonna_with_the_Long_Neck.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Madonna of the Pinks",
+  "file": "Raphael Madonna of the Pinks.jpg",
+  "license": "Public domain",
+  "artist": "Raphael",
+  "page": "https://commons.wikimedia.org/wiki/File:Raphael_Madonna_of_the_Pinks.jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "Layla and Majnun",
   "file": "Layla and Majnun2.jpg",
   "license": "Public domain",
   "artist": "Unknown authorUnknown author",
   "page": "https://commons.wikimedia.org/wiki/File:Layla_and_Majnun2.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Baburnama",
+  "file": "Babur in the first illustrated Baburnama, painted in 1589-1590.jpg",
+  "license": "Public domain",
+  "artist": "c.1589",
+  "page": "https://commons.wikimedia.org/wiki/File:Babur_in_the_first_illustrated_Baburnama,_painted_in_1589-1590.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Khamsa of Nizami",
+  "file": "Khusraw arriving at Shirin's castle (f.80). Khamsa of Nizami, Jalayirid style, 1386-88, Baghdad (British Library, Or.13297).jpg",
+  "license": "Public domain",
+  "artist": "1386-88 Baghdad artist",
+  "page": "https://commons.wikimedia.org/wiki/File:Khusraw_arriving_at_Shirin%27s_castle_(f.80)._Khamsa_of_Nizami,_Jalayirid_style,_1386-88,_Baghdad_(British_Library,_Or.13297).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Kalīla wa-Dimna",
+  "file": "Kalila wa Dimna BNF Arabe 3465, folio 34r.jpg",
+  "license": "Public domain",
+  "artist": "13th century artist",
+  "page": "https://commons.wikimedia.org/wiki/File:Kalila_wa_Dimna_BNF_Arabe_3465,_folio_34r.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Kitāb al-Diryāq",
+  "file": "Kitab al-Diryaq BNF 1.jpg",
+  "license": "Public domain",
+  "artist": "12th century CE author",
+  "page": "https://commons.wikimedia.org/wiki/File:Kitab_al-Diryaq_BNF_1.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Hunt in the Forest",
+  "file": "Hunt in the forest by paolo uccello.jpg",
+  "license": "Public domain",
+  "artist": "Paolo Uccello",
+  "page": "https://commons.wikimedia.org/wiki/File:Hunt_in_the_forest_by_paolo_uccello.jpg",
   "needs_attribution": false
  },
  {
@@ -480,11 +1320,123 @@
   "needs_attribution": false
  },
  {
+  "title": "The Haywain Triptych",
+  "file": "Bosch - Haywain Triptych (1512-1515).jpg",
+  "license": "Public domain",
+  "artist": "Hieronymus Bosch",
+  "page": "https://commons.wikimedia.org/wiki/File:Bosch_-_Haywain_Triptych_(1512-1515).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "A Girl with a Watering Can",
+  "file": "Auguste Renoir - A Girl with a Watering Can - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Pierre-Auguste Renoir",
+  "page": "https://commons.wikimedia.org/wiki/File:Auguste_Renoir_-_A_Girl_with_a_Watering_Can_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Boulevard Montmartre",
+  "file": "Boulevard Montmartre - Paris X (FR75) - 2021-06-14 - 2.jpg",
+  "license": "CC BY-SA 4.0",
+  "artist": "Chabe01",
+  "page": "https://commons.wikimedia.org/wiki/File:Boulevard_Montmartre_-_Paris_X_(FR75)_-_2021-06-14_-_2.jpg",
+  "needs_attribution": true
+ },
+ {
+  "title": "The Circus (Seurat)",
+  "file": "Georges Seurat - The Circus - Google Art Project.jpg",
+  "license": "Public domain",
+  "artist": "Georges Seurat",
+  "page": "https://commons.wikimedia.org/wiki/File:Georges_Seurat_-_The_Circus_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Yellow Christ",
+  "file": "Paul Gauguin - The Yellow Christ (Le Christ jaune) 1889.jpg",
+  "license": "Public domain",
+  "artist": "Paul Gauguin",
+  "page": "https://commons.wikimedia.org/wiki/File:Paul_Gauguin_-_The_Yellow_Christ_(Le_Christ_jaune)_1889.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Basket of Apples",
+  "file": "Paul Cézanne - The Basket of Apples - 1926.252 - Art Institute of Chicago.jpg",
+  "license": "Public domain",
+  "artist": "Paul Cézanne",
+  "page": "https://commons.wikimedia.org/wiki/File:Paul_C%C3%A9zanne_-_The_Basket_of_Apples_-_1926.252_-_Art_Institute_of_Chicago.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Snake Charmer (Rousseau)",
+  "file": "HENRI ROUSSEAU - La Encantadora de Serpientes (Museo de Orsay, París, 1907. Óleo sobre lienzo, 169 x 189.5 cm).jpg",
+  "license": "Public domain",
+  "artist": "Henri Rousseau",
+  "page": "https://commons.wikimedia.org/wiki/File:HENRI_ROUSSEAU_-_La_Encantadora_de_Serpientes_(Museo_de_Orsay,_Par%C3%ADs,_1907._%C3%93leo_sobre_lienzo,_169_x_189.5_cm).jpg",
+  "needs_attribution": false
+ },
+ {
   "title": "The Gross Clinic",
   "file": "Thomas Eakins, American - Portrait of Dr. Samuel D. Gross (The Gross Clinic) - Google Art Project.jpg",
   "license": "Public domain",
   "artist": "Thomas Eakins, American, 1844 - 1916 (1844 - 1916) – Artist/Maker (American) Born in Phila",
   "page": "https://commons.wikimedia.org/wiki/File:Thomas_Eakins,_American_-_Portrait_of_Dr._Samuel_D._Gross_(The_Gross_Clinic)_-_Google_Art_Project.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Swimming Hole",
+  "file": "Thomas Eakins - Swimming (1895).jpg",
+  "license": "Public domain",
+  "artist": "Thomas Eakins",
+  "page": "https://commons.wikimedia.org/wiki/File:Thomas_Eakins_-_Swimming_(1895).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Oxbow",
+  "file": "Cole Thomas The Oxbow (The Connecticut River near Northampton 1836).jpg",
+  "license": "Public domain",
+  "artist": "Thomas Cole",
+  "page": "https://commons.wikimedia.org/wiki/File:Cole_Thomas_The_Oxbow_(The_Connecticut_River_near_Northampton_1836).jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Heart of the Andes",
+  "file": "Church Heart of the Andes.jpg",
+  "license": "Public domain",
+  "artist": "Frederic Edwin Church",
+  "page": "https://commons.wikimedia.org/wiki/File:Church_Heart_of_the_Andes.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Rocky Mountains, Lander's Peak",
+  "file": "1863 - bierstadt landers peak.jpg",
+  "license": "Public domain",
+  "artist": "Albert Bierstadt",
+  "page": "https://commons.wikimedia.org/wiki/File:1863_-_bierstadt_landers_peak.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Sad Inheritance!",
+  "file": "Triste herencia, por Joaquín Sorolla.jpg",
+  "license": "Public domain",
+  "artist": "Joaquín Sorolla",
+  "page": "https://commons.wikimedia.org/wiki/File:Triste_herencia,_por_Joaqu%C3%ADn_Sorolla.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "The Slav Epic",
+  "file": "Alfons Mucha at work on Slav Epic.jpg",
+  "license": "Public domain",
+  "artist": "Unknown authorUnknown author",
+  "page": "https://commons.wikimedia.org/wiki/File:Alfons_Mucha_at_work_on_Slav_Epic.jpg",
+  "needs_attribution": false
+ },
+ {
+  "title": "Christ's Entry Into Brussels in 1889",
+  "file": "Christ's Entry into Brussels in 1889.jpg",
+  "license": "Public domain",
+  "artist": "James Ensor",
+  "page": "https://commons.wikimedia.org/wiki/File:Christ%27s_Entry_into_Brussels_in_1889.jpg",
   "needs_attribution": false
  }
 ]
