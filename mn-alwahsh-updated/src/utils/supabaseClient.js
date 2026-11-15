@@ -131,6 +131,11 @@ export async function fetchCategories() {
   return unique;
 }
 
+// Which table owns a category (set by fetchCategories). Used to keep whole tables out of a mode.
+export function getCategoryTable(name) {
+  return categoryTableMap.get(String(name || '').toLowerCase().trim()) || null;
+}
+
 // Per-table cache of the working "used" filter string — resolved once, reused forever
 // Values: '&used=not.is.true' | '&used=neq.true' | '' (no filter)
 const tableUsedFilterCache = new Map();

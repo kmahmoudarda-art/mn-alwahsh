@@ -7,6 +7,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { fetchCategories, fetchQuestion } from '../utils/supabaseClient';
 import { fetchAndCacheImage, getCachedImageUrl } from '../utils/questionGenerator';
 import { displayName, getIcon } from '../utils/categoryIcons';
+import { isSoloExcluded } from '../utils/soloExcluded';
 import { isHiddenCategory } from '../utils/hiddenCategories';
 import { isPremiumCategory, isTestAccount } from '../utils/premiumConfig';
 import { fetchUnlockedCategories } from '../utils/entitlements';
@@ -85,6 +86,7 @@ export default function SoloGame() {
   const reduce = useReducedMotion();
   const [run, setRun] = useState(newRun);
   const [hasSave, setHasSave] = useState(false);
+  const [saveInfo, setSaveInfo] = useState(null); // { level, score, mode } of the saved run
   const [notice, setNotice] = useState('');
 
   const [pool, setPool] = useState(null);     // free category names
@@ -121,6 +123,8 @@ export default function SoloGame() {
     const s = loadSave();
     if (s?.run && !(s.run.level === 0 && !s.run.levelPoints?.length && !s.run.losses && !s.run.gameOver && !s.pending)) {
       setHasSave(true);
+      const sr = { ...newRun({ mode: 'pick' }), ...s.run };
+      setSaveInfo({ level: sr.level, score: baseScore(sr), mode: sr.mode, over: sr.gameOver || sr.finished });
     }
   }, []);
 
@@ -132,7 +136,7 @@ export default function SoloGame() {
     const cats = await fetchCategories();
     const unlocked = new Set(await fetchUnlockedCategories().catch(() => []));
     const test = isTestAccount(user);
-    const visible = cats.filter(c => !isHiddenCategory(c));
+    const visible = cats.filter(c => !isHiddenCategory(c) && !isSoloExcluded(c));
     const playable = visible.filter(c => !isPremiumCategory(c) || test || unlocked.has(c));
     setAllCats(visible);
     setPool(playable);
@@ -149,7 +153,8 @@ export default function SoloGame() {
     try {
       const base = await ensurePool();
       const cur = runRef.current;
-      const cats = cur.mode === 'pick' && cur.categories?.length ? cur.categories : base;
+      const chosen = (cur.categories || []).filter(c => base.includes(c)); // drops anything excluded since an older save
+      const cats = cur.mode === 'pick' && chosen.length ? chosen : base;
       for (let i = 0; i < 25; i++) {
         const live = cats.filter(c => !deadCombos.current.has(`${c}|${points}`));
         if (!live.length) break;
@@ -329,7 +334,7 @@ export default function SoloGame() {
         <p style={{ fontSize: 16, fontWeight: 700, opacity: 0.85, marginTop: 4 }}>محاولة واحدة لكل سؤال</p>
       </div>
       <div style={{ ...card, padding: '18px 16px 12px' }}>
-        <LevelTrack level={0} idle />
+        <LevelTrack level={saveInfo && !saveInfo.over ? saveInfo.level : 0} idle />
       </div>
       <div style={{ ...card, display: 'grid', gap: 10 }}>
         <p style={{ fontWeight: 800, fontSize: 14, opacity: 0.8 }}>إذا أخطأت</p>
@@ -352,7 +357,16 @@ export default function SoloGame() {
           سجّل دخولك من الشاشة الرئيسية حتى تدخل نتيجتك قائمة المتصدّرين.
         </p>
       )}
-      {hasSave && <motion.button {...tap} style={redBtn} onClick={resume}>تابع جولتك</motion.button>}
+      {hasSave && (
+        <motion.button {...tap} style={redBtn} onClick={resume}>
+          <span style={{ display: 'block' }}>{saveInfo?.over ? 'عرض نتيجة جولتك' : 'تابع جولتك'}</span>
+          {saveInfo && !saveInfo.over && (
+            <span style={{ display: 'block', fontSize: 13, fontWeight: 600, opacity: 0.9, marginTop: 2 }}>
+              أنت في المرحلة {saveInfo.level + 1} من {TOTAL_LEVELS} · {saveInfo.score.toLocaleString('en')} نقطة{saveInfo.mode === 'all' ? ' · كل الفئات ×' + ALL_CATEGORIES_MULT : ''}
+            </span>
+          )}
+        </motion.button>
+      )}
       <motion.button {...tap} style={hasSave ? ghostBtn : redBtn} onClick={() => {
         if (hasSave && !window.confirm('سيُحذف تقدّمك الحالي. متأكد؟')) return;
         setView('mode');
