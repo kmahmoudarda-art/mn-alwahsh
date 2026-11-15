@@ -10,7 +10,7 @@ old=req('GET',f"Sin-Jim1?select=question,points,slot&category=eq.{urllib.parse.q
 seen={_n(r['question']).strip() for r in old}
 rows=[]; ok=True
 for name,pts in [('EASY',200),('MEDIUM',400),('HARD',600)]:
-    have=[r for r in old if r['points']==pts]; need=TARGET-len(have)
+    have=[r for r in old if str(r['points'])==str(pts)]; need=TARGET-len(have)
     good=[]
     for q,o in ns.get(name,[]):
         k=_n(q).strip(); p=problems(q,o)
