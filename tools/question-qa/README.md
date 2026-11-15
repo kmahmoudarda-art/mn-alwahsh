@@ -15,3 +15,4 @@ Auth: requests send header `apikey` (set via the environment credential). Never 
 New: رمضان، الكويت، عُمان، سوريا، لبنان، السعودية، فلسطين (~40 each), كائنات البحر 49، أرقام قياسية 43, شعر عربي، أمثال شعبية، أكلات العالم، حقائق مجنونة، جسم الإنسان، اختراعات، الفضاء، لغة عربية.
 Old: WildRift, رياضة, أكل عربي, الإمارات, دبي, الأردن, بريكينج باد, Friends, بيكي بلايندرز, نتفليكس, عمرو دياب, تامر حسني, عبد الحليم, أم كلثوم, بريزون بريك, حمو بيكا, مسلسلات تركية, أفلام, أغاني, مسرحيات, Arab Idol, Arab Got Talent, سبيستون, Dubai Bling, فلسفة, فنانون عرب, أعلام العالم.
 Then re-tier difficulty everywhere.
+- New categories (فوازير، مسلسلات رمضانية، اقتصاد ومال، الألغاز الجغرافية، علم السلوك البشري) are at the standard 60 easy / 60 medium / 60 hard. `newcat_tiered.py` creates 60/60/60; `append_tiered.py` tops an existing category up to 60 per tier.
