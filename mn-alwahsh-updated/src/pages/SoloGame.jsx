@@ -13,7 +13,7 @@ import { isPremiumCategory, isTestAccount } from '../utils/premiumConfig';
 import { fetchUnlockedCategories } from '../utils/entitlements';
 import { getCurrentUser } from '../utils/authClient';
 import { sounds } from '../utils/soundEffects';
-import { fetchLeaderboard, submitRun } from '../utils/soloLeaderboard';
+import { fetchLeaderboard, submitRun, syncDisplayName, displayNameFor } from '../utils/soloLeaderboard';
 import SongPlayer from '../components/game/SongPlayer';
 import UnlockPrompt from '../components/game/UnlockPrompt';
 import LevelTrack from '../components/solo/LevelTrack';
@@ -455,7 +455,11 @@ export default function SoloGame() {
 
   const openBoard = async () => {
     setView('board'); setBoard(null);
-    setBoard(await fetchLeaderboard());
+    const rows = await fetchLeaderboard();
+    // show the player's own row with the current name right away, and fix the stored one in the background
+    const wanted = user ? displayNameFor(user) : null;
+    setBoard(rows.map(r => (user && r.user_id === user.id ? { ...r, display_name: wanted } : r)));
+    if (user) syncDisplayName(user, rows);
   };
 
   // ── views ───────────────────────────────────────────────────────────

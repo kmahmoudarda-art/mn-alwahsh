@@ -6,13 +6,35 @@ import { getValidSession } from './authClient';
 
 const TABLE = `${SUPABASE_URL}/rest/v1/solo_scores`;
 
-// Shown publicly on the board, so never the full email: a chosen name if the
-// account has one, otherwise the first two letters of the email name + dots.
+// Shown publicly on the board: the name chosen for the account if there is one,
+// otherwise the part of the email before the @ (never the domain).
 export function displayNameFor(user) {
   const meta = user?.user_metadata?.name || user?.user_metadata?.full_name;
   if (meta) return String(meta).slice(0, 24);
   const local = (user?.email || '').split('@')[0];
-  return local ? `${local.slice(0, 2)}•••` : 'لاعب';
+  return (local || 'لاعب').slice(0, 24);
+}
+
+// Rows saved earlier hold the old masked name; bring the signed-in player's own row up to date.
+export async function syncDisplayName(user, rows) {
+  try {
+    const session = await getValidSession();
+    if (!session?.access_token || !session?.user?.id) return false;
+    const mine = (rows || []).find(r => r.user_id === session.user.id);
+    const wanted = displayNameFor(user || session.user);
+    if (!mine || mine.display_name === wanted) return false;
+    const res = await fetch(`${TABLE}?user_id=eq.${session.user.id}`, {
+      method: 'PATCH',
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({ display_name: wanted }),
+    });
+    return res.ok;
+  } catch { return false; }
 }
 
 // Top players, best score first. Returns [] if the table isn't set up yet.
