@@ -29,7 +29,7 @@ import {
   TOTAL_LEVELS, MAX_SCORE, DOUBLE_MULT, HELP_COST_RATE,
   newRun, tierPoints, resolveQuestion, applyLifeline,
   baseScore, levelSum, helpBonus, lossBonus, finalScore, levelsCompleted,
-  canUseLifeline, isTrap, openBox, QUESTION_SECONDS, withdrawRun, HEARTS_MAX, BOX_EVERY, friendSuggestion, FRIEND_ACCURACY,
+  canUseLifeline, isTrap, openBox, QUESTION_SECONDS, withdrawRun, HEARTS_MAX, HEARTS_CAP, HEART_EVERY, BOX_EVERY, friendSuggestion, FRIEND_ACCURACY,
   ALL_CATEGORIES_MULT, PICK_COUNT, modeMultiplier,
 } from '../utils/soloEngine';
 
@@ -647,8 +647,11 @@ export default function SoloGame() {
       </div>
       <div className="solo-col">
       <div className="solo-rules" style={{ ...card, display: 'grid', gap: 10 }}>
-        <p style={{ fontWeight: 800, fontSize: 14, opacity: 0.8 }}>إذا أخطأت</p>
-        {[[200, 'تفقد قلباً (لديك 3 ❤️)، وإذا نفدت ترجع 3 مراحل'], [400, 'ترجع 10 مراحل'], [600, 'تبدأ من الصفر']].map(([pts, text]) => (
+        <p style={{ fontSize: 13.5, lineHeight: 1.8 }}>
+          ❤️ تبدأ بـ{HEARTS_MAX} قلوب تحميك من الخطأ في أي سؤال: تفقد قلباً وتعيد المرحلة بسؤال جديد. وتحصل على قلب إضافي عند إنهاء المرحلة {HEART_EVERY} و{HEART_EVERY * 2} و{HEART_EVERY * 3} و{HEART_EVERY * 4} (حتى {HEARTS_CAP} قلوب)، وقد يكون القلب جائزة في صندوق المفاجأة.
+        </p>
+        <p style={{ fontWeight: 800, fontSize: 14, opacity: 0.8 }}>إذا أخطأت بعد نفاد قلوبك</p>
+        {[[200, 'ترجع 3 مراحل'], [400, 'ترجع 10 مراحل'], [600, 'تبدأ من الصفر']].map(([pts, text]) => (
           <div key={pts} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 15, fontWeight: 700 }}>
             <span style={{ minWidth: 92, padding: '3px 10px', borderRadius: 8, textAlign: 'center', fontWeight: 900, background: `${TIER[pts].color}22`, color: TIER[pts].color, border: `1px solid ${TIER[pts].color}66` }}>
               سؤال {pts}
@@ -817,8 +820,9 @@ export default function SoloGame() {
     const msg = !R ? null : {
       removeOne: ['🗑️', 'مساعدة "احذف إجابة" إضافية', good],
       twoAnswers: ['✌️', 'مساعدة "جاوب جوابين" إضافية', good],
-      points: ['⭐', `+${R.amount} نقطة إضافية`, good],
+      points: ['⭐', R.fromHeart ? `قلوبك ممتلئة، فحصلت على +${R.amount} نقطة بدلاً من القلب` : `+${R.amount} نقطة إضافية`, good],
       shield: ['🛡️', 'درع! يلغي أول سؤال تخسره', good],
+      heart: ['❤️', 'قلب إضافي!', good],
       losePoints: ['💸', R.amount ? `خسرت ${R.amount} نقطة` : 'حظ سيئ، لكن لا نقاط لتخسرها', bad],
       rollback: ['⏪', `رجعت ${R.back} ${R.back === 1 ? 'مرحلة' : 'مراحل'} إلى المرحلة ${R.newLevel + 1}`, bad],
     }[R.type];
@@ -951,7 +955,7 @@ export default function SoloGame() {
           <span style={{ fontWeight: 900, fontSize: 17, color: '#FFD700', whiteSpace: 'nowrap' }}>⭐ <CountUp value={baseScore(run)} /></span>
         </div>
         <LevelTrack level={run.level} boxesSeen={run.boxesSeen} />
-        <div style={{ marginTop: 6 }}><Hearts hearts={run.hearts ?? HEARTS_MAX} max={HEARTS_MAX} /></div>
+        <div style={{ marginTop: 6 }}><Hearts hearts={run.hearts ?? HEARTS_MAX} max={Math.max(HEARTS_MAX, run.hearts ?? HEARTS_MAX)} /></div>
         <p style={{ fontSize: 11.5, opacity: 0.6, marginTop: 6, textAlign: 'center' }}>
           {run.mode === 'all' ? <b style={{ color: '#FFD700' }}>🌍 كل الفئات · نقاط ×{ALL_CATEGORIES_MULT} · </b> : null}{run.shield ? '🛡️ درع مفعّل · ' : ''}مساعدات {run.helpsUsed} · خسارات {run.losses}
         </p>
@@ -1104,6 +1108,9 @@ export default function SoloGame() {
                 {outcome.timeBonus > 0 && (
                   <p style={{ fontSize: 13, color: '#FFD700', fontWeight: 700 }}>⏱️ منها {outcome.timeBonus} نقطة سرعة</p>
                 )}
+                {outcome.heartGained && (
+                  <p style={{ fontSize: 14, color: '#FF6B8A', fontWeight: 800 }}>❤️ حصلت على قلب إضافي لإنهائك {run.level} مرحلة!</p>
+                )}
               </>
             ) : (
               <p style={{ fontSize: 24, fontWeight: 900, color: isGood ? '#46C98B' : '#FF4A4A' }}>
@@ -1115,7 +1122,7 @@ export default function SoloGame() {
                 💔 فقدت قلباً.{' '}
                 {outcome.heartsLeft > 0
                   ? `بقي لك ${outcome.heartsLeft === 1 ? 'قلب واحد' : 'قلبان'}.`
-                  : 'لم يبق لك قلوب: الخطأ القادم في سؤال 200 يرجعك 3 مراحل.'}
+                  : `لم يبق لك قلوب: الخطأ القادم ${outcome.points === 200 ? 'يرجعك 3 مراحل' : outcome.points === 400 ? 'يرجعك 10 مراحل' : 'ينهي الجولة ويبدؤك من الصفر'}.`}
                 {' '}تبقى في المرحلة نفسها بسؤال جديد{outcome.penalty ? ` · وخسرت ${outcome.penalty} نقطة بسبب الدبل` : ''}.
               </p>
             )}
@@ -1128,7 +1135,7 @@ export default function SoloGame() {
             )}
             {outcome.type === 'trapLost' && (
               <p style={{ fontSize: 14, color: '#F2A93B', fontWeight: 700, marginTop: 4 }}>
-                ☠️ كان فخاً! {outcome.penalty ? `خُصمت ${outcome.penalty} نقطة` : 'لا نقاط لتُخصم'}، وتكمل إلى السؤال التالي دون رجوع.
+                ☠️ كان فخاً! {outcome.penalty ? `خُصمت ${outcome.penalty} نقطة` : 'لا نقاط لتُخصم'}، وتكمل إلى السؤال التالي دون رجوع.{outcome.heartGained ? ` ❤️ وحصلت على قلب إضافي لإنهائك ${run.level} مرحلة!` : ''}
               </p>
             )}
             {outcome.trap && outcome.type === 'correct' && (
