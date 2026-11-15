@@ -402,6 +402,7 @@ export default function SoloGame() {
             : submitInfo.saved ? (submitInfo.newBest ? '🏆 رقم قياسي جديد! حُفظت نتيجتك.' : '✔ حُفظت نتيجتك.')
             : '⚠️ تعذّر حفظ النتيجة (تحقّق من الاتصال).'}
         </p>
+        <ShareButtons run={run} />
         <button style={redBtn} onClick={() => { startNew(); }}>🔁 جولة جديدة</button>
         <button style={ghostBtn} onClick={openBoard}>🏆 المتصدّرون</button>
         <button style={ghostBtn} onClick={() => { setHasSave(false); setView('intro'); navigate('/'); }}>الشاشة الرئيسية</button>
@@ -431,6 +432,7 @@ export default function SoloGame() {
           <span style={{ color: tier.color, fontWeight: 800 }}>{tier.name} · {points} نقطة</span>
           <span style={{ opacity: 0.7 }}>{run.shield ? '🛡️ · ' : ''}مساعدات: {run.helpsUsed} · خسارات: {run.losses}</span>
         </div>
+        <div style={{ marginTop: 8 }}><ShareButtons run={run} compact /></div>
       </div>
 
       {notice && (
@@ -537,6 +539,35 @@ export default function SoloGame() {
           </AnimatePresence>
         </>
       )}
+    </div>
+  );
+}
+
+// Share the current level and score — WhatsApp, Facebook, the phone's own
+// share sheet (when available) or copy the text.
+function ShareButtons({ run, compact = false }) {
+  const [copied, setCopied] = useState(false);
+  const levels = levelsCompleted(run);
+  const score = finalScore(run);
+  const url = `${window.location.origin}/solo`;
+  const text = run.finished
+    ? `🎉 أنهيت تحدّي «من الوحش» كاملاً (${TOTAL_LEVELS} مرحلة) وجمعت ${score.toLocaleString('en')} نقطة! هل تقدر تتفوق عليّ؟ 🎯`
+    : `🎯 وصلت إلى المرحلة ${levels + (run.gameOver ? 0 : 1)} من ${TOTAL_LEVELS} في تحدّي «من الوحش» وجمعت ${score.toLocaleString('en')} نقطة! هل تقدر تتفوق عليّ؟`;
+  const full = `${text}\n${url}`;
+  const open = (href) => window.open(href, '_blank', 'noopener,noreferrer');
+  const btn = { ...ghostBtn, padding: compact ? '6px 10px' : '10px 14px', fontSize: compact ? 12 : 14 };
+  const canNative = typeof navigator !== 'undefined' && !!navigator.share;
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(full); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
+  };
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
+      {!compact && <span style={{ width: '100%', textAlign: 'center', fontSize: 13, opacity: 0.8 }}>📣 شارك نتيجتك</span>}
+      <button style={{ ...btn, borderColor: '#25D366' }} onClick={() => open(`https://wa.me/?text=${encodeURIComponent(full)}`)}>واتساب</button>
+      <button style={{ ...btn, borderColor: '#1877F2' }}
+        onClick={() => open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`)}>فيسبوك</button>
+      {canNative && <button style={btn} onClick={() => navigator.share({ text, url }).catch(() => {})}>مشاركة…</button>}
+      <button style={btn} onClick={copy}>{copied ? '✔ نُسخ' : 'نسخ'}</button>
     </div>
   );
 }
