@@ -10,12 +10,14 @@ import { useEffect, useRef, useState } from 'react';
 const MAX_WAIT_MS = 60000; // never leave the game stuck if play is never pressed
 const CLIP_SECONDS = 5;   // how long each press of play lasts
 
-export default function SongPlayer({ itunesId, onStarted }) {
+export default function SongPlayer({ itunesId, onStarted, onFailed, solo = false }) {
   const audioRef = useRef(null);
   const startedRef = useRef(false);
   const stopTimerRef = useRef(null);
   const onStartedRef = useRef(onStarted);
   onStartedRef.current = onStarted;
+  const onFailedRef = useRef(onFailed);
+  onFailedRef.current = onFailed;
   const [status, setStatus] = useState('loading'); // loading | ready | playing | error
   const [attempt, setAttempt] = useState(0); // bumped to retry loading after an error
   const [errCode, setErrCode] = useState(0); // 1 lookup failed, 2 no preview, 3 audio failed, 4 play blocked
@@ -63,11 +65,12 @@ export default function SongPlayer({ itunesId, onStarted }) {
         a.onerror = () => {
           if (attempt === 0) { setAttempt(1); return; } // one silent retry
           setErrCode(3); setStatus('error'); fireStarted();
+          if (onFailedRef.current) onFailedRef.current();
         };
         audioRef.current = a;
         setStatus('ready');
       })
-      .catch((e) => { if (!cancelled) { setErrCode(e?.code || 1); setStatus('error'); fireStarted(); } }); // don't freeze the game
+      .catch((e) => { if (!cancelled) { setErrCode(e?.code || 1); setStatus('error'); fireStarted(); if (onFailedRef.current) onFailedRef.current(); } }); // don't freeze the game
     return () => {
       cancelled = true;
       clearTimeout(fallback);
@@ -99,7 +102,7 @@ export default function SongPlayer({ itunesId, onStarted }) {
         cursor: status === 'loading' ? 'default' : 'pointer', minWidth:200,
       }}>{label}</button>
       <span style={{ fontFamily:'var(--font-cairo)', fontSize:11, color:'#555', marginTop:6 }}>
-        مقطع قصير (٥ ثوانٍ) · العدّاد يبدأ عند التشغيل · ♪ Preview by Apple
+        {solo ? 'مقطع قصير (٥ ثوانٍ) · ♪ Preview by Apple' : 'مقطع قصير (٥ ثوانٍ) · العدّاد يبدأ عند التشغيل · ♪ Preview by Apple'}
       </span>
     </div>
   );

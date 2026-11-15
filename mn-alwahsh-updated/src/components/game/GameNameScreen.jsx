@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Gamepad2, BookOpen, Download, X } from 'lucide-react';
+import { Gamepad2, BookOpen, Download, X, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import InstructionManual from './InstructionManual';
@@ -158,6 +158,8 @@ export default function GameNameScreen({ onEnter }) {
   const [user, setUser] = useState(getCurrentUser());
   // 'account' = login/signup form, 'guest' = plain name entry, skipping account
   const [entryMode, setEntryMode] = useState('choice');
+  // After sign-in / 'continue as guest': pick solo or multiplayer. null = not choosing yet.
+  const [pickMode, setPickMode] = useState(null); // null | 'user' | 'guest'
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteSending, setDeleteSending] = useState(false);
@@ -202,13 +204,13 @@ export default function GameNameScreen({ onEnter }) {
   // identifies the session (also used to save/restore it, see Game.jsx).
   const handleStartAsUser = () => {
     if (!user) return;
-    onEnter(user.email || user.id);
+    setPickMode('user');
   };
 
   const handleSignedIn = () => {
     const signedInUser = getCurrentUser();
     setUser(signedInUser);
-    if (signedInUser) onEnter(signedInUser.email || signedInUser.id);
+    if (signedInUser) setPickMode('user');
   };
 
   const handleSignOut = () => {
@@ -448,7 +450,51 @@ export default function GameNameScreen({ onEnter }) {
             border: '1.5px solid rgba(139,0,0,0.4)', padding: 20,
             backdropFilter: 'blur(10px)',
           }}>
-            {user ? (
+            {pickMode ? (
+              /* Solo vs multiplayer — only offered once the player is in (signed in or guest) */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <p style={{ textAlign: 'center', fontSize: 15, fontWeight: 700, color: '#FFE4E4', fontFamily: 'var(--font-cairo)', margin: 0 }}>
+                  كيف تريد أن تلعب؟
+                </p>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+                  <Button
+                    onClick={() => {
+                      if (pickMode === 'user') { const u = user || getCurrentUser(); if (!u) { setPickMode(null); return; } onEnter(u.email || u.id); }
+                      else { setPickMode(null); setEntryMode('guest'); }
+                    }}
+                    className="w-full font-cairo font-bold py-5 rounded-xl gap-2"
+                    style={{
+                      background: 'linear-gradient(135deg, #6B0000 0%, #CC0000 50%, #6B0000 100%)',
+                      color: '#FFE4E4', border: '1px solid rgba(255,60,60,0.4)', fontSize: 16,
+                      boxShadow: '0 0 20px rgba(139,0,0,0.55)',
+                    }}
+                  >
+                    <Users className="w-5 h-5" />
+                    لعب جماعي (فريقان)
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+                  <Button
+                    onClick={() => navigate('/solo')}
+                    className="w-full font-cairo font-bold py-5 rounded-xl gap-2"
+                    style={{
+                      background: 'rgba(10,0,0,0.7)', border: '1.5px solid #FFD700',
+                      color: '#FFE4E4', fontSize: 16, boxShadow: '0 0 16px rgba(255,215,0,0.2)',
+                    }}
+                  >
+                    🎯 تحدّي فردي · 90 مرحلة
+                  </Button>
+                </motion.div>
+                <button
+                  type="button"
+                  onClick={() => setPickMode(null)}
+                  className="w-full font-tajawal text-xs py-1"
+                  style={{ color: '#FF9999', textDecoration: 'underline' }}
+                >
+                  رجوع
+                </button>
+              </div>
+            ) : user ? (
               /* Already signed in — one tap to start */
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <p style={{ textAlign: 'center', fontSize: 13, fontWeight: 400, color: 'rgba(255,228,228,0.75)', fontFamily: 'var(--font-cairo)' }}>
@@ -495,7 +541,7 @@ export default function GameNameScreen({ onEnter }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
                   <Button
-                    onClick={() => setEntryMode('guest')}
+                    onClick={() => setPickMode('guest')}
                     className="w-full font-cairo font-bold py-5 rounded-xl gap-2"
                     style={{
                       background: 'linear-gradient(135deg, #6B0000 0%, #CC0000 50%, #6B0000 100%)',
