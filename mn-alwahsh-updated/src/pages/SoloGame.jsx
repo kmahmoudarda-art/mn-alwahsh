@@ -8,7 +8,8 @@ import { fetchCategories, fetchQuestion } from '../utils/supabaseClient';
 import { fetchAndCacheImage, getCachedImageUrl } from '../utils/questionGenerator';
 import { displayName, getIcon } from '../utils/categoryIcons';
 import { isHiddenCategory } from '../utils/hiddenCategories';
-import { isPremiumCategory } from '../utils/premiumConfig';
+import { isPremiumCategory, isTestAccount } from '../utils/premiumConfig';
+import { fetchUnlockedCategories } from '../utils/entitlements';
 import { getCurrentUser } from '../utils/authClient';
 import { sounds } from '../utils/soundEffects';
 import { fetchLeaderboard, submitRun } from '../utils/soloLeaderboard';
@@ -76,6 +77,8 @@ export default function SoloGame() {
   const [view, setView] = useState('intro'); // intro | mode | pick | play | box | end | board
   const [boxResult, setBoxResult] = useState(null);
   const [opening, setOpening] = useState(false);
+  const [allCats, setAllCats] = useState(null); // every visible category, locked ones included
+  const [lockMsg, setLockMsg] = useState('');
   const [picked, setPicked] = useState([]);
   const [search, setSearch] = useState('');
   const [flash, setFlash] = useState(0);
@@ -122,13 +125,19 @@ export default function SoloGame() {
   }, []);
 
   // ── question fetching ───────────────────────────────────────────────
+  // Playable = free categories + premium ones this account has unlocked.
+  // Locked premium categories are still listed in the picker (with a lock).
   const ensurePool = useCallback(async () => {
     if (pool) return pool;
     const cats = await fetchCategories();
-    const free = cats.filter(c => !isHiddenCategory(c) && !isPremiumCategory(c));
-    setPool(free);
-    return free;
-  }, [pool]);
+    const unlocked = new Set(await fetchUnlockedCategories().catch(() => []));
+    const test = isTestAccount(user);
+    const visible = cats.filter(c => !isHiddenCategory(c));
+    const playable = visible.filter(c => !isPremiumCategory(c) || test || unlocked.has(c));
+    setAllCats(visible);
+    setPool(playable);
+    return playable;
+  }, [pool, user]);
 
   const loadQuestion = useCallback(async (level, carry) => {
     setLoading(true); setLoadError(false);
@@ -379,8 +388,15 @@ export default function SoloGame() {
   );
 
   if (view === 'pick') {
-    const list = (pool || []).filter(c => displayName(c).includes(search.trim()));
-    const toggle = (c) => setPicked(prev => prev.includes(c) ? prev.filter(x => x !== c) : prev.length < PICK_COUNT ? [...prev, c] : prev);
+    const playable = new Set(pool || []);
+    const list = (allCats || [])
+      .filter(c => displayName(c).includes(search.trim()))
+      .sort((x, y) => Number(playable.has(y)) - Number(playable.has(x))); // open ones first
+    const toggle = (c) => {
+      if (!playable.has(c)) { setLockMsg('هذه فئة مدفوعة. يمكنك فتحها من الشاشة الرئيسية ثم تعود لاختيارها.'); return; }
+      setLockMsg('');
+      setPicked(prev => prev.includes(c) ? prev.filter(x => x !== c) : prev.length < PICK_COUNT ? [...prev, c] : prev);
+    };
     const ready = picked.length === PICK_COUNT;
     return shell(
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 12, paddingBottom: 90 }}>
@@ -388,19 +404,22 @@ export default function SoloGame() {
         <h2 style={{ textAlign: 'center', fontSize: 24, fontWeight: 900 }}>اختر {PICK_COUNT} فئات</h2>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="ابحث عن فئة"
           style={{ ...font, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(196,22,28,0.5)', borderRadius: 12, padding: '11px 14px', color: '#FFE9E9', fontSize: 15, outline: 'none' }} />
-        {pool === null && <p style={{ textAlign: 'center', opacity: 0.8, padding: 20 }}>جاري تحميل الفئات…</p>}
+        {allCats === null && <p style={{ textAlign: 'center', opacity: 0.8, padding: 20 }}>جاري تحميل الفئات…</p>}
+        {lockMsg && <p style={{ textAlign: 'center', fontSize: 13, color: '#F2A93B' }}>{lockMsg}</p>}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
           {list.map(c => {
             const on = picked.includes(c);
-            const full = !on && picked.length >= PICK_COUNT;
+            const locked = !playable.has(c);
+            const full = !on && !locked && picked.length >= PICK_COUNT;
             return (
               <motion.button key={c} whileTap={{ scale: 0.95 }} transition={springs.snappy} onClick={() => toggle(c)} aria-pressed={on}
                 style={{
                   ...font, fontWeight: 700, fontSize: 14, padding: '8px 14px', borderRadius: 999, cursor: full ? 'default' : 'pointer',
+                  borderStyle: locked ? 'dashed' : 'solid',
                   color: on ? '#0A0305' : '#FFE9E9', background: on ? '#FFD700' : 'rgba(255,255,255,0.05)',
-                  border: `1.5px solid ${on ? '#FFD700' : 'rgba(196,22,28,0.5)'}`, opacity: full ? 0.35 : 1,
+                  border: `1.5px solid ${on ? '#FFD700' : 'rgba(196,22,28,0.5)'}`, opacity: full ? 0.35 : locked ? 0.55 : 1,
                 }}>
-                {getIcon ? getIcon(c) : ''} {displayName(c)}
+                {locked ? '🔒' : getIcon ? getIcon(c) : ''} {displayName(c)}
               </motion.button>
             );
           })}
