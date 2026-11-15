@@ -27,7 +27,7 @@ import {
   TOTAL_LEVELS, MAX_SCORE, DOUBLE_MULT, HELP_COST_RATE,
   newRun, tierPoints, resolveQuestion, applyLifeline,
   baseScore, levelSum, helpBonus, lossBonus, finalScore, levelsCompleted,
-  canUseLifeline, isTrap, openBox, QUESTION_SECONDS, BOX_EVERY, friendSuggestion, FRIEND_ACCURACY,
+  canUseLifeline, isTrap, openBox, QUESTION_SECONDS, withdrawRun, BOX_EVERY, friendSuggestion, FRIEND_ACCURACY,
   ALL_CATEGORIES_MULT, PICK_COUNT, modeMultiplier,
 } from '../utils/soloEngine';
 
@@ -148,6 +148,7 @@ export default function SoloGame() {
   const [flash, setFlash] = useState(0);
   const [run, setRun] = useState(newRun);
   const [hasSave, setHasSave] = useState(false);
+  const [confirmWithdraw, setConfirmWithdraw] = useState(false);
   const [confirmNew, setConfirmNew] = useState(false); // in-page confirmation: the apps' WebView ignores window.confirm
   const [saveInfo, setSaveInfo] = useState(null); // { level, score, mode } of the saved run
 
@@ -514,6 +515,18 @@ export default function SoloGame() {
     loadQuestion(runRef.current.level, { helps: helpsOnQ.current, doubled });
   }, [answered, doubled, loadQuestion]);
 
+  // "انسحاب": end the run now, record what has been banked on the leaderboard, then offer a new run.
+  const doWithdraw = () => {
+    setConfirmWithdraw(false);
+    loadTok.current += 1;                 // stop any question still loading
+    clearTimeout(boxTimer.current);
+    clearTimeout(progressTimer.current);
+    const r = withdrawRun(runRef.current);
+    runRef.current = r;
+    setRun(r);
+    endRun(r);
+  };
+
   // "I can't hear it": the player swaps a song question themselves (a few times per run).
   const onSongSkip = () => {
     if (songSkips <= 0 || songSwapped.current || answered) return;
@@ -817,10 +830,14 @@ export default function SoloGame() {
         <div className="solo-col">
         <motion.h2 initial={reduce ? false : { opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={springs.pop}
           style={{ textAlign: 'center', fontSize: 32, fontWeight: 900, color: run.finished ? '#46C98B' : '#FF3B3B', textShadow: `0 0 22px ${run.finished ? 'rgba(70,201,139,0.5)' : 'rgba(229,30,40,0.5)'}` }}>
-          {run.finished ? 'أنهيت التحدّي!' : 'انتهت الجولة'}
+          {run.finished ? 'أنهيت التحدّي!' : run.withdrawn ? 'انسحبت من الجولة' : 'انتهت الجولة'}
         </motion.h2>
         {!run.finished && (
-          <p style={{ textAlign: 'center', fontSize: 14, opacity: 0.85 }}>أخطأت في سؤال {run.lostAt || 600} نقطة بعد {levelsCompleted(run)} مرحلة.{run.lostAt && run.lostAt < 600 ? ' ولم تكن هناك مراحل كافية لترجع إليها.' : ''}</p>
+          <p style={{ textAlign: 'center', fontSize: 14, opacity: 0.85 }}>
+            {run.withdrawn
+              ? `انسحبت بعد ${levelsCompleted(run)} مرحلة، وهذه نتيجتك المسجَّلة.`
+              : <>أخطأت في سؤال {run.lostAt || 600} نقطة بعد {levelsCompleted(run)} مرحلة.{run.lostAt && run.lostAt < 600 ? ' ولم تكن هناك مراحل كافية لترجع إليها.' : ''}</>}
+          </p>
         )}
         <div style={{ ...card, textAlign: 'center' }}>
           <p style={{ fontSize: 13, opacity: 0.7 }}>مجموع نقاطك</p>
@@ -845,6 +862,7 @@ export default function SoloGame() {
           {!user ? '⚠️ لم تُسجَّل النتيجة في المتصدّرين لأنك لم تسجّل دخولك.'
             : submitInfo === null ? 'جاري حفظ نتيجتك…'
             : submitInfo.saved ? (submitInfo.newBest ? '🏆 رقم قياسي جديد! حُفظت نتيجتك.' : '✔ حُفظت نتيجتك.')
+            : submitInfo.skipped ? 'لا توجد نتيجة لتسجيلها بعد (لم تُنهِ أي مرحلة).'
             : '⚠️ تعذّر حفظ النتيجة، تحقّق من الاتصال.'}
         </p>
         <ShareResult run={run} />
@@ -1065,7 +1083,33 @@ export default function SoloGame() {
           </motion.div>
         )}
       </AnimatePresence>
+      <motion.button {...tap} style={{ ...ghostBtn, fontSize: 13, padding: '8px 14px', borderColor: 'rgba(255,255,255,0.25)', opacity: 0.9 }} onClick={() => setConfirmWithdraw(true)}>
+        🏳️ انسحاب وتسجيل نتيجتي
+      </motion.button>
       </div>
+
+      <AnimatePresence>
+        {confirmWithdraw && (
+          <motion.div key="confirm-withdraw" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.15 } }}
+            onClick={() => setConfirmWithdraw(false)}
+            style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(0,0,0,0.8)', display: 'grid', placeItems: 'center', padding: 16, overflowY: 'auto' }}>
+            <motion.div role="dialog" aria-modal="true" aria-labelledby="withdraw-title"
+              initial={reduce ? false : { scale: 0.94, y: 8 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, opacity: 0, transition: { duration: 0.15 } }} transition={springs.gentle}
+              onClick={(e) => e.stopPropagation()}
+              style={{ ...card, maxWidth: 360, display: 'flex', flexDirection: 'column', gap: 10, textAlign: 'center' }}>
+              <p id="withdraw-title" style={{ fontSize: 18, fontWeight: 900 }}>الانسحاب من الجولة؟</p>
+              <p style={{ fontSize: 14, lineHeight: 1.8, opacity: 0.9 }}>
+                تنتهي جولتك الآن وتُسجَّل نتيجتك في المتصدّرين:
+                <br /><b style={{ color: '#FFD700' }}>أنهيت {run.level} من {TOTAL_LEVELS} مرحلة · {baseScore(run).toLocaleString('en')} نقطة</b>
+                <br /><span style={{ fontSize: 12.5, opacity: 0.8 }}>لا تُضاف مكافآت الإنهاء، ثم تبدأ جولة جديدة.</span>
+              </p>
+              {!user && <p style={{ fontSize: 12.5, color: '#F2A93B' }}>لست مسجّل الدخول، فلن تُحفظ نتيجتك في المتصدّرين.</p>}
+              <motion.button {...tap} style={redBtn} onClick={doWithdraw}>نعم، انسحب وسجّل نتيجتي</motion.button>
+              <motion.button {...tap} style={ghostBtn} onClick={() => setConfirmWithdraw(false)} autoFocus>إلغاء، أكمل اللعب</motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

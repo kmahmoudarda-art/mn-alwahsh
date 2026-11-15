@@ -248,6 +248,12 @@ export function resolveQuestion(run, { correct, helps = 0, doubled = false, time
   };
 }
 
+// The player gives up: the run ends right now and what they have banked is recorded.
+// No completion bonuses (those are only for finishing all levels), no penalty either.
+export function withdrawRun(run) {
+  return { ...run, gameOver: true, withdrawn: true, boxPending: null };
+}
+
 // How many levels the player has completed in this run (for the leaderboard).
 export function levelsCompleted(run) {
   return run.finished ? TOTAL_LEVELS : run.level;
