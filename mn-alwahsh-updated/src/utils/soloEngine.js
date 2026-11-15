@@ -12,6 +12,11 @@
 // Every 10 levels (10, 20 … 80) a mystery box is offered once: the player
 // chooses to open it or skip it WITHOUT knowing what's inside (see openBox).
 //
+// Hearts: the player starts with 3. A wrong answer on a 200-point question costs a
+// heart instead of sending them back 3 levels; they stay on the same level with a new
+// question. Only when no hearts are left does the usual rollback happen, and hearts
+// refill to 3 after any rollback. 400 and 600 questions and traps ignore hearts.
+//
 // Trap questions: once in every block of 30 levels one question is a trap
 // (shown with a warning, no helps allowed). Answer it right and it scores as
 // normal; get it wrong and you only lose points — no rollback, no game over —
@@ -81,6 +86,8 @@ export function modeMultiplier(run) {
   return run.mode === 'all' ? ALL_CATEGORIES_MULT : 1;
 }
 
+export const HEARTS_MAX = 3;
+
 export const LIFELINE_IDS = ['removeOne', 'twoAnswers', 'switch', 'friend', 'double'];
 
 export function tierPoints(levelIndex) {
@@ -94,7 +101,7 @@ export function pickTraps(rng = Math.random) {
   return [0, 1, 2].map(i => i * TIER_SIZE + Math.floor(rng() * TIER_SIZE));
 }
 
-export function newRun({ mode = 'all', categories = [], trial = [], traps = pickTraps() } = {}) {
+export function newRun({ mode = 'all', categories = [], trial = [], traps = pickTraps(), hearts = HEARTS_MAX } = {}) {
   return {
     mode,                // 'all' | 'pick'
     categories,          // the 10 chosen names when mode === 'pick'
@@ -107,6 +114,7 @@ export function newRun({ mode = 'all', categories = [], trial = [], traps = pick
     losses: 0,           // total questions lost in this run (never decreases)
     lifelinesUsed: {},   // { removeOne: true, ... } — each once per run
     bonusLifelines: { removeOne: 0, twoAnswers: 0 }, // extra uses won from boxes
+    hearts,              // lives that absorb a wrong 200-point answer (see top of file)
     bonusPoints: 0,      // net points won/lost from boxes
     shield: false,       // cancels the next lost question
     boxesSeen: [],       // milestone levels already offered (once each)
@@ -223,6 +231,20 @@ export function resolveQuestion(run, { correct, helps = 0, doubled = false, time
   }
   const back = ROLLBACK[points];
   const losses = run.losses + 1;
+  // A heart absorbs a wrong 200-point answer: no rollback, same level, new question.
+  const hearts = run.hearts ?? HEARTS_MAX;
+  if (points === 200 && hearts > 0) {
+    const levelPoints = [...run.levelPoints];
+    let penalty = 0;
+    if (doubled && levelPoints.length) { // "double" still costs its extra penalty
+      penalty = Math.min(points, levelPoints[levelPoints.length - 1] ?? 0);
+      levelPoints[levelPoints.length - 1] -= penalty;
+    }
+    return {
+      run: { ...run, losses, hearts: hearts - 1, levelPoints },
+      outcome: { type: 'heartLost', points, heartsLeft: hearts - 1, penalty },
+    };
+  }
   // A 600 loss always ends the run. A 200/400 loss ends it too when there
   // aren't enough levels behind the player to fall back over (e.g. 3 for 200).
   const noRoom = back !== Infinity && run.level - back < 0;
@@ -243,7 +265,7 @@ export function resolveQuestion(run, { correct, helps = 0, doubled = false, time
     levelPoints[levelPoints.length - 1] -= penalty;
   }
   return {
-    run: { ...run, losses, level: newLevel, levelPoints },
+    run: { ...run, losses, level: newLevel, levelPoints, hearts: HEARTS_MAX }, // a fresh start: hearts refill
     outcome: { type: 'fellBack', points, fellBack, newLevel, penalty },
   };
 }

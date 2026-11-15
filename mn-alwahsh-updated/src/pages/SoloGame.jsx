@@ -20,6 +20,7 @@ import UnlockPrompt from '../components/game/UnlockPrompt';
 import LevelTrack from '../components/solo/LevelTrack';
 import CountUp from '../components/solo/CountUp';
 import QuestionTimer from '../components/solo/QuestionTimer';
+import Hearts from '../components/solo/Hearts';
 import ShareResult from '../components/solo/ShareResult';
 import { setScreenSecure } from '../utils/nativeBridge';
 import SoloBackdrop from '../components/solo/SoloBackdrop';
@@ -28,7 +29,7 @@ import {
   TOTAL_LEVELS, MAX_SCORE, DOUBLE_MULT, HELP_COST_RATE,
   newRun, tierPoints, resolveQuestion, applyLifeline,
   baseScore, levelSum, helpBonus, lossBonus, finalScore, levelsCompleted,
-  canUseLifeline, isTrap, openBox, QUESTION_SECONDS, withdrawRun, BOX_EVERY, friendSuggestion, FRIEND_ACCURACY,
+  canUseLifeline, isTrap, openBox, QUESTION_SECONDS, withdrawRun, HEARTS_MAX, BOX_EVERY, friendSuggestion, FRIEND_ACCURACY,
   ALL_CATEGORIES_MULT, PICK_COUNT, modeMultiplier,
 } from '../utils/soloEngine';
 
@@ -647,7 +648,7 @@ export default function SoloGame() {
       <div className="solo-col">
       <div className="solo-rules" style={{ ...card, display: 'grid', gap: 10 }}>
         <p style={{ fontWeight: 800, fontSize: 14, opacity: 0.8 }}>إذا أخطأت</p>
-        {[[200, 'ترجع 3 مراحل'], [400, 'ترجع 10 مراحل'], [600, 'تبدأ من الصفر']].map(([pts, text]) => (
+        {[[200, 'تفقد قلباً (لديك 3 ❤️)، وإذا نفدت ترجع 3 مراحل'], [400, 'ترجع 10 مراحل'], [600, 'تبدأ من الصفر']].map(([pts, text]) => (
           <div key={pts} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 15, fontWeight: 700 }}>
             <span style={{ minWidth: 92, padding: '3px 10px', borderRadius: 8, textAlign: 'center', fontWeight: 900, background: `${TIER[pts].color}22`, color: TIER[pts].color, border: `1px solid ${TIER[pts].color}66` }}>
               سؤال {pts}
@@ -655,7 +656,7 @@ export default function SoloGame() {
             <span>{text}</span>
           </div>
         ))}
-        <p style={{ fontSize: 13, color: '#F2A93B', lineHeight: 1.7 }}>وإذا لم يكن خلفك مراحل كافية لترجع إليها (في أول 3 مراحل)، فأي خطأ يُنهي الجولة.</p>
+        <p style={{ fontSize: 13, color: '#F2A93B', lineHeight: 1.7 }}>وبعد نفاد القلوب، إذا لم يكن خلفك 3 مراحل لترجع إليها (في أول 3 مراحل) فالخطأ يُنهي الجولة. وتعود القلوب إلى 3 بعد أي رجوع للخلف.</p>
         <div style={{ borderTop: '1px solid rgba(196,22,28,0.3)', paddingTop: 10, fontSize: 13.5, lineHeight: 1.9, opacity: 0.9 }}>
           <p>🛟 خمس وسائل مساعدة: حذف إجابة، جوابان، تبديل السؤال، اتصل بصديق (يصيب 70%)، ودبل. <b>كل وسيلة تُستخدم مرة واحدة فقط في الجولة كلها (٩٠ مرحلة)</b>، وتخصم 25% من نقاط السؤال وتنقص المكافأة النهائية.</p>
           <p>⏱️ لكل سؤال 30 ثانية: إذا انتهى الوقت يُحتسب خطأً، وكل ثانية متبقية عند الإجابة الصحيحة تضيف نقطة.</p>
@@ -950,6 +951,7 @@ export default function SoloGame() {
           <span style={{ fontWeight: 900, fontSize: 17, color: '#FFD700', whiteSpace: 'nowrap' }}>⭐ <CountUp value={baseScore(run)} /></span>
         </div>
         <LevelTrack level={run.level} boxesSeen={run.boxesSeen} />
+        <div style={{ marginTop: 6 }}><Hearts hearts={run.hearts ?? HEARTS_MAX} max={HEARTS_MAX} /></div>
         <p style={{ fontSize: 11.5, opacity: 0.6, marginTop: 6, textAlign: 'center' }}>
           {run.mode === 'all' ? <b style={{ color: '#FFD700' }}>🌍 كل الفئات · نقاط ×{ALL_CATEGORIES_MULT} · </b> : null}{run.shield ? '🛡️ درع مفعّل · ' : ''}مساعدات {run.helpsUsed} · خسارات {run.losses}
         </p>
@@ -1108,10 +1110,20 @@ export default function SoloGame() {
                 {timedOut ? '⏰ انتهى الوقت' : outcome.type === 'shielded' ? 'إجابة خاطئة، لكن…' : 'إجابة خاطئة'}
               </p>
             )}
+            {outcome.type === 'heartLost' && (
+              <p style={{ fontSize: 14, color: '#FF8A8A', fontWeight: 700, marginTop: 4, lineHeight: 1.7 }}>
+                💔 فقدت قلباً.{' '}
+                {outcome.heartsLeft > 0
+                  ? `بقي لك ${outcome.heartsLeft === 1 ? 'قلب واحد' : 'قلبان'}.`
+                  : 'لم يبق لك قلوب: الخطأ القادم في سؤال 200 يرجعك 3 مراحل.'}
+                {' '}تبقى في المرحلة نفسها بسؤال جديد{outcome.penalty ? ` · وخسرت ${outcome.penalty} نقطة بسبب الدبل` : ''}.
+              </p>
+            )}
             {outcome.type === 'fellBack' && (
               <p style={{ fontSize: 14, color: '#F2A93B', fontWeight: 700, marginTop: 4 }}>
                 رجعت {outcome.fellBack} {outcome.fellBack === 1 ? 'مرحلة' : 'مراحل'} إلى المرحلة {outcome.newLevel + 1}
                 {outcome.penalty ? ` · وخسرت ${outcome.penalty} نقطة بسبب الدبل` : ''}
+                {' '}· وعادت لك قلوبك الثلاثة ❤️
               </p>
             )}
             {outcome.type === 'trapLost' && (
@@ -1132,7 +1144,7 @@ export default function SoloGame() {
             )}
             {question.explanation && <p style={{ fontSize: 14, margin: '8px 0', opacity: 0.85, lineHeight: 1.7 }}>{question.explanation}</p>}
             <motion.button {...tap} style={{ ...redBtn, marginTop: 8 }} onClick={onContinue} autoFocus>
-              {outcome.type === 'gameOver' || outcome.type === 'finished' || outcome.finished ? 'عرض النتيجة' : 'المرحلة التالية'}
+              {outcome.type === 'gameOver' || outcome.type === 'finished' || outcome.finished ? 'عرض النتيجة' : outcome.type === 'heartLost' ? 'حاول بسؤال جديد' : 'المرحلة التالية'}
             </motion.button>
           </motion.div>
         )}
