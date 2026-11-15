@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity() {
         android.webkit.CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
 
         webView.addJavascriptInterface(AndroidBillingBridge(this, webView), "AndroidBillingNative")
+        webView.addJavascriptInterface(ScreenSecureBridge(this), "AndroidScreen")
 
         webView.webViewClient = object : WebViewClient() {
             @Suppress("DEPRECATION")
@@ -76,6 +77,8 @@ class MainActivity : AppCompatActivity() {
 
             override fun onPageStarted(view: WebView, url: String?, favicon: android.graphics.Bitmap?) {
                 super.onPageStarted(view, url, favicon)
+                // Every full page load starts unprotected; the solo game re-enables it when it opens.
+                window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
                 if (isOwnSite(url?.let { Uri.parse(it).host })) {
                     offlineLayout.visibility = View.GONE
                 }
