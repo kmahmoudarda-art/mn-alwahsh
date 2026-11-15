@@ -41,6 +41,18 @@ const LIFELINES = [
   { id: 'double', label: '🎯 دبل يا كبير', desc: `نقاط السؤال ×${DOUBLE_MULT} إن أصبت، وإن أخطأت تخسر نقاطه من المرحلة السابقة` },
 ];
 
+// Every solo question this player has been shown, kept on this device per
+// account, so a new run avoids questions from earlier runs too. When that pool
+// runs dry the game allows repeats (never inside the same run).
+const HISTORY_CAP = 6000;
+const historyKey = (u) => `mn_alwahsh_v3_solo_seen_${u?.id || 'guest'}`;
+function loadHistory(u) {
+  try { return new Set(JSON.parse(localStorage.getItem(historyKey(u)) || '[]')); } catch { return new Set(); }
+}
+function saveHistory(u, set) {
+  try { localStorage.setItem(historyKey(u), JSON.stringify([...set].slice(-HISTORY_CAP))); } catch { /* storage full or blocked */ }
+}
+
 function loadSave() {
   try { return JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch { return null; }
 }
@@ -117,24 +129,23 @@ const tap = { whileTap: { scale: 0.97 }, transition: springs.snappy };
 export default function SoloGame() {
   const navigate = useNavigate();
   const user = getCurrentUser();
+  const reduce = useReducedMotion();
 
   const [view, setView] = useState('intro'); // intro | mode | pick | play | box | end | board
   const [boxResult, setBoxResult] = useState(null);
   const [opening, setOpening] = useState(false);
   const [allCats, setAllCats] = useState(null); // every visible category, locked ones included
+  const [catsError, setCatsError] = useState(false);
   const [unlockFor, setUnlockFor] = useState(null); // premium category whose purchase prompt is open
   const trialRef = useRef([]);                    // premium categories borrowed for this run (trial SKU)
   const [picked, setPicked] = useState([]);
   const [search, setSearch] = useState('');
   const [flash, setFlash] = useState(0);
-  const [showExit, setShowExit] = useState(false);
-  const reduce = useReducedMotion();
   const [run, setRun] = useState(newRun);
   const [hasSave, setHasSave] = useState(false);
   const [saveInfo, setSaveInfo] = useState(null); // { level, score, mode } of the saved run
-  const [notice, setNotice] = useState('');
 
-  const [pool, setPool] = useState(null);     // free category names
+  const [pool, setPool] = useState(null);     // categories this account can play
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [question, setQuestion] = useState(null);
@@ -143,7 +154,7 @@ export default function SoloGame() {
   const [outcome, setOutcome] = useState(null);
 
   // Per-question help state
-  const [removed, setRemoved] = useState(null);
+  const [removed, setRemoved] = useState([]);
   const [twoMode, setTwoMode] = useState(false);
   const [firstWrong, setFirstWrong] = useState(null);
   const [doubled, setDoubled] = useState(false);
@@ -153,20 +164,54 @@ export default function SoloGame() {
   const [submitInfo, setSubmitInfo] = useState(null);
   const [board, setBoard] = useState(null);
 
-  const seen = useRef(new Set());
+  const seen = useRef(new Set());       // questions shown in THIS run
+  const history = useRef(null);         // questions shown in every run on this device (see loadHistory)
   const deadCombos = useRef(new Set());
   const songSwapped = useRef(false);
+  const songFails = useRef(0);          // unplayable clips in a row; after 2 we stop serving songs until an answer
+  const submittedRef = useRef(false);   // this finished run is already on the leaderboard
+  const loadTok = useRef(0);            // newest loadQuestion wins; stale ones stop quietly
+  const boxTimer = useRef(null);
   const runRef = useRef(run);
   runRef.current = run;
+  const liveRun = useRef(false);        // a run is on screen, so auto-save may write
 
-  // ── persistence ─────────────────────────────────────────────────────
-  const persist = useCallback((r, extra = {}) => {
-    writeSave({ run: r, seen: [...seen.current].slice(-400), ...extra });
+  // ── auto-save ───────────────────────────────────────────────────────
+  // The run AND the question on screen (with the helps already used on it) are
+  // saved after every change, so leaving, refreshing or a killed app brings the
+  // player back to the same question — nothing is lost and nothing can be rerolled.
+  const latest = useRef({});
+  latest.current = { run, question, removed, twoMode, firstWrong, doubled, friendKey, answered, loading };
+  const saveNow = useCallback(() => {
+    if (!liveRun.current) return;
+    const L = latest.current;
+    let qs = null;
+    if (L.question && !L.answered) {
+      qs = { question: L.question, removed: L.removed, twoMode: L.twoMode, firstWrong: L.firstWrong, doubled: L.doubled, friendKey: L.friendKey, helps: helpsOnQ.current };
+    } else if (L.loading) {
+      qs = { carry: { helps: helpsOnQ.current, doubled: L.doubled } };
+    }
+    writeSave({ run: L.run, seen: [...seen.current].slice(-400), qs, submitted: submittedRef.current });
   }, []);
+
+  useEffect(() => { saveNow(); }, [run, question, removed, twoMode, firstWrong, doubled, friendKey, answered, loading, view, saveNow]);
+
+  useEffect(() => {
+    const onHide = () => { if (document.visibilityState === 'hidden') saveNow(); };
+    window.addEventListener('pagehide', saveNow);
+    document.addEventListener('visibilitychange', onHide);
+    return () => {
+      window.removeEventListener('pagehide', saveNow);
+      document.removeEventListener('visibilitychange', onHide);
+      saveNow();
+      loadTok.current += 1;             // cancel any question still loading
+      clearTimeout(boxTimer.current);   // and a box still opening
+    };
+  }, [saveNow]);
 
   useEffect(() => {
     const s = loadSave();
-    if (s?.run && !(s.run.level === 0 && !s.run.levelPoints?.length && !s.run.losses && !s.run.gameOver && !s.pending)) {
+    if (s?.run && !(s.run.level === 0 && !s.run.levelPoints?.length && !s.run.losses && !s.run.gameOver && !s.qs)) {
       setHasSave(true);
       const sr = { ...newRun({ mode: 'pick' }), ...s.run };
       setSaveInfo({ level: sr.level, score: baseScore(sr), mode: sr.mode, over: sr.gameOver || sr.finished });
@@ -186,6 +231,7 @@ export default function SoloGame() {
   const ensurePool = useCallback(async () => {
     if (pool) return pool;
     const cats = await fetchCategories();
+    if (!cats.length) throw new Error('no-categories');
     const visible = cats.filter(c => !isHiddenCategory(c) && !isSoloExcluded(c));
     setAllCats(visible);
     const unlockedList = await fetchUnlockedCategories().catch(() => []);
@@ -216,88 +262,112 @@ export default function SoloGame() {
   };
 
   const loadQuestion = useCallback(async (level, carry) => {
+    const tok = ++loadTok.current;
     setLoading(true); setLoadError(false);
     setQuestion(null); setSelected(null); setAnswered(false); setOutcome(null);
-    setRemoved(null); setTwoMode(false); setFirstWrong(null); setDoubled(!!carry?.doubled); setFriendKey(null);
+    setRemoved([]); setTwoMode(false); setFirstWrong(null); setDoubled(!!carry?.doubled); setFriendKey(null);
     // a swapped question keeps the help cost / double already committed on the old one
     helpsOnQ.current = carry?.helps || 0; songSwapped.current = false;
     const points = tierPoints(level);
     try {
       const base = await ensurePool();
+      if (tok !== loadTok.current) return;
       const cur = runRef.current;
       const chosen = (cur.categories || []).filter(c => base.includes(c) || (cur.trial || []).includes(c)); // drops anything excluded since an older save
       const cats = cur.mode === 'pick' && chosen.length ? chosen : base;
-      for (let i = 0; i < 25; i++) {
-        const live = cats.filter(c => !deadCombos.current.has(`${c}|${points}`));
-        if (!live.length) break;
-        const cat = pick(live);
-        const q = await fetchQuestion(cat, points);
-        if (!q) { deadCombos.current.add(`${cat}|${points}`); continue; }
-        if (!validQuestion(q) || seen.current.has(qKey(q))) continue;
-        seen.current.add(qKey(q));
-        if (q.image_url) await Promise.race([fetchAndCacheImage(q.image_url), new Promise(r => setTimeout(r, 2500))]);
-        setQuestion({ ...q, category: cat });
-        setLoading(false);
-        // From here the question is on screen: leaving now counts as a loss.
-        persist(runRef.current, { pending: true });
-        return;
+      if (!history.current) history.current = loadHistory(user);
+      const hist = history.current;
+      // First pass skips everything this player has ever seen in solo; only if that
+      // finds nothing do we allow repeats from older runs (never within this run).
+      for (const strict of [true, false]) {
+        for (let i = 0; i < 25; i++) {
+          const avail = cats.filter(c => !deadCombos.current.has(`${c}|${points}`));
+          if (!avail.length) break;
+          const cat = pick(avail);
+          const q = await fetchQuestion(cat, points);
+          if (tok !== loadTok.current) return;
+          if (!q) { deadCombos.current.add(`${cat}|${points}`); continue; }
+          const k = qKey(q);
+          if (!validQuestion(q) || seen.current.has(k) || (strict && hist.has(k))) continue;
+          if (q.itunes_id && songFails.current >= 2) continue; // clips keep failing: serve other questions
+          if (q.image_url) await Promise.race([fetchAndCacheImage(q.image_url), new Promise(r => setTimeout(r, 2500))]);
+          if (tok !== loadTok.current) return;
+          seen.current.add(k); hist.add(k); saveHistory(user, hist);
+          setQuestion({ ...q, category: cat });
+          setLoading(false);
+          return;
+        }
       }
       setLoadError(true);
     } catch {
-      setLoadError(true);
+      if (tok === loadTok.current) setLoadError(true);
     }
-    setLoading(false);
-  }, [ensurePool, persist]);
+    if (tok === loadTok.current) setLoading(false);
+  }, [ensurePool, user]);
 
   // ── run lifecycle ───────────────────────────────────────────────────
   const endRun = useCallback(async (r) => {
     setView('end');
     setSubmitInfo(null);
+    if (submittedRef.current) { setSubmitInfo({ saved: true, newBest: false, signedIn: true }); return; }
+    submittedRef.current = true;          // set first, so tapping twice can't submit twice
     const info = await submitRun({
       score: finalScore(r), levels: levelsCompleted(r), finished: r.finished, user,
     });
     setSubmitInfo(info);
-  }, [user]);
+    if (!info.saved && !info.skipped) submittedRef.current = false; // failed or signed out: try again next time
+    saveNow();
+  }, [user, saveNow]);
 
   const startNew = (mode = 'all', categories = []) => {
     const trial = categories.filter(c => trialRef.current.includes(c)); // borrowed premium categories live only in this run
     seen.current = new Set();
     deadCombos.current = new Set();
+    songFails.current = 0;
+    submittedRef.current = false;
     const r = newRun({ mode, categories, trial });
     runRef.current = r;            // loadQuestion reads the mode from here
-    setRun(r); setNotice(''); setView('play');
-    persist(r, { pending: false });
+    liveRun.current = true;
+    setRun(r); setBoxResult(null); setView('play');
     loadQuestion(0);
   };
 
-  const chooseMode = async (mode) => {
+  const loadPicker = async () => {
+    setCatsError(false);
+    try { await ensurePool(); } catch { setCatsError(true); }
+  };
+
+  const chooseMode = (mode) => {
     if (mode === 'all') { startNew('all'); return; }
     setPicked([]); setSearch(''); setView('pick');
-    try { await ensurePool(); } catch {}
+    loadPicker();
   };
 
   const resume = () => {
     const s = loadSave();
     if (!s?.run) return startNew();
     seen.current = new Set(s.seen || []);
-    let r = { ...newRun({ mode: 'pick' }), ...s.run }; // saves from before modes behave like 'pick', ×1
-    if (r.gameOver || r.finished) { setRun(r); endRun(r); return; }
-    let msg = '';
-    if (s.pending) {
-      // Left a question without answering — it counts as a miss (one attempt only).
-      const res = resolveQuestion(r, { correct: false });
-      r = res.run;
-      msg = res.outcome.type === 'gameOver'
-        ? 'خرجت من السؤال قبل الإجابة فاحتُسب خطأً، وبهذا الخطأ انتهت الجولة.'
-        : `خرجت من السؤال قبل الإجابة فاحتُسب خطأً — رجعت ${res.outcome.fellBack} مراحل.`;
-    }
+    deadCombos.current = new Set();
+    songFails.current = 0;
+    submittedRef.current = !!s.submitted;
+    const r = { ...newRun({ mode: 'pick' }), ...s.run }; // saves from before modes behave like 'pick', ×1
     runRef.current = r;
-    setRun(r); setNotice(msg);
-    persist(r, { pending: false });
-    if (r.gameOver) { endRun(r); return; }
+    liveRun.current = true;
+    setRun(r);
+    if (r.gameOver || r.finished) { endRun(r); return; }
     if (r.boxPending) { setBoxResult(null); setView('box'); return; }
     setView('play');
-    loadQuestion(r.level);
+    const qs = s.qs;
+    if (qs?.question) {
+      // Same question, same helps: leaving and coming back costs nothing and can't be used to reroll.
+      helpsOnQ.current = qs.helps || 0;
+      setQuestion(qs.question); setRemoved(qs.removed || []); setTwoMode(!!qs.twoMode); setFirstWrong(qs.firstWrong || null);
+      setDoubled(!!qs.doubled); setFriendKey(qs.friendKey || null);
+      setSelected(null); setAnswered(false); setOutcome(null); setLoading(false); setLoadError(false);
+      if (qs.question.image_url) fetchAndCacheImage(qs.question.image_url).catch(() => {});
+      return;
+    }
+    loadQuestion(r.level, qs?.carry);
   };
 
   // ── answering ───────────────────────────────────────────────────────
@@ -306,12 +376,12 @@ export default function SoloGame() {
     setRun(res.run);
     setOutcome(res.outcome);
     setAnswered(true);
+    songFails.current = 0;
     if (correct) sounds?.correct?.(); else { sounds?.wrong?.(); if (res.outcome.type !== 'shielded') setFlash(f => f + 1); }
-    persist(res.run, { pending: false });
   };
 
   const onPick = (key) => {
-    if (answered || key === removed || key === firstWrong || !question) return;
+    if (answered || removed.includes(key) || key === firstWrong || !question) return;
     setSelected(key);
     const correct = key === question.correct;
     if (!correct && twoMode && !firstWrong) {
@@ -325,17 +395,16 @@ export default function SoloGame() {
     if (answered || !question || !canUseLifeline(run, id) || isTrap(runRef.current)) return; // no helps on a trap
     const next = applyLifeline(run, id);
     setRun(next);
-    persist(next, { pending: true });
     if (id === 'removeOne') {
       helpsOnQ.current += 1;
-      const wrong = Object.keys(question.options).filter(k => k !== question.correct && question.options[k]);
-      setRemoved(pick(wrong));
+      const wrong = Object.keys(question.options).filter(k => k !== question.correct && question.options[k] && !removed.includes(k) && k !== firstWrong);
+      if (wrong.length) setRemoved(prev => [...prev, pick(wrong)]);
     } else if (id === 'twoAnswers') {
       helpsOnQ.current += 1;
       setTwoMode(true);
     } else if (id === 'friend') {
       helpsOnQ.current += 1;
-      const keys = Object.keys(question.options).filter(k => question.options[k] && k !== removed && k !== firstWrong);
+      const keys = Object.keys(question.options).filter(k => question.options[k] && !removed.includes(k) && k !== firstWrong);
       setFriendKey(friendSuggestion(question.correct, keys));
     } else if (id === 'switch') {
       // new question at the same level; this help's cost carries over to it
@@ -357,16 +426,14 @@ export default function SoloGame() {
     if (!open) {
       const res = openBox(run, false);
       setRun(res.run);
-      persist(res.run, { pending: false });
       setView('play'); loadQuestion(res.run.level);
       return;
     }
     // shake first, then reveal — the result is only decided at reveal time
     setOpening(true);
-    setTimeout(() => {
+    boxTimer.current = setTimeout(() => {
       const res = openBox(runRef.current, true);
       setRun(res.run);
-      persist(res.run, { pending: false });
       setBoxResult(res.result);
       setOpening(false);
     }, reduce ? 0 : 700);
@@ -378,27 +445,9 @@ export default function SoloGame() {
   const onSongFailed = useCallback(() => {
     if (songSwapped.current || answered) return;
     songSwapped.current = true;
+    songFails.current += 1;
     loadQuestion(runRef.current.level, { helps: helpsOnQ.current, doubled });
   }, [answered, doubled, loadQuestion]);
-
-  // "Save and exit". Between questions (answered, loading, box) progress is
-  // already saved, so just leave. While a question is on screen, leaving
-  // would dodge the one-attempt rule, so ask first and count it as a miss.
-  const questionOpen = view === 'play' && !!question && !loading && !answered;
-  const requestExit = () => { if (questionOpen) setShowExit(true); else navigate('/'); };
-  const confirmExit = () => {
-    const res = resolveQuestion(runRef.current, { correct: false, helps: helpsOnQ.current, doubled });
-    persist(res.run, { pending: false });  // saved with the loss already applied
-    setShowExit(false);
-    navigate('/');
-  };
-
-  useEffect(() => {
-    if (!showExit) return undefined;
-    const onKey = (e) => { if (e.key === 'Escape') setShowExit(false); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [showExit]);
 
   const openBoard = async () => {
     setView('board'); setBoard(null);
@@ -520,7 +569,13 @@ export default function SoloGame() {
         <h2 style={{ textAlign: 'center', fontSize: 24, fontWeight: 900 }}>اختر {PICK_COUNT} فئات</h2>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="ابحث عن فئة"
           style={{ ...font, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(196,22,28,0.5)', borderRadius: 12, padding: '11px 14px', color: '#FFE9E9', fontSize: 15, outline: 'none' }} />
-        {allCats === null && <p style={{ textAlign: 'center', opacity: 0.8, padding: 20 }}>جاري تحميل الفئات…</p>}
+        {allCats === null && !catsError && <p style={{ textAlign: 'center', opacity: 0.8, padding: 20 }}>جاري تحميل الفئات…</p>}
+        {catsError && (
+          <div style={{ textAlign: 'center', padding: 16 }}>
+            <p style={{ marginBottom: 10 }}>تعذّر تحميل الفئات. تحقّق من اتصالك ثم أعد المحاولة.</p>
+            <motion.button {...tap} style={{ ...redBtn, maxWidth: 260 }} onClick={loadPicker}>إعادة المحاولة</motion.button>
+          </div>
+        )}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
           {list.map(c => {
             const on = picked.includes(c);
@@ -530,9 +585,8 @@ export default function SoloGame() {
               <motion.button key={c} whileTap={{ scale: 0.95 }} transition={springs.snappy} onClick={() => toggle(c)} aria-pressed={on}
                 style={{
                   ...font, fontWeight: 700, fontSize: 14, padding: '8px 14px', borderRadius: 999, cursor: full ? 'default' : 'pointer',
-                  borderStyle: locked ? 'dashed' : 'solid',
                   color: on ? '#0A0305' : '#FFE9E9', background: on ? '#FFD700' : 'rgba(255,255,255,0.05)',
-                  border: `1.5px solid ${on ? '#FFD700' : 'rgba(196,22,28,0.5)'}`, opacity: full ? 0.35 : locked ? 0.55 : 1,
+                  border: `1.5px ${locked ? 'dashed' : 'solid'} ${on ? '#FFD700' : 'rgba(196,22,28,0.5)'}`, opacity: full ? 0.35 : locked ? 0.55 : 1,
                 }}>
                 {locked ? '🔒' : getIcon ? getIcon(c) : ''} {displayName(c)}
               </motion.button>
@@ -724,7 +778,7 @@ export default function SoloGame() {
       {/* header: score + track */}
       <div className="solo-head-card" style={{ ...card, padding: '12px 14px 10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <button onClick={requestExit} style={{ ...ghostBtn, padding: '5px 10px', fontSize: 12, whiteSpace: 'nowrap' }}>حفظ وخروج</button>
+          <button onClick={() => navigate('/')} style={{ ...ghostBtn, padding: '5px 10px', fontSize: 12, whiteSpace: 'nowrap' }}>خروج (يُحفظ تلقائياً)</button>
           <span style={{ fontWeight: 900, fontSize: 15, whiteSpace: 'nowrap' }}>المرحلة {run.level + 1}<span style={{ opacity: 0.5, fontWeight: 600 }}> / {TOTAL_LEVELS}</span></span>
           <span style={{ fontWeight: 900, fontSize: 17, color: '#FFD700', whiteSpace: 'nowrap' }}>⭐ <CountUp value={baseScore(run)} /></span>
         </div>
@@ -733,13 +787,6 @@ export default function SoloGame() {
           {run.mode === 'all' ? <b style={{ color: '#FFD700' }}>🌍 كل الفئات · نقاط ×{ALL_CATEGORIES_MULT} · </b> : null}{run.shield ? '🛡️ درع مفعّل · ' : ''}مساعدات {run.helpsUsed} · خسارات {run.losses}
         </p>
       </div>
-
-      {notice && (
-        <div style={{ ...card, padding: 10, borderColor: '#F2A93B', fontSize: 13 }}>
-          ⚠️ {notice}
-          <button onClick={() => setNotice('')} style={{ ...ghostBtn, padding: '2px 8px', marginRight: 8, fontSize: 12 }}>حسناً</button>
-        </div>
-      )}
 
       </div>
 
@@ -786,7 +833,7 @@ export default function SoloGame() {
               background: 'linear-gradient(180deg, #F3EAD7, #E4D7BA)', color: '#1d1410', borderRadius: 14, padding: 16,
               border: `2px solid ${tier.color}`, boxShadow: `0 0 0 3px #0A0305, 0 10px 30px rgba(0,0,0,0.5), 0 0 24px ${tier.glow}`,
             }}>
-              {hero && <img src={hero} alt="" style={{ width: '100%', maxHeight: 240, objectFit: 'contain', borderRadius: 10, marginBottom: 10 }} />}
+              {hero && <img src={hero} alt="" style={{ width: '100%', maxHeight: 'min(240px, 36vh)', objectFit: 'contain', borderRadius: 10, marginBottom: 10 }} />}
               {question.itunes_id && (
                 <SongPlayer key={question.id ?? question.itunes_id} itunesId={question.itunes_id} solo onFailed={onSongFailed} />
               )}
@@ -797,7 +844,7 @@ export default function SoloGame() {
               initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: reduce ? 0 : STAGGER, delayChildren: 0.1 } } }}>
               {Object.entries(question.options).map(([key, value]) => {
                 if (!value) return null;
-                const isRemoved = key === removed;
+                const isRemoved = removed.includes(key);
                 const isFirstWrong = key === firstWrong;
                 const isRight = key === question.correct;
                 const isWrongPick = answered && key === selected && !isRight;
@@ -919,26 +966,6 @@ export default function SoloGame() {
       </AnimatePresence>
       </div>
 
-      <AnimatePresence>
-        {showExit && (
-          <motion.div key="exit" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.15 } }}
-            style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'grid', placeItems: 'center', padding: 20, background: 'rgba(0,0,0,0.78)', backdropFilter: 'blur(4px)' }}
-            onClick={() => setShowExit(false)}>
-            <motion.div role="dialog" aria-modal="true" aria-labelledby="exit-title"
-              initial={reduce ? false : { scale: 0.92, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.15 } }} transition={springs.gentle}
-              onClick={e => e.stopPropagation()}
-              style={{ ...card, maxWidth: 360, display: 'flex', flexDirection: 'column', gap: 12, textAlign: 'center' }}>
-              <p id="exit-title" style={{ fontSize: 18, fontWeight: 900 }}>الخروج أثناء السؤال؟</p>
-              <p style={{ fontSize: 14, lineHeight: 1.8, opacity: 0.9 }}>
-                لكل سؤال محاولة واحدة، فإذا خرجت الآن يُحتسب هذا السؤال خطأً.
-                أجب أولاً ثم اضغط «حفظ وخروج» لتحتفظ بتقدّمك بلا أي خسارة.
-              </p>
-              <motion.button {...tap} style={redBtn} onClick={() => setShowExit(false)} autoFocus>أكمل السؤال</motion.button>
-              <motion.button {...tap} style={ghostBtn} onClick={confirmExit}>اخرج واحتسبه خطأً</motion.button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
