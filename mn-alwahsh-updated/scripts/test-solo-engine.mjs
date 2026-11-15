@@ -158,4 +158,14 @@ let tmr2 = E.resolveQuestion({ ...E.newRun({ mode: 'all', traps: [] }) }, { corr
 assert.equal(tmr2.outcome.earned, Math.round(Math.max(0, 200 - 50) * 2 * 1.5) + 10);
 // a wrong answer earns no speed points
 assert.ok(!('timeBonus' in E.resolveQuestion(E.newRun({ mode: 'pick', traps: [] }), { correct: false, timeLeft: 25 }).outcome));
+// ── Withdraw ──
+let wd = E.newRun({ mode: 'pick', traps: [] });
+for (let i = 0; i < 12; i++) wd = E.resolveQuestion(wd, { correct: true }).run;
+const wr = E.withdrawRun(wd);
+assert.ok(wr.gameOver && wr.withdrawn && !wr.finished);
+assert.equal(E.finalScore(wr), E.baseScore(wd)); // exactly what was banked, no bonuses
+assert.equal(E.levelsCompleted(wr), 12);
+assert.equal(wr.losses, wd.losses);            // not counted as a loss
+// withdrawing with a box waiting does not leave it pending
+assert.equal(E.withdrawRun({ ...wd, boxPending: 10 }).boxPending, null);
 console.log('solo engine: all tests passed');
