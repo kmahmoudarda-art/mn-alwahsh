@@ -12,6 +12,9 @@
 // Every 10 levels (10, 20 … 80) a mystery box is offered once: the player
 // chooses to open it or skip it WITHOUT knowing what's inside (see openBox).
 //
+// If there aren't enough levels behind you to fall back over (e.g. a 200
+// question in the first 3 levels), the run ends like a 600 loss.
+//
 // Points earned on the levels you fall back over are taken away (you replay
 // them), but help/loss counters keep counting for the whole run.
 
@@ -180,10 +183,13 @@ export function resolveQuestion(run, { correct, helps = 0, doubled = false }) {
   }
   const back = ROLLBACK[points];
   const losses = run.losses + 1;
-  if (back === Infinity) {
+  // A 600 loss always ends the run. A 200/400 loss ends it too when there
+  // aren't enough levels behind the player to fall back over (e.g. 3 for 200).
+  const noRoom = back !== Infinity && run.level - back < 0;
+  if (back === Infinity || noRoom) {
     return {
-      run: { ...run, losses, gameOver: true },
-      outcome: { type: 'gameOver', points, reachedLevels: run.level },
+      run: { ...run, losses, gameOver: true, lostAt: points },
+      outcome: { type: 'gameOver', points, reachedLevels: run.level, noRoom, back: noRoom ? back : null },
     };
   }
   const newLevel = Math.max(0, run.level - back);

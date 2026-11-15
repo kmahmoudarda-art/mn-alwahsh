@@ -215,7 +215,7 @@ export default function SoloGame() {
       const res = resolveQuestion(r, { correct: false });
       r = res.run;
       msg = res.outcome.type === 'gameOver'
-        ? 'خرجت من السؤال قبل الإجابة فاحتُسب خطأً — وكان بـ600 نقطة فانتهت الجولة.'
+        ? 'خرجت من السؤال قبل الإجابة فاحتُسب خطأً، وبهذا الخطأ انتهت الجولة.'
         : `خرجت من السؤال قبل الإجابة فاحتُسب خطأً — رجعت ${res.outcome.fellBack} مراحل.`;
     }
     runRef.current = r;
@@ -346,6 +346,7 @@ export default function SoloGame() {
             <span>{text}</span>
           </div>
         ))}
+        <p style={{ fontSize: 13, color: '#F2A93B', lineHeight: 1.7 }}>وإذا لم يكن خلفك مراحل كافية لترجع إليها (في أول 3 مراحل)، فأي خطأ يُنهي الجولة.</p>
         <div style={{ borderTop: '1px solid rgba(196,22,28,0.3)', paddingTop: 10, fontSize: 13.5, lineHeight: 1.9, opacity: 0.9 }}>
           <p>🛟 خمس وسائل مساعدة، كل واحدة مرة واحدة: حذف إجابة، جوابان، تبديل السؤال، اتصل بصديق (يصيب 70%)، ودبل. تخصم من نقاط السؤال وتنقص المكافأة النهائية.</p>
           <p>🎁 بعد كل {BOX_EVERY} مراحل صندوق مفاجأة: تفتحه أو تتخطاه دون أن ترى ما بداخله.</p>
@@ -558,7 +559,7 @@ export default function SoloGame() {
           {run.finished ? 'أنهيت التحدّي!' : 'انتهت الجولة'}
         </motion.h2>
         {!run.finished && (
-          <p style={{ textAlign: 'center', fontSize: 14, opacity: 0.85 }}>أخطأت في سؤال 600 نقطة بعد {levelsCompleted(run)} مرحلة.</p>
+          <p style={{ textAlign: 'center', fontSize: 14, opacity: 0.85 }}>أخطأت في سؤال {run.lostAt || 600} نقطة بعد {levelsCompleted(run)} مرحلة.{run.lostAt && run.lostAt < 600 ? ' ولم تكن هناك مراحل كافية لترجع إليها.' : ''}</p>
         )}
         <div style={{ ...card, textAlign: 'center' }}>
           <p style={{ fontSize: 13, opacity: 0.7 }}>مجموع نقاطك</p>
@@ -755,7 +756,9 @@ export default function SoloGame() {
               <p style={{ fontSize: 14, color: '#46C98B', fontWeight: 700, marginTop: 4 }}>🛡️ الدرع حماك. لم تخسر شيئاً وتبقى في مرحلتك.</p>
             )}
             {outcome.type === 'gameOver' && (
-              <p style={{ fontSize: 14, color: '#FF6666', fontWeight: 700, marginTop: 4 }}>سؤال 600 نقطة، فتبدأ الجولة من الصفر.</p>
+              <p style={{ fontSize: 14, color: '#FF6666', fontWeight: 700, marginTop: 4 }}>{outcome.noRoom
+                  ? `لا توجد ${outcome.back} مراحل قبلك لترجع إليها، فتنتهي الجولة.`
+                  : 'سؤال 600 نقطة، فتبدأ الجولة من الصفر.'}</p>
             )}
             {question.explanation && <p style={{ fontSize: 14, margin: '8px 0', opacity: 0.85, lineHeight: 1.7 }}>{question.explanation}</p>}
             <motion.button {...tap} style={{ ...redBtn, marginTop: 8 }} onClick={onContinue} autoFocus>

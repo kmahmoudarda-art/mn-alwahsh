@@ -20,8 +20,19 @@ for (let i = 0; i < 5; i++) r = E.resolveQuestion(r, { correct: true }).run;
 let res = E.resolveQuestion(r, { correct: false });
 assert.equal(res.run.level, 2); assert.equal(res.run.losses, 1);
 assert.equal(E.baseScore(res.run), 400);
-res = E.resolveQuestion(E.resolveQuestion(E.newRun({ mode: 'pick' }), { correct: true }).run, { correct: false });
-assert.equal(res.run.level, 0); assert.equal(E.baseScore(res.run), 0);
+// not enough levels behind to fall back 3 → the run ends (questions 1–3)
+for (const lvl of [0, 1, 2]) {
+  const r0 = { ...E.newRun({ mode: 'pick' }), level: lvl, levelPoints: Array(lvl).fill(200) };
+  const g = E.resolveQuestion(r0, { correct: false });
+  assert.ok(g.run.gameOver, 'level ' + lvl); assert.equal(g.outcome.type, 'gameOver'); assert.ok(g.outcome.noRoom); assert.equal(g.run.lostAt, 200);
+}
+// exactly 3 levels behind is enough
+const r3 = { ...E.newRun({ mode: 'pick' }), level: 3, levelPoints: Array(3).fill(200) };
+const ok3 = E.resolveQuestion(r3, { correct: false });
+assert.ok(!ok3.run.gameOver); assert.equal(ok3.run.level, 0);
+// a shield still saves you there
+const sh0 = E.resolveQuestion({ ...E.newRun({ mode: 'pick' }), shield: true }, { correct: false });
+assert.equal(sh0.outcome.type, 'shielded'); assert.ok(!sh0.run.gameOver);
 
 // 400 loss: back 10
 r = E.newRun({ mode: 'pick' });
