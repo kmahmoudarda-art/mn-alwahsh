@@ -83,4 +83,11 @@ L = E.applyLifeline(L, 'removeOne'); assert.ok(!E.canUseLifeline(L, 'removeOne')
 let sh = { ...E.newRun(), level: 65, shield: true };
 const sres = E.resolveQuestion(sh, { correct: false });
 assert.equal(sres.outcome.type, 'shielded'); assert.equal(sres.run.level, 65); assert.equal(sres.run.losses, 0); assert.ok(!sres.run.shield);
+// ── Call a friend / switch ──
+let right = 0; const N = 20000;
+for (let i = 0; i < N; i++) if (E.friendSuggestion('B', ['A', 'B', 'C', 'D']) === 'B') right++;
+assert.ok(Math.abs(right / N - 0.7) < 0.02, 'friend accuracy ~70%: ' + right / N);
+assert.equal(E.friendSuggestion('B', ['B'], () => 0.99), 'B'); // only the right one left
+let f = E.applyLifeline(E.newRun(), 'friend'); assert.equal(f.helpsUsed, 1); assert.ok(!E.canUseLifeline(f, 'friend'));
+let sw = E.applyLifeline(E.newRun(), 'switch'); assert.equal(sw.helpsUsed, 1); assert.ok(!E.canUseLifeline(sw, 'switch'));
 console.log('solo engine: all tests passed');

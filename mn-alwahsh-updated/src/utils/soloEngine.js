@@ -43,7 +43,21 @@ export const BOX_TABLE = [        // weights sum to 100 → ~70% good / 30% bad
   { type: 'rollback', w: 12 },
 ];
 
-export const LIFELINE_IDS = ['removeOne', 'twoAnswers', 'double'];
+// "اتصل بصديق": the friend points at an answer — right 70% of the time.
+export const FRIEND_ACCURACY = 0.7;
+
+// Picks which option the friend suggests. `keys` are the options still on
+// screen; the friend is right with probability FRIEND_ACCURACY, otherwise
+// suggests one of the wrong ones. rng is injectable for tests.
+export function friendSuggestion(correct, keys, rng = Math.random) {
+  const wrong = keys.filter(k => k !== correct);
+  if (!wrong.length || rng() < FRIEND_ACCURACY) return correct;
+  return wrong[Math.floor(rng() * wrong.length)];
+}
+
+// removeOne / twoAnswers / switch (new question, once per run) / friend are
+// "helps" (cost points + shrink the end bonus); double is a gamble, not a help.
+export const LIFELINE_IDS = ['removeOne', 'twoAnswers', 'switch', 'friend', 'double'];
 
 export function tierPoints(levelIndex) {
   if (levelIndex < TIER_SIZE) return 200;

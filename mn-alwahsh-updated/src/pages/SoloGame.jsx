@@ -16,7 +16,7 @@ import {
   TOTAL_LEVELS, TIER_SIZE, MAX_SCORE, DOUBLE_MULT, HELP_COST_RATE,
   newRun, tierPoints, resolveQuestion, applyLifeline,
   baseScore, levelSum, helpBonus, lossBonus, finalScore, levelsCompleted,
-  canUseLifeline, openBox, BOX_EVERY,
+  canUseLifeline, openBox, BOX_EVERY, friendSuggestion, FRIEND_ACCURACY,
 } from '../utils/soloEngine';
 
 // Key must start with "mn_alwahsh_v3_" — supabaseClient wipes every other
@@ -32,6 +32,8 @@ const TIER_STYLE = {
 const LIFELINES = [
   { id: 'removeOne', label: '🗑️ احذف إجابة', desc: `يحذف خياراً خاطئاً — يخصم ${HELP_COST_RATE * 100}% من نقاط السؤال` },
   { id: 'twoAnswers', label: '✌️ جاوب جوابين', desc: `محاولتان للإجابة — يخصم ${HELP_COST_RATE * 100}% من نقاط السؤال` },
+  { id: 'switch', label: '🔄 بدّل السؤال', desc: `سؤال جديد بدل الحالي — مرة واحدة في الجولة كلها، ويخصم ${HELP_COST_RATE * 100}%` },
+  { id: 'friend', label: '📞 اتصل بصديق', desc: `صديقك يقترح إجابة: صحيحة بنسبة ${FRIEND_ACCURACY * 100}% وخاطئة بنسبة ${100 - FRIEND_ACCURACY * 100}%` },
   { id: 'double', label: '🎯 دبل يا كبير', desc: `نقاط السؤال ×${DOUBLE_MULT} إن أصبت، وإن أخطأت تخسر نقاطه من المرحلة السابقة` },
 ];
 
@@ -88,6 +90,7 @@ export default function SoloGame() {
   const [twoMode, setTwoMode] = useState(false);
   const [firstWrong, setFirstWrong] = useState(null);
   const [doubled, setDoubled] = useState(false);
+  const [friendKey, setFriendKey] = useState(null);
   const helpsOnQ = useRef(0);
 
   const [submitInfo, setSubmitInfo] = useState(null);
@@ -120,11 +123,12 @@ export default function SoloGame() {
     return free;
   }, [pool]);
 
-  const loadQuestion = useCallback(async (level) => {
+  const loadQuestion = useCallback(async (level, carry) => {
     setLoading(true); setLoadError(false);
     setQuestion(null); setSelected(null); setAnswered(false); setOutcome(null);
-    setRemoved(null); setTwoMode(false); setFirstWrong(null); setDoubled(false);
-    helpsOnQ.current = 0; songSwapped.current = false;
+    setRemoved(null); setTwoMode(false); setFirstWrong(null); setDoubled(!!carry?.doubled); setFriendKey(null);
+    // a swapped question keeps the help cost / double already committed on the old one
+    helpsOnQ.current = carry?.helps || 0; songSwapped.current = false;
     const points = tierPoints(level);
     try {
       const cats = await ensurePool();
@@ -224,6 +228,13 @@ export default function SoloGame() {
     } else if (id === 'twoAnswers') {
       helpsOnQ.current += 1;
       setTwoMode(true);
+    } else if (id === 'friend') {
+      helpsOnQ.current += 1;
+      const keys = Object.keys(question.options).filter(k => question.options[k] && k !== removed && k !== firstWrong);
+      setFriendKey(friendSuggestion(question.correct, keys));
+    } else if (id === 'switch') {
+      // new question at the same level; this help's cost carries over to it
+      loadQuestion(next.level, { helps: helpsOnQ.current + 1, doubled });
     } else if (id === 'double') {
       setDoubled(true);
     }
@@ -250,8 +261,8 @@ export default function SoloGame() {
   const onSongFailed = useCallback(() => {
     if (songSwapped.current || answered) return;
     songSwapped.current = true;
-    loadQuestion(runRef.current.level);
-  }, [answered, loadQuestion]);
+    loadQuestion(runRef.current.level, { helps: helpsOnQ.current, doubled });
+  }, [answered, doubled, loadQuestion]);
 
   const openBoard = async () => {
     setView('board'); setBoard(null);
@@ -278,7 +289,7 @@ export default function SoloGame() {
           <li>فئات وأسئلة عشوائية، ومحاولة واحدة لكل سؤال.</li>
           <li>خطأ في سؤال 200 ← ترجع 3 مراحل. سؤال 400 ← ترجع 10 مراحل.</li>
           <li>خطأ في سؤال 600 ← تبدأ الجولة من الصفر.</li>
-          <li>كل وسيلة مساعدة تُستخدم مرة واحدة في الجولة، وتخصم من النقاط وتنقص مكافأة النهاية.</li>
+          <li>وسائل المساعدة: حذف إجابة، جوابان، 🔄 تبديل السؤال، 📞 اتصل بصديق (يصيب بنسبة 70%)، ودبل. كل وسيلة تُستخدم مرة واحدة في الجولة، وتخصم من النقاط وتنقص مكافأة النهاية.</li>
           <li>عند إنهاء المراحل كلها تُضاف مكافأة بلا مساعدات ومكافأة بلا خسارات. أعلى نتيجة بلا صناديق: {MAX_SCORE.toLocaleString('en')}.</li>
           <li>🎁 بعد كل {BOX_EVERY} مراحل صندوق مفاجأة: تفتحه أو تتخطاه دون أن ترى ما بداخله — قد تربح وقد تخسر!</li>
         </ul>
@@ -483,11 +494,17 @@ export default function SoloGame() {
                     border: `2px solid ${border}`, cursor: answered ? 'default' : 'pointer',
                     textDecoration: isRemoved || isFirstWrong ? 'line-through' : 'none',
                   }}>
-                  <span style={{ color: '#FF6666', marginLeft: 10 }}>{key}.</span>{value}
+                  <span style={{ color: '#FF6666', marginLeft: 10 }}>{key}.</span>{value}{friendKey === key && !answered ? ' 📞' : ''}
                 </motion.button>
               );
             })}
           </div>
+
+          {friendKey && !answered && (
+            <p style={{ textAlign: 'center', fontWeight: 800, color: '#FFD700', fontSize: 14 }}>
+              📞 صديقك يظن أن الإجابة {friendKey}… (قد يخطئ!)
+            </p>
+          )}
 
           {!answered && (
             <div>
@@ -506,7 +523,7 @@ export default function SoloGame() {
               <p style={{ textAlign: 'center', fontSize: 11, opacity: 0.65, marginTop: 6 }}>
                 {twoMode && !firstWrong ? '✌️ لديك محاولتان لهذا السؤال. ' : ''}
                 {doubled ? `🎯 دبل مفعّل: ×${DOUBLE_MULT} إن أصبت. ` : ''}
-                المساعدة تخصم {HELP_COST_RATE * 100}% من نقاط السؤال (للحذف والجوابين) وكل وسيلة مرة واحدة في الجولة.
+                كل مساعدة تخصم {HELP_COST_RATE * 100}% من نقاط السؤال (عدا الدبل) وكل وسيلة مرة واحدة في الجولة.
               </p>
             </div>
           )}
