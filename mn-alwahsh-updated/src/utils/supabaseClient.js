@@ -136,6 +136,18 @@ export function getCategoryTable(name) {
   return categoryTableMap.get(String(name || '').toLowerCase().trim()) || null;
 }
 
+// Lets a saved copy of the category → table map be reused without re-reading every row
+// (see categoryCache.js). Entries are [lowercased name, table]; existing entries win.
+export function seedCategoryTableMap(entries) {
+  for (const [name, table] of entries || []) {
+    const key = String(name).toLowerCase().trim();
+    if (!categoryTableMap.has(key)) categoryTableMap.set(key, table);
+  }
+}
+export function getCategoryTableEntries() {
+  return [...categoryTableMap.entries()];
+}
+
 // Per-table cache of the working "used" filter string — resolved once, reused forever
 // Values: '&used=not.is.true' | '&used=neq.true' | '' (no filter)
 const tableUsedFilterCache = new Map();
