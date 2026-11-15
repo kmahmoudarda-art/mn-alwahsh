@@ -12,6 +12,11 @@
 // Every 10 levels (10, 20 … 80) a mystery box is offered once: the player
 // chooses to open it or skip it WITHOUT knowing what's inside (see openBox).
 //
+// Trap questions: once in every block of 30 levels one question is a trap
+// (shown with a warning, no helps allowed). Answer it right and it scores as
+// normal; get it wrong and you only lose points — no rollback, no game over —
+// and play continues with the next question.
+//
 // If there aren't enough levels behind you to fall back over (e.g. a 200
 // question in the first 3 levels), the run ends like a 600 loss.
 //
@@ -77,11 +82,18 @@ export function tierPoints(levelIndex) {
   return 600;
 }
 
-export function newRun({ mode = 'all', categories = [], trial = [] } = {}) {
+// One random level inside each block of 30 (levels 1–30, 31–60, 61–90).
+export function pickTraps(rng = Math.random) {
+  return [0, 1, 2].map(i => i * TIER_SIZE + Math.floor(rng() * TIER_SIZE));
+}
+
+export function newRun({ mode = 'all', categories = [], trial = [], traps = pickTraps() } = {}) {
   return {
     mode,                // 'all' | 'pick'
     categories,          // the 10 chosen names when mode === 'pick'
     trial,               // premium categories borrowed for this run only (one-game trial)
+    traps,               // the 3 trap levels of this run (0-based), one per block of 30
+    trapsDone: [],       // trap levels already faced (a trap never repeats after a rollback)
     level: 0,            // 0-based index of the level being played
     levelPoints: [],     // points banked for each finished level (index = level)
     helpsUsed: 0,        // total helps used in this run (never decreases)
@@ -154,33 +166,51 @@ export function canUseLifeline(run, id) {
 //   helps    — how many helps (removeOne / twoAnswers) were used on it
 //   doubled  — whether "double" was active on it
 // Returns { run, outcome } where outcome describes what happened for the UI.
+export function isTrap(run, level = run.level) {
+  return (run.traps || []).includes(level) && !(run.trapsDone || []).includes(level);
+}
+
+// Move on to the next level after this one was settled with `earned` points.
+function advance(run, earned) {
+  const levelPoints = [...run.levelPoints];
+  levelPoints[run.level] = earned;
+  const nextLevel = run.level + 1;
+  const finished = nextLevel >= TOTAL_LEVELS;
+  const boxDue = !finished && nextLevel % BOX_EVERY === 0 && !run.boxesSeen.includes(nextLevel);
+  return {
+    ...run, levelPoints, level: finished ? run.level : nextLevel, finished,
+    boxPending: boxDue ? nextLevel : null,
+    trapsDone: isTrap(run) ? [...(run.trapsDone || []), run.level] : (run.trapsDone || []),
+  };
+}
+
 export function resolveQuestion(run, { correct, helps = 0, doubled = false }) {
   const points = tierPoints(run.level);
+  const trap = isTrap(run);
 
   if (correct) {
     let earned = Math.max(0, points - helps * helpCost(points));
     if (doubled) earned *= DOUBLE_MULT;
     earned = Math.round(earned * modeMultiplier(run));
-    const levelPoints = [...run.levelPoints];
-    levelPoints[run.level] = earned;
-    const nextLevel = run.level + 1;
-    const finished = nextLevel >= TOTAL_LEVELS;
-    const boxDue = !finished && nextLevel % BOX_EVERY === 0 && !run.boxesSeen.includes(nextLevel);
+    const next = advance(run, earned);
     return {
-      run: {
-        ...run, levelPoints, level: finished ? run.level : nextLevel, finished,
-        boxPending: boxDue ? nextLevel : null,
-      },
-      outcome: { type: finished ? 'finished' : 'correct', earned, points },
+      run: next,
+      outcome: { type: next.finished ? 'finished' : 'correct', earned, points, trap },
     };
   }
 
   // Wrong answer — a shield cancels the loss entirely.
   if (run.shield) {
     return {
-      run: { ...run, shield: false },
-      outcome: { type: 'shielded', points },
+      run: { ...run, shield: false, trapsDone: trap ? [...(run.trapsDone || []), run.level] : (run.trapsDone || []) },
+      outcome: { type: 'shielded', points, trap },
     };
+  }
+  // A trap only costs points: no rollback, no game over, not counted as a loss.
+  if (trap) {
+    const penalty = Math.min(Math.round(points * modeMultiplier(run)), baseScore(run));
+    const next = advance(run, -penalty);
+    return { run: next, outcome: { type: 'trapLost', points, penalty, finished: next.finished, trap: true } };
   }
   const back = ROLLBACK[points];
   const losses = run.losses + 1;

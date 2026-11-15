@@ -15,6 +15,15 @@ create table if not exists public.solo_scores (
 create index if not exists solo_scores_rank_idx
   on public.solo_scores (best_score desc, best_levels desc);
 
+-- Basic sanity limits (scores are sent by the app, so keep them in a believable range).
+alter table public.solo_scores drop constraint if exists solo_scores_sane;
+alter table public.solo_scores add constraint solo_scores_sane check (
+  char_length(display_name) <= 24
+  and best_levels between 0 and 90
+  and best_score between 0 and 200000
+  and completed_runs between 0 and 100000
+);
+
 alter table public.solo_scores enable row level security;
 
 drop policy if exists "Anyone can read solo scores" on public.solo_scores;

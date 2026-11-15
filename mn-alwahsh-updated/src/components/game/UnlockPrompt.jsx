@@ -46,6 +46,12 @@ export default function UnlockPrompt({ category, onClose, onChanged }) {
   const sku = getSkuForCategory(category);
 
   useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose?.(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  useEffect(() => {
     if (!showStorePrices) return undefined;
     const skus = [sku, ALL_CATEGORIES_SKU, TRIAL_SKU].filter(Boolean);
     let cancelled = false;

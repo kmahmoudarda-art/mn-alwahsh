@@ -6,11 +6,13 @@ import { getValidSession } from './authClient';
 
 const TABLE = `${SUPABASE_URL}/rest/v1/solo_scores`;
 
+// Shown publicly on the board, so never the full email: a chosen name if the
+// account has one, otherwise the first two letters of the email name + dots.
 export function displayNameFor(user) {
   const meta = user?.user_metadata?.name || user?.user_metadata?.full_name;
   if (meta) return String(meta).slice(0, 24);
   const local = (user?.email || '').split('@')[0];
-  return (local || 'لاعب').slice(0, 24);
+  return local ? `${local.slice(0, 2)}•••` : 'لاعب';
 }
 
 // Top players, best score first. Returns [] if the table isn't set up yet.
@@ -30,6 +32,7 @@ export async function fetchLeaderboard(limit = 30) {
 // Keeps the player's best score and their furthest level separately.
 // Returns { saved, signedIn, newBest }.
 export async function submitRun({ score, levels, finished, user }) {
+  if (!(score > 0 || levels > 0)) return { saved: false, signedIn: true, newBest: false, skipped: true }; // nothing to record
   const session = await getValidSession();
   if (!session?.access_token || !session?.user?.id) return { saved: false, signedIn: false, newBest: false };
   const uid = session.user.id;

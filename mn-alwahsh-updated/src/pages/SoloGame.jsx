@@ -25,7 +25,7 @@ import {
   TOTAL_LEVELS, MAX_SCORE, DOUBLE_MULT, HELP_COST_RATE,
   newRun, tierPoints, resolveQuestion, applyLifeline,
   baseScore, levelSum, helpBonus, lossBonus, finalScore, levelsCompleted,
-  canUseLifeline, openBox, BOX_EVERY, friendSuggestion, FRIEND_ACCURACY,
+  canUseLifeline, isTrap, openBox, BOX_EVERY, friendSuggestion, FRIEND_ACCURACY,
   ALL_CATEGORIES_MULT, PICK_COUNT, modeMultiplier,
 } from '../utils/soloEngine';
 
@@ -96,6 +96,19 @@ const LAYOUT_CSS = `
   .solo-title{font-size:34px!important}
   .solo-head-card{padding:8px 12px 6px!important}
   .solo-parch{padding:12px!important}
+  .solo-page{gap:6px!important;padding-top:0!important;padding-bottom:0!important}
+  .solo-shell{padding-bottom:4px!important}
+  .solo-page h2{font-size:20px!important}
+  .solo-hero{padding:0!important}
+  .solo-hero p{font-size:13px!important;margin-top:0!important}
+  .solo-page .solo-col{gap:7px}
+  .solo-page .solo-col button{padding:8px 14px!important;font-size:14px!important}
+  .solo-rules{gap:5px!important;padding:10px 12px!important}
+  .solo-rules>p{font-size:12.5px!important;line-height:1.5!important}
+  .solo-rules span{font-size:13px!important}
+  .solo-rules div{font-size:12px!important;line-height:1.55!important;padding-top:6px!important}
+  .solo-rules div p{margin-bottom:2px}
+  .solo-page .solo-two button{padding:10px 12px!important}
 }
 `;
 
@@ -309,7 +322,7 @@ export default function SoloGame() {
   };
 
   const onLifeline = (id) => {
-    if (answered || !question || !canUseLifeline(run, id)) return;
+    if (answered || !question || !canUseLifeline(run, id) || isTrap(runRef.current)) return; // no helps on a trap
     const next = applyLifeline(run, id);
     setRun(next);
     persist(next, { pending: true });
@@ -334,7 +347,7 @@ export default function SoloGame() {
 
   const onContinue = () => {
     if (!outcome) return;
-    if (outcome.type === 'gameOver' || outcome.type === 'finished') { endRun(run); return; }
+    if (outcome.type === 'gameOver' || outcome.type === 'finished' || outcome.finished) { endRun(run); return; }
     if (run.boxPending) { setBoxResult(null); setView('box'); return; }
     loadQuestion(run.level);
   };
@@ -453,6 +466,7 @@ export default function SoloGame() {
         <p style={{ fontSize: 13, color: '#F2A93B', lineHeight: 1.7 }}>وإذا لم يكن خلفك مراحل كافية لترجع إليها (في أول 3 مراحل)، فأي خطأ يُنهي الجولة.</p>
         <div style={{ borderTop: '1px solid rgba(196,22,28,0.3)', paddingTop: 10, fontSize: 13.5, lineHeight: 1.9, opacity: 0.9 }}>
           <p>🛟 خمس وسائل مساعدة: حذف إجابة، جوابان، تبديل السؤال، اتصل بصديق (يصيب 70%)، ودبل. <b>كل وسيلة تُستخدم مرة واحدة فقط في الجولة كلها (٩٠ مرحلة)</b>، وتخصم 25% من نقاط السؤال وتنقص المكافأة النهائية.</p>
+          <p>☠️ في كل 30 مرحلة سؤال فخ واحد: خطؤه يخصم نقاطاً فقط دون رجوع، ولا تعمل فيه وسائل المساعدة.</p>
           <p>🎁 بعد كل {BOX_EVERY} مراحل صندوق مفاجأة: تفتحه أو تتخطاه دون أن ترى ما بداخله.</p>
           <p>⭐ بعد المرحلة {TOTAL_LEVELS}: مكافأة بلا مساعدات ومكافأة بلا خسارات. أعلى نتيجة بلا صناديق {MAX_SCORE.toLocaleString('en')} (وفي نمط «كل الفئات» نقاط المراحل ×{ALL_CATEGORIES_MULT}).</p>
         </div>
@@ -463,7 +477,7 @@ export default function SoloGame() {
   );
 
   if (view === 'mode') return shell(
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 16 }}>
+    <div className="solo-page" style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 16 }}>
       <button onClick={() => setView('intro')} style={{ ...ghostBtn, alignSelf: 'flex-start', padding: '6px 12px', fontSize: 13 }}>→ رجوع</button>
       <h2 style={{ textAlign: 'center', fontSize: 26, fontWeight: 900 }}>من أين تأتي الأسئلة؟</h2>
 
@@ -699,6 +713,10 @@ export default function SoloGame() {
   const tier = TIER[points];
   const hero = question?.image_url && !question?.itunes_id ? getCachedImageUrl(question.image_url) : null;
   const isGood = outcome && ['correct', 'finished', 'shielded'].includes(outcome.type);
+  // The trap flag must be read from the run the question was shown with; after answering the
+  // run has already moved on, so use the outcome then.
+  const trapNow = !answered && !!question && isTrap(run);
+  const trapPenalty = Math.min(Math.round(points * modeMultiplier(run)), baseScore(run));
 
   return shell(
     <div className="solo-play">
@@ -746,6 +764,18 @@ export default function SoloGame() {
             initial={reduce ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }} transition={springs.gentle}
             style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {trapNow && (
+              <motion.div role="alert" initial={reduce ? false : { scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={springs.pop}
+                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 12, background: 'linear-gradient(135deg, #5a0000, #2a0000)', border: '1.5px solid #FF3B3B', boxShadow: '0 0 18px rgba(255,59,59,0.35)' }}>
+                <motion.span animate={reduce ? {} : { scale: [1, 1.18, 1] }} transition={{ duration: 1.4, repeat: Infinity }} style={{ fontSize: 26 }}>☠️</motion.span>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontWeight: 900, fontSize: 15, color: '#fff', lineHeight: 1.2 }}>سؤال فخ!</p>
+                  <p style={{ fontWeight: 600, fontSize: 12, color: 'rgba(255,255,255,0.85)', lineHeight: 1.4 }}>
+                    الخطأ يخصم {trapPenalty} نقطة فقط ولا يرجعك للخلف. لا وسائل مساعدة هنا.
+                  </p>
+                </div>
+              </motion.div>
+            )}
             {modeMultiplier(run) > 1 && (
               <div style={{ alignSelf: 'center', background: 'rgba(255,215,0,0.12)', border: '1px solid #FFD700', color: '#FFD700', borderRadius: 999, padding: '3px 14px', fontSize: 13, fontWeight: 800 }}>
                 هذا السؤال بـ {Math.round(points * modeMultiplier(run))} نقطة (×{modeMultiplier(run)})
@@ -820,7 +850,7 @@ export default function SoloGame() {
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
             {LIFELINES.map(l => {
-              const used = !canUseLifeline(run, l.id);
+              const used = !canUseLifeline(run, l.id) || trapNow;
               const extra = run.bonusLifelines?.[l.id] || 0;
               const [icon, ...rest] = l.label.split(' ');
               return (
@@ -864,6 +894,14 @@ export default function SoloGame() {
                 {outcome.penalty ? ` · وخسرت ${outcome.penalty} نقطة بسبب الدبل` : ''}
               </p>
             )}
+            {outcome.type === 'trapLost' && (
+              <p style={{ fontSize: 14, color: '#F2A93B', fontWeight: 700, marginTop: 4 }}>
+                ☠️ كان فخاً! {outcome.penalty ? `خُصمت ${outcome.penalty} نقطة` : 'لا نقاط لتُخصم'}، وتكمل إلى السؤال التالي دون رجوع.
+              </p>
+            )}
+            {outcome.trap && outcome.type === 'correct' && (
+              <p style={{ fontSize: 14, color: '#46C98B', fontWeight: 700, marginTop: 4 }}>☠️ نجوت من الفخ!</p>
+            )}
             {outcome.type === 'shielded' && (
               <p style={{ fontSize: 14, color: '#46C98B', fontWeight: 700, marginTop: 4 }}>🛡️ الدرع حماك. لم تخسر شيئاً وتبقى في مرحلتك.</p>
             )}
@@ -874,7 +912,7 @@ export default function SoloGame() {
             )}
             {question.explanation && <p style={{ fontSize: 14, margin: '8px 0', opacity: 0.85, lineHeight: 1.7 }}>{question.explanation}</p>}
             <motion.button {...tap} style={{ ...redBtn, marginTop: 8 }} onClick={onContinue} autoFocus>
-              {outcome.type === 'gameOver' || outcome.type === 'finished' ? 'عرض النتيجة' : 'المرحلة التالية'}
+              {outcome.type === 'gameOver' || outcome.type === 'finished' || outcome.finished ? 'عرض النتيجة' : 'المرحلة التالية'}
             </motion.button>
           </motion.div>
         )}

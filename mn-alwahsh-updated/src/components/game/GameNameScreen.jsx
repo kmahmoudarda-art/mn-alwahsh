@@ -459,7 +459,7 @@ export default function GameNameScreen({ onEnter }) {
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
                   <Button
                     onClick={() => {
-                      if (pickMode === 'user') { const u = user || getCurrentUser(); onEnter(u.email || u.id); }
+                      if (pickMode === 'user') { const u = user || getCurrentUser(); if (!u) { setPickMode(null); return; } onEnter(u.email || u.id); }
                       else { setPickMode(null); setEntryMode('guest'); }
                     }}
                     className="w-full font-cairo font-bold py-5 rounded-xl gap-2"
