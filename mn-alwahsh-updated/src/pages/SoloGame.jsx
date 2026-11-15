@@ -182,6 +182,7 @@ export default function SoloGame() {
   const boxTimer = useRef(null);
   const runRef = useRef(run);
   runRef.current = run;
+  const progressTimer = useRef(null);
   const timerRef = useRef({ used: 0, startedAt: null }); // seconds spent on this question; only counts while it is on screen
   const liveRun = useRef(false);        // a run is on screen, so auto-save may write
 
@@ -389,11 +390,22 @@ export default function SoloGame() {
   };
 
   // ── answering ───────────────────────────────────────────────────────
+  // Keep the leaderboard current while a run is in progress (not only when it ends), so other
+  // players see you playing. Signed-in players only; the final result is still sent when the run ends.
+  const queueProgress = (r) => {
+    if (!user || r.finished || r.gameOver) return;
+    clearTimeout(progressTimer.current);
+    progressTimer.current = setTimeout(() => {
+      submitRun({ score: baseScore(r), levels: levelsCompleted(r), finished: false, user });
+    }, 1500);
+  };
+
   const resolve = (correct, { timeUp = false } = {}) => {
     const secondsLeft = Math.max(0, QUESTION_SECONDS - timeUsedNow());
     const res = resolveQuestion(runRef.current, { correct, helps: helpsOnQ.current, doubled, timeLeft: secondsLeft });
     setTimedOut(timeUp);
     setRun(res.run);
+    queueProgress(res.run);
     setOutcome(res.outcome);
     setAnswered(true);
     songFails.current = 0;
@@ -671,6 +683,7 @@ export default function SoloGame() {
       <button onClick={() => setView(run.gameOver || run.finished ? 'end' : 'intro')} style={{ ...ghostBtn, alignSelf: 'flex-start', padding: '6px 12px', fontSize: 13 }}>→ رجوع</button>
       <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 900, color: '#FFD700' }}>🏆 المتصدّرون</h2>
       <div style={{ ...card, padding: 8 }}>
+        <p style={{ textAlign: 'center', fontSize: 11.5, opacity: 0.6, padding: '4px 8px 8px' }}>تظهر هنا نتائج من سجّل دخوله فقط، وتتحدّث نتيجتك أثناء اللعب.</p>
         {board === null && <p style={{ textAlign: 'center', padding: 20, opacity: 0.8 }}>جاري التحميل…</p>}
         {board && board.length === 0 && <p style={{ textAlign: 'center', padding: 20 }}>لا توجد نتائج بعد. كن الأول!</p>}
         {board && board.map((row, i) => {
