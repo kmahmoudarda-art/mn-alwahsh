@@ -161,6 +161,7 @@ export default function SoloGame() {
   const [timeLeft, setTimeLeft] = useState(QUESTION_SECONDS);
   const [songStarted, setSongStarted] = useState(false); // a song question's clock starts when the clip is first played
   const [timedOut, setTimedOut] = useState(false);
+  const [songSkips, setSongSkips] = useState(3); // manual "can't hear it" swaps left in this run
 
   // Per-question help state
   const [removed, setRemoved] = useState([]);
@@ -340,7 +341,7 @@ export default function SoloGame() {
     const trial = categories.filter(c => trialRef.current.includes(c)); // borrowed premium categories live only in this run
     seen.current = new Set();
     deadCombos.current = new Set();
-    songFails.current = 0;
+    songFails.current = 0; setSongSkips(3);
     submittedRef.current = false;
     const r = newRun({ mode, categories, trial });
     runRef.current = r;            // loadQuestion reads the mode from here
@@ -512,6 +513,13 @@ export default function SoloGame() {
     songFails.current += 1;
     loadQuestion(runRef.current.level, { helps: helpsOnQ.current, doubled });
   }, [answered, doubled, loadQuestion]);
+
+  // "I can't hear it": the player swaps a song question themselves (a few times per run).
+  const onSongSkip = () => {
+    if (songSkips <= 0 || songSwapped.current || answered) return;
+    setSongSkips(n => n - 1);
+    onSongFailed();
+  };
 
   const openBoard = async () => {
     setView('board'); setBoard(null);
@@ -923,7 +931,7 @@ export default function SoloGame() {
             }}>
               {hero && <img src={hero} alt="" style={{ width: '100%', maxHeight: 'min(240px, 36vh)', objectFit: 'contain', borderRadius: 10, marginBottom: 10 }} />}
               {question.itunes_id && (
-                <SongPlayer key={question.id ?? question.itunes_id} itunesId={question.itunes_id} solo onStarted={() => setSongStarted(true)} onFailed={onSongFailed} />
+                <SongPlayer key={question.id ?? question.itunes_id} itunesId={question.itunes_id} solo onStarted={() => setSongStarted(true)} onFailed={onSongFailed} onSkip={onSongSkip} skipsLeft={songSkips} />
               )}
               <p className="solo-q" style={{ fontWeight: 800, fontSize: 20, lineHeight: 1.75, textAlign: 'right' }}>{question.question}</p>
             </div>
