@@ -38,14 +38,14 @@ assert.equal(sh0.outcome.type, 'shielded'); assert.ok(!sh0.run.gameOver);
 r = E.newRun({ mode: 'pick', traps: [], hearts: 0 });
 for (let i = 0; i < 35; i++) r = E.resolveQuestion(r, { correct: true }).run;
 assert.equal(r.level, 35);
-res = E.resolveQuestion(r, { correct: false });
+res = E.resolveQuestion({ ...r, hearts: 0 }, { correct: false }); // (hearts were earned on the way; test the penalty itself)
 assert.equal(res.run.level, 25);
 assert.equal(E.baseScore(res.run), 25 * 200);
 
 // 600 loss: game over
 r = E.newRun({ mode: 'pick', traps: [], hearts: 0 });
 for (let i = 0; i < 62; i++) r = E.resolveQuestion(r, { correct: true }).run;
-res = E.resolveQuestion(r, { correct: false });
+res = E.resolveQuestion({ ...r, hearts: 0 }, { correct: false });
 assert.ok(res.run.gameOver); assert.equal(res.outcome.type, 'gameOver');
 
 // Help cost + bonuses
@@ -71,12 +71,12 @@ assert.equal(r.level, 10); assert.equal(r.boxPending, 10);
 // skip
 let sk = E.openBox(r, false);
 assert.equal(sk.run.boxPending, null); assert.deepEqual(sk.run.boxesSeen, [10]);
-// deterministic outcomes via rng (table order: removeOne 0-20, twoAnswers 20-35, points 35-55, shield 55-70, lose 70-88, rollback 88-100)
+// deterministic outcomes via rng (table order: removeOne 0-.16, twoAnswers -.28, points -.46, shield -.58, heart -.70, lose -.88, rollback -1)
 const at = (x) => () => x;
 let o = E.openBox(r, true, at(0.05)); assert.equal(o.run.bonusLifelines.removeOne, 1);
 o = E.openBox(r, true, at(0.25)); assert.equal(o.run.bonusLifelines.twoAnswers, 1);
 o = E.openBox(r, true, at(0.4)); assert.equal(o.run.bonusPoints, 400); assert.equal(E.baseScore(o.run), 2000 + 400);
-o = E.openBox(r, true, at(0.6)); assert.ok(o.run.shield);
+o = E.openBox(r, true, at(0.5)); assert.ok(o.run.shield);
 o = E.openBox(r, true, at(0.8)); assert.equal(o.run.bonusPoints, -200);
 const seq = [0.95, 0.4]; let k = 0;
 o = E.openBox(r, true, () => seq[k++]); assert.equal(o.result.type, 'rollback'); assert.equal(o.run.level, 9); assert.equal(o.run.losses, 0);
@@ -188,9 +188,14 @@ let early = hr({ level: 1, levelPoints: [200] });
 for (let i = 0; i < 3; i++) early = E.resolveQuestion(early, { correct: false }).run;
 assert.ok(!early.gameOver); assert.equal(early.hearts, 0);
 assert.ok(E.resolveQuestion(early, { correct: false }).run.gameOver);
-// 400 and 600 questions ignore hearts
-assert.equal(E.resolveQuestion(hr({ level: 40, levelPoints: Array(40).fill(300) }), { correct: false }).outcome.type, 'fellBack');
-assert.ok(E.resolveQuestion(hr({ level: 70, levelPoints: Array(70).fill(300) }), { correct: false }).run.gameOver);
+// hearts protect on every tier: a 400 and a 600 loss cost a heart first
+const h400 = E.resolveQuestion(hr({ level: 40, levelPoints: Array(40).fill(300) }), { correct: false });
+assert.equal(h400.outcome.type, 'heartLost'); assert.equal(h400.run.level, 40);
+const h600 = E.resolveQuestion(hr({ level: 70, levelPoints: Array(70).fill(300) }), { correct: false });
+assert.equal(h600.outcome.type, 'heartLost'); assert.ok(!h600.run.gameOver); assert.equal(h600.run.level, 70);
+// with no hearts the old penalties apply (400 → back 10, 600 → game over)
+assert.equal(E.resolveQuestion(hr({ level: 40, levelPoints: Array(40).fill(300), hearts: 0 }), { correct: false }).run.level, 30);
+assert.ok(E.resolveQuestion(hr({ level: 70, levelPoints: Array(70).fill(300), hearts: 0 }), { correct: false }).run.gameOver);
 // a shield still comes first and keeps the heart; a trap never touches hearts
 const sh2 = E.resolveQuestion(hr({ level: 8, levelPoints: Array(8).fill(200), shield: true }), { correct: false });
 assert.equal(sh2.outcome.type, 'shielded'); assert.equal(sh2.run.hearts, 3);
@@ -201,4 +206,32 @@ const dbl = E.resolveQuestion(hr({ level: 8, levelPoints: Array(8).fill(200) }),
 assert.equal(dbl.outcome.type, 'heartLost'); assert.equal(dbl.outcome.penalty, 200); assert.equal(E.baseScore(dbl.run), 1400);
 // saves from before hearts (no field) behave like a full set
 assert.equal(E.resolveQuestion({ ...hr({ level: 8, levelPoints: Array(8).fill(200) }), hearts: undefined }, { correct: false }).outcome.type, 'heartLost');
+// ── Extra hearts every 20 levels, and as a box prize ──
+assert.equal(E.HEARTS_CAP, 5); assert.equal(E.HEART_EVERY, 20);
+let ms = hr({ level: 19, levelPoints: Array(19).fill(200) });
+const got = E.resolveQuestion(ms, { correct: true });
+assert.equal(got.run.level, 20); assert.equal(got.run.hearts, 4); assert.ok(got.outcome.heartGained); assert.deepEqual(got.run.heartGiven, [20]);
+// not on other levels
+assert.equal(E.resolveQuestion(hr({ level: 18, levelPoints: Array(18).fill(200) }), { correct: true }).outcome.heartGained, false);
+// once per milestone: fall back below 20 and finish it again → no second heart
+let again2 = { ...got.run, level: 19, levelPoints: Array(19).fill(200), hearts: 3 };
+const noTwice = E.resolveQuestion(again2, { correct: true });
+assert.equal(noTwice.run.hearts, 3); assert.ok(!noTwice.outcome.heartGained);
+// the cap
+const capped = E.resolveQuestion(hr({ level: 39, levelPoints: Array(39).fill(200), hearts: 5 }), { correct: true });
+assert.equal(capped.run.hearts, 5); assert.ok(!capped.outcome.heartGained); assert.deepEqual(capped.run.heartGiven, [40]);
+// all four milestones in one run: 3 + 4 = 7 would exceed the cap → stops at 5
+let full = hr(); const seen = [];
+for (let i = 0; i < 89; i++) { full = E.resolveQuestion(full, { correct: true }).run; if ((i + 1) % 20 === 0) seen.push(full.hearts); if (full.boxPending) full = E.openBox(full, false).run; }
+assert.deepEqual(seen, [4, 5, 5, 5]);
+// a trap loss on a milestone level still advances and awards the heart
+const trapMs = E.resolveQuestion(hr({ level: 19, levelPoints: Array(19).fill(200), traps: [19] }), { correct: false });
+assert.equal(trapMs.outcome.type, 'trapLost'); assert.equal(trapMs.run.hearts, 4);
+// box prize: a heart (turns into points when full)
+const boxRun = (o) => ({ ...hr({ level: 10, levelPoints: Array(10).fill(200), boxPending: 10 }), ...o });
+// weights: removeOne16 twoAnswers12 points18 shield12 heart12 lose18 rollback12 → heart = [58,70)
+const hb = E.openBox(boxRun(), true, () => 0.62);
+assert.equal(hb.result.type, 'heart'); assert.equal(hb.run.hearts, 4);
+const hbFull = E.openBox(boxRun({ hearts: 5 }), true, () => 0.62);
+assert.equal(hbFull.result.type, 'points'); assert.ok(hbFull.result.fromHeart); assert.equal(hbFull.run.hearts, 5); assert.equal(hbFull.run.bonusPoints, 400);
 console.log('solo engine: all tests passed');

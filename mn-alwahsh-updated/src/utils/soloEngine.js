@@ -12,10 +12,13 @@
 // Every 10 levels (10, 20 … 80) a mystery box is offered once: the player
 // chooses to open it or skip it WITHOUT knowing what's inside (see openBox).
 //
-// Hearts: the player starts with 3. A wrong answer on a 200-point question costs a
-// heart instead of sending them back 3 levels; they stay on the same level with a new
-// question. Only when no hearts are left does the usual rollback happen, and hearts
-// refill to 3 after any rollback. 400 and 600 questions and traps ignore hearts.
+// Hearts: the player starts with 3. A wrong answer (or running out of time) on ANY
+// question (200, 400 or 600) costs a heart instead of its usual penalty; the player stays
+// on the same level with a new question and earns nothing for the failed one. Only when no
+// hearts are left does the usual penalty apply (rollback / restart), and after a rollback
+// the hearts go back to 3. Extra hearts: +1 on finishing level 20, 40, 60 and 80, and a
+// heart can be a mystery-box prize; at most HEARTS_CAP at a time. Traps cost points only
+// and never touch hearts; a shield still comes first.
 //
 // Trap questions: once in every block of 30 levels one question is a trap
 // (shown with a warning, no helps allowed). Answer it right and it scores as
@@ -55,10 +58,11 @@ export const BOX_EVERY = 10;
 export const BOX_BONUS_MULT = 2;  // ⭐ gain  = tier points × 2
 export const BOX_LOSS_MULT = 1;   // 💸 loss  = tier points × 1 (never below 0 total)
 export const BOX_TABLE = [        // weights sum to 100 → ~70% good / 30% bad
-  { type: 'removeOne', w: 20 },
-  { type: 'twoAnswers', w: 15 },
-  { type: 'points', w: 20 },
-  { type: 'shield', w: 15 },
+  { type: 'removeOne', w: 16 },
+  { type: 'twoAnswers', w: 12 },
+  { type: 'points', w: 18 },
+  { type: 'shield', w: 12 },
+  { type: 'heart', w: 12 },
   { type: 'losePoints', w: 18 },
   { type: 'rollback', w: 12 },
 ];
@@ -86,7 +90,9 @@ export function modeMultiplier(run) {
   return run.mode === 'all' ? ALL_CATEGORIES_MULT : 1;
 }
 
-export const HEARTS_MAX = 3;
+export const HEARTS_MAX = 3;        // what a run starts with (and returns to after a rollback)
+export const HEARTS_CAP = 5;        // most hearts a player can hold
+export const HEART_EVERY = 20;      // +1 heart each time this many levels are finished
 
 export const LIFELINE_IDS = ['removeOne', 'twoAnswers', 'switch', 'friend', 'double'];
 
@@ -118,6 +124,7 @@ export function newRun({ mode = 'all', categories = [], trial = [], traps = pick
     bonusPoints: 0,      // net points won/lost from boxes
     shield: false,       // cancels the next lost question
     boxesSeen: [],       // milestone levels already offered (once each)
+    heartGiven: [],      // milestone levels that already gave their extra heart (once each)
     boxPending: null,    // milestone level whose box awaits a decision
     finished: false,
     gameOver: false,     // true right after losing a 600 (run must restart)
@@ -192,9 +199,15 @@ function advance(run, earned) {
   const nextLevel = run.level + 1;
   const finished = nextLevel >= TOTAL_LEVELS;
   const boxDue = !finished && nextLevel % BOX_EVERY === 0 && !run.boxesSeen.includes(nextLevel);
+  // an extra heart each HEART_EVERY levels (once per milestone, even after a rollback), up to the cap
+  const heartDue = !finished && nextLevel % HEART_EVERY === 0 && !(run.heartGiven || []).includes(nextLevel);
+  const hearts = run.hearts ?? HEARTS_MAX;
+  const gainHeart = heartDue && hearts < HEARTS_CAP;
   return {
     ...run, levelPoints, level: finished ? run.level : nextLevel, finished,
     boxPending: boxDue ? nextLevel : null,
+    hearts: gainHeart ? hearts + 1 : hearts,
+    heartGiven: heartDue ? [...(run.heartGiven || []), nextLevel] : (run.heartGiven || []),
     trapsDone: isTrap(run) ? [...(run.trapsDone || []), run.level] : (run.trapsDone || []),
   };
 }
@@ -212,7 +225,7 @@ export function resolveQuestion(run, { correct, helps = 0, doubled = false, time
     const next = advance(run, earned);
     return {
       run: next,
-      outcome: { type: next.finished ? 'finished' : 'correct', earned, points, trap, timeBonus: speed },
+      outcome: { type: next.finished ? 'finished' : 'correct', earned, points, trap, timeBonus: speed, heartGained: next.hearts > (run.hearts ?? HEARTS_MAX) },
     };
   }
 
@@ -227,13 +240,13 @@ export function resolveQuestion(run, { correct, helps = 0, doubled = false, time
   if (trap) {
     const penalty = Math.min(Math.round(points * modeMultiplier(run)), baseScore(run));
     const next = advance(run, -penalty);
-    return { run: next, outcome: { type: 'trapLost', points, penalty, finished: next.finished, trap: true } };
+    return { run: next, outcome: { type: 'trapLost', points, penalty, finished: next.finished, trap: true, heartGained: next.hearts > (run.hearts ?? HEARTS_MAX) } };
   }
   const back = ROLLBACK[points];
   const losses = run.losses + 1;
-  // A heart absorbs a wrong 200-point answer: no rollback, same level, new question.
+  // A heart absorbs a wrong answer on any question: no penalty, same level, new question.
   const hearts = run.hearts ?? HEARTS_MAX;
-  if (points === 200 && hearts > 0) {
+  if (hearts > 0) {
     const levelPoints = [...run.levelPoints];
     let penalty = 0;
     if (doubled && levelPoints.length) { // "double" still costs its extra penalty
@@ -265,7 +278,7 @@ export function resolveQuestion(run, { correct, helps = 0, doubled = false, time
     levelPoints[levelPoints.length - 1] -= penalty;
   }
   return {
-    run: { ...run, losses, level: newLevel, levelPoints, hearts: HEARTS_MAX }, // a fresh start: hearts refill
+    run: { ...run, losses, level: newLevel, levelPoints, hearts: Math.max(hearts, HEARTS_MAX) }, // a fresh start: hearts refill
     outcome: { type: 'fellBack', points, fellBack, newLevel, penalty },
   };
 }
@@ -304,6 +317,12 @@ export function openBox(run, open, rng = Math.random) {
     }
     case 'shield':
       return { run: { ...settled, shield: true }, result: { type } };
+    case 'heart': {
+      const have = settled.hearts ?? HEARTS_MAX;
+      if (have < HEARTS_CAP) return { run: { ...settled, hearts: have + 1 }, result: { type } };
+      const amount = points * BOX_BONUS_MULT;        // hearts already full: paid out in points instead
+      return { run: { ...settled, bonusPoints: settled.bonusPoints + amount }, result: { type: 'points', amount, fromHeart: true } };
+    }
     case 'losePoints': {
       const amount = Math.min(points * BOX_LOSS_MULT, baseScore(settled));
       return { run: { ...settled, bonusPoints: settled.bonusPoints - amount }, result: { type, amount } };
