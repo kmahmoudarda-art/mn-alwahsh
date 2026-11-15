@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { renderResultCard, shareText } from './resultCard';
+import { canNativeShare, nativeShareImage } from '../../utils/nativeBridge';
 import { springs } from './soloMotion';
 
 const font = { fontFamily: 'var(--font-cairo)' };
@@ -27,6 +28,8 @@ export default function ShareResult({ run }) {
     try {
       const blob = await renderResultCard(run);
       if (!blob) throw new Error('no-image');
+      // Inside the Android app: hand the picture to the system share sheet.
+      if (canNativeShare() && await nativeShareImage(blob, text)) return;
       const file = new File([blob], 'mn-alwahsh-solo.png', { type: 'image/png' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
