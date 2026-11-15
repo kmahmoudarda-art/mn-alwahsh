@@ -102,7 +102,7 @@ export default function SongPlayer({ itunesId, onStarted, onFailed, solo = false
         cursor: status === 'loading' ? 'default' : 'pointer', minWidth:200,
       }}>{label}</button>
       <span style={{ fontFamily:'var(--font-cairo)', fontSize:11, color:'#555', marginTop:6 }}>
-        {solo ? 'مقطع قصير (٥ ثوانٍ) · ♪ Preview by Apple' : 'مقطع قصير (٥ ثوانٍ) · العدّاد يبدأ عند التشغيل · ♪ Preview by Apple'}
+        {solo ? 'مقطع قصير (٥ ثوانٍ) · العدّاد (30 ثانية) يبدأ عند التشغيل · ♪ Preview by Apple' : 'مقطع قصير (٥ ثوانٍ) · العدّاد يبدأ عند التشغيل · ♪ Preview by Apple'}
       </span>
     </div>
   );

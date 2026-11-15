@@ -10,8 +10,8 @@ assert.equal(E.tierPoints(60), 600); assert.equal(E.tierPoints(89), 600);
 let r = E.newRun({ mode: 'pick', traps: [] });
 for (let i = 0; i < 90; i++) r = E.resolveQuestion(r, { correct: true }).run;
 assert.ok(r.finished);
-assert.equal(E.finalScore(r), E.MAX_SCORE);
-assert.equal(E.MAX_SCORE, 36000 + 9000);
+assert.equal(E.finalScore(r), E.MAX_SCORE - 90 * 30); // the perfect run in these tests answers with no time left
+assert.equal(E.MAX_SCORE, 36000 + 9000 + 90 * 30);
 assert.equal(E.levelsCompleted(r), 90);
 
 // 200 loss: back 3 (floored at 0), points of those levels removed
@@ -148,4 +148,14 @@ assert.equal(tb.run.boxPending, 10);
 // last level trap finishes the run
 let tf = E.resolveQuestion({ ...E.newRun({ mode: 'pick', traps: [89] }), level: 89, levelPoints: Array(89).fill(600) }, { correct: false });
 assert.ok(tf.run.finished);
+// ── Timer ──
+assert.equal(E.QUESTION_SECONDS, 30);
+assert.equal(E.timeBonus(17.9), 17); assert.equal(E.timeBonus(0), 0); assert.equal(E.timeBonus(-3), 0); assert.equal(E.timeBonus(99), 30);
+let tmr = E.resolveQuestion(E.newRun({ mode: 'pick', traps: [] }), { correct: true, timeLeft: 22.4 });
+assert.equal(tmr.outcome.earned, 222); assert.equal(tmr.outcome.timeBonus, 22); // 200 + 22
+// bonus is flat: not doubled, not multiplied by the mode, and not charged the help cost
+let tmr2 = E.resolveQuestion({ ...E.newRun({ mode: 'all', traps: [] }) }, { correct: true, helps: 1, doubled: true, timeLeft: 10 });
+assert.equal(tmr2.outcome.earned, Math.round(Math.max(0, 200 - 50) * 2 * 1.5) + 10);
+// a wrong answer earns no speed points
+assert.ok(!('timeBonus' in E.resolveQuestion(E.newRun({ mode: 'pick', traps: [] }), { correct: false, timeLeft: 25 }).outcome));
 console.log('solo engine: all tests passed');

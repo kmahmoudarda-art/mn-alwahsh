@@ -18,6 +18,7 @@ import SongPlayer from '../components/game/SongPlayer';
 import UnlockPrompt from '../components/game/UnlockPrompt';
 import LevelTrack from '../components/solo/LevelTrack';
 import CountUp from '../components/solo/CountUp';
+import QuestionTimer from '../components/solo/QuestionTimer';
 import ShareResult from '../components/solo/ShareResult';
 import { setScreenSecure } from '../utils/nativeBridge';
 import SoloBackdrop from '../components/solo/SoloBackdrop';
@@ -26,7 +27,7 @@ import {
   TOTAL_LEVELS, MAX_SCORE, DOUBLE_MULT, HELP_COST_RATE,
   newRun, tierPoints, resolveQuestion, applyLifeline,
   baseScore, levelSum, helpBonus, lossBonus, finalScore, levelsCompleted,
-  canUseLifeline, isTrap, openBox, BOX_EVERY, friendSuggestion, FRIEND_ACCURACY,
+  canUseLifeline, isTrap, openBox, QUESTION_SECONDS, BOX_EVERY, friendSuggestion, FRIEND_ACCURACY,
   ALL_CATEGORIES_MULT, PICK_COUNT, modeMultiplier,
 } from '../utils/soloEngine';
 
@@ -156,6 +157,9 @@ export default function SoloGame() {
   const [selected, setSelected] = useState(null);
   const [answered, setAnswered] = useState(false);
   const [outcome, setOutcome] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(QUESTION_SECONDS);
+  const [songStarted, setSongStarted] = useState(false); // a song question's clock starts when the clip is first played
+  const [timedOut, setTimedOut] = useState(false);
 
   // Per-question help state
   const [removed, setRemoved] = useState([]);
@@ -178,6 +182,7 @@ export default function SoloGame() {
   const boxTimer = useRef(null);
   const runRef = useRef(run);
   runRef.current = run;
+  const timerRef = useRef({ used: 0, startedAt: null }); // seconds spent on this question; only counts while it is on screen
   const liveRun = useRef(false);        // a run is on screen, so auto-save may write
 
   // ── auto-save ───────────────────────────────────────────────────────
@@ -185,20 +190,24 @@ export default function SoloGame() {
   // saved after every change, so leaving, refreshing or a killed app brings the
   // player back to the same question — nothing is lost and nothing can be rerolled.
   const latest = useRef({});
-  latest.current = { run, question, removed, twoMode, firstWrong, doubled, friendKey, answered, loading };
+  latest.current = { run, question, removed, twoMode, firstWrong, doubled, friendKey, answered, loading, songStarted };
+  const timeUsedNow = () => {
+    const T = timerRef.current;
+    return T.used + (T.startedAt ? (Date.now() - T.startedAt) / 1000 : 0);
+  };
   const saveNow = useCallback(() => {
     if (!liveRun.current) return;
     const L = latest.current;
     let qs = null;
     if (L.question && !L.answered) {
-      qs = { question: L.question, removed: L.removed, twoMode: L.twoMode, firstWrong: L.firstWrong, doubled: L.doubled, friendKey: L.friendKey, helps: helpsOnQ.current };
+      qs = { question: L.question, removed: L.removed, twoMode: L.twoMode, firstWrong: L.firstWrong, doubled: L.doubled, friendKey: L.friendKey, helps: helpsOnQ.current, songStarted: L.songStarted, timeUsed: timeUsedNow() };
     } else if (L.loading) {
       qs = { carry: { helps: helpsOnQ.current, doubled: L.doubled } };
     }
     writeSave({ run: L.run, seen: [...seen.current].slice(-400), qs, submitted: submittedRef.current });
   }, []);
 
-  useEffect(() => { saveNow(); }, [run, question, removed, twoMode, firstWrong, doubled, friendKey, answered, loading, view, saveNow]);
+  useEffect(() => { saveNow(); }, [run, question, removed, twoMode, firstWrong, doubled, friendKey, answered, loading, songStarted, view, saveNow]);
 
   useEffect(() => {
     const onHide = () => { if (document.visibilityState === 'hidden') saveNow(); };
@@ -272,6 +281,8 @@ export default function SoloGame() {
     setRemoved([]); setTwoMode(false); setFirstWrong(null); setDoubled(!!carry?.doubled); setFriendKey(null);
     // a swapped question keeps the help cost / double already committed on the old one
     helpsOnQ.current = carry?.helps || 0; songSwapped.current = false;
+    timerRef.current = { used: 0, startedAt: null };
+    setTimeLeft(QUESTION_SECONDS); setSongStarted(false); setTimedOut(false);
     const points = tierPoints(level);
     try {
       const base = await ensurePool();
@@ -368,6 +379,9 @@ export default function SoloGame() {
       setQuestion(qs.question); setRemoved(qs.removed || []); setTwoMode(!!qs.twoMode); setFirstWrong(qs.firstWrong || null);
       setDoubled(!!qs.doubled); setFriendKey(qs.friendKey || null);
       setSelected(null); setAnswered(false); setOutcome(null); setLoading(false); setLoadError(false);
+      // the clock only runs while the question is on screen, so leaving and coming back doesn't cost time
+      timerRef.current = { used: Math.min(QUESTION_SECONDS, Number(qs.timeUsed) || 0), startedAt: null };
+      setTimeLeft(Math.max(0, QUESTION_SECONDS - timerRef.current.used)); setSongStarted(!!qs.songStarted); setTimedOut(false);
       if (qs.question.image_url) fetchAndCacheImage(qs.question.image_url).catch(() => {});
       return;
     }
@@ -375,14 +389,47 @@ export default function SoloGame() {
   };
 
   // ── answering ───────────────────────────────────────────────────────
-  const resolve = (correct) => {
-    const res = resolveQuestion(runRef.current, { correct, helps: helpsOnQ.current, doubled });
+  const resolve = (correct, { timeUp = false } = {}) => {
+    const secondsLeft = Math.max(0, QUESTION_SECONDS - timeUsedNow());
+    const res = resolveQuestion(runRef.current, { correct, helps: helpsOnQ.current, doubled, timeLeft: secondsLeft });
+    setTimedOut(timeUp);
     setRun(res.run);
     setOutcome(res.outcome);
     setAnswered(true);
     songFails.current = 0;
     if (correct) sounds?.correct?.(); else { sounds?.wrong?.(); if (res.outcome.type !== 'shielded') setFlash(f => f + 1); }
   };
+
+  // The clock: runs while a question is on screen (for a song, from the first play),
+  // freezes while answered, hidden or left. Time running out is a wrong answer.
+  const timeUpRef = useRef(() => {});
+  timeUpRef.current = () => resolve(false, { timeUp: true });
+  const timerActive = view === 'play' && !!question && !loading && !answered && (!question.itunes_id || songStarted);
+  useEffect(() => {
+    if (!timerActive) return undefined;
+    const T = timerRef.current;
+    T.startedAt = Date.now();
+    const update = () => {
+      const used = T.used + (T.startedAt ? (Date.now() - T.startedAt) / 1000 : 0);
+      setTimeLeft(Math.max(0, QUESTION_SECONDS - used));
+      return used;
+    };
+    const onVis = () => {
+      if (document.visibilityState === 'hidden') { if (T.startedAt) { T.used += (Date.now() - T.startedAt) / 1000; T.startedAt = null; } }
+      else if (!T.startedAt) T.startedAt = Date.now();
+    };
+    document.addEventListener('visibilitychange', onVis);
+    const id = setInterval(() => {
+      if (!T.startedAt) return;
+      if (update() >= QUESTION_SECONDS) { clearInterval(id); timeUpRef.current(); }
+    }, 100);
+    update();
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', onVis);
+      if (T.startedAt) { T.used += (Date.now() - T.startedAt) / 1000; T.startedAt = null; }
+    };
+  }, [timerActive, question]);
 
   const onPick = (key) => {
     if (answered || removed.includes(key) || key === firstWrong || !question) return;
@@ -523,6 +570,7 @@ export default function SoloGame() {
         <p style={{ fontSize: 13, color: '#F2A93B', lineHeight: 1.7 }}>وإذا لم يكن خلفك مراحل كافية لترجع إليها (في أول 3 مراحل)، فأي خطأ يُنهي الجولة.</p>
         <div style={{ borderTop: '1px solid rgba(196,22,28,0.3)', paddingTop: 10, fontSize: 13.5, lineHeight: 1.9, opacity: 0.9 }}>
           <p>🛟 خمس وسائل مساعدة: حذف إجابة، جوابان، تبديل السؤال، اتصل بصديق (يصيب 70%)، ودبل. <b>كل وسيلة تُستخدم مرة واحدة فقط في الجولة كلها (٩٠ مرحلة)</b>، وتخصم 25% من نقاط السؤال وتنقص المكافأة النهائية.</p>
+          <p>⏱️ لكل سؤال 30 ثانية: إذا انتهى الوقت يُحتسب خطأً، وكل ثانية متبقية عند الإجابة الصحيحة تضيف نقطة.</p>
           <p>☠️ في كل 30 مرحلة سؤال فخ واحد: خطؤه يخصم نقاطاً فقط دون رجوع، ولا تعمل فيه وسائل المساعدة.</p>
           <p>🎁 بعد كل {BOX_EVERY} مراحل صندوق مفاجأة: تفتحه أو تتخطاه دون أن ترى ما بداخله.</p>
           <p>⭐ بعد المرحلة {TOTAL_LEVELS}: مكافأة بلا مساعدات ومكافأة بلا خسارات. أعلى نتيجة بلا صناديق {MAX_SCORE.toLocaleString('en')} (وفي نمط «كل الفئات» نقاط المراحل ×{ALL_CATEGORIES_MULT}).</p>
@@ -836,6 +884,7 @@ export default function SoloGame() {
                 هذا السؤال بـ {Math.round(points * modeMultiplier(run))} نقطة (×{modeMultiplier(run)})
               </div>
             )}
+            <QuestionTimer secondsLeft={timeLeft} total={QUESTION_SECONDS} waiting={!!question.itunes_id && !songStarted && !answered} />
             {/* parchment: the only light surface on the page, so the question is what you read first */}
             <div className="solo-parch" style={{
               background: 'linear-gradient(180deg, #F3EAD7, #E4D7BA)', color: '#1d1410', borderRadius: 14, padding: 16,
@@ -843,7 +892,7 @@ export default function SoloGame() {
             }}>
               {hero && <img src={hero} alt="" style={{ width: '100%', maxHeight: 'min(240px, 36vh)', objectFit: 'contain', borderRadius: 10, marginBottom: 10 }} />}
               {question.itunes_id && (
-                <SongPlayer key={question.id ?? question.itunes_id} itunesId={question.itunes_id} solo onFailed={onSongFailed} />
+                <SongPlayer key={question.id ?? question.itunes_id} itunesId={question.itunes_id} solo onStarted={() => setSongStarted(true)} onFailed={onSongFailed} />
               )}
               <p className="solo-q" style={{ fontWeight: 800, fontSize: 20, lineHeight: 1.75, textAlign: 'right' }}>{question.question}</p>
             </div>
@@ -934,13 +983,18 @@ export default function SoloGame() {
           <motion.div key="outcome" initial={reduce ? false : { opacity: 0, y: 16, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={springs.pop}
             style={{ ...card, textAlign: 'center', borderColor: isGood ? '#46C98B' : '#FF4A4A', boxShadow: `0 0 28px ${isGood ? 'rgba(70,201,139,0.25)' : 'rgba(229,30,40,0.3)'}` }}>
             {outcome.type === 'correct' || outcome.type === 'finished' ? (
-              <p style={{ fontSize: 34, fontWeight: 900, color: '#46C98B', lineHeight: 1.3 }}>
-                <CountUp value={outcome.earned} from={0} duration={0.7} signed />
-                <span style={{ fontSize: 15, marginRight: 8, fontWeight: 700 }}>إجابة صحيحة</span>
-              </p>
+              <>
+                <p style={{ fontSize: 34, fontWeight: 900, color: '#46C98B', lineHeight: 1.3 }}>
+                  <CountUp value={outcome.earned} from={0} duration={0.7} signed />
+                  <span style={{ fontSize: 15, marginRight: 8, fontWeight: 700 }}>إجابة صحيحة</span>
+                </p>
+                {outcome.timeBonus > 0 && (
+                  <p style={{ fontSize: 13, color: '#FFD700', fontWeight: 700 }}>⏱️ منها {outcome.timeBonus} نقطة سرعة</p>
+                )}
+              </>
             ) : (
               <p style={{ fontSize: 24, fontWeight: 900, color: isGood ? '#46C98B' : '#FF4A4A' }}>
-                {outcome.type === 'shielded' ? 'إجابة خاطئة، لكن…' : 'إجابة خاطئة'}
+                {timedOut ? '⏰ انتهى الوقت' : outcome.type === 'shielded' ? 'إجابة خاطئة، لكن…' : 'إجابة خاطئة'}
               </p>
             )}
             {outcome.type === 'fellBack' && (
