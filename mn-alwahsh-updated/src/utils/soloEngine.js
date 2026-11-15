@@ -57,6 +57,15 @@ export function friendSuggestion(correct, keys, rng = Math.random) {
 
 // removeOne / twoAnswers / switch (new question, once per run) / friend are
 // "helps" (cost points + shrink the end bonus); double is a gamble, not a help.
+// Category modes: 'all' = every free category (worth more), 'pick' = the
+// player's own 10 categories. Runs saved before modes existed have no mode
+// and behave like 'pick' with no multiplier.
+export const ALL_CATEGORIES_MULT = 1.5;
+export const PICK_COUNT = 10;
+export function modeMultiplier(run) {
+  return run.mode === 'all' ? ALL_CATEGORIES_MULT : 1;
+}
+
 export const LIFELINE_IDS = ['removeOne', 'twoAnswers', 'switch', 'friend', 'double'];
 
 export function tierPoints(levelIndex) {
@@ -65,8 +74,10 @@ export function tierPoints(levelIndex) {
   return 600;
 }
 
-export function newRun() {
+export function newRun({ mode = 'all', categories = [] } = {}) {
   return {
+    mode,                // 'all' | 'pick'
+    categories,          // the 10 chosen names when mode === 'pick'
     level: 0,            // 0-based index of the level being played
     levelPoints: [],     // points banked for each finished level (index = level)
     helpsUsed: 0,        // total helps used in this run (never decreases)
@@ -145,6 +156,7 @@ export function resolveQuestion(run, { correct, helps = 0, doubled = false }) {
   if (correct) {
     let earned = Math.max(0, points - helps * helpCost(points));
     if (doubled) earned *= DOUBLE_MULT;
+    earned = Math.round(earned * modeMultiplier(run));
     const levelPoints = [...run.levelPoints];
     levelPoints[run.level] = earned;
     const nextLevel = run.level + 1;
