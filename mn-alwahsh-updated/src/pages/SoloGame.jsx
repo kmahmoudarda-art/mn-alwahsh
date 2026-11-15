@@ -15,7 +15,8 @@ import SongPlayer from '../components/game/SongPlayer';
 import {
   TOTAL_LEVELS, TIER_SIZE, MAX_SCORE, DOUBLE_MULT, HELP_COST_RATE,
   newRun, tierPoints, resolveQuestion, applyLifeline,
-  baseScore, helpBonus, lossBonus, finalScore, levelsCompleted,
+  baseScore, levelSum, helpBonus, lossBonus, finalScore, levelsCompleted,
+  canUseLifeline, openBox, BOX_EVERY,
 } from '../utils/soloEngine';
 
 // Key must start with "mn_alwahsh_v3_" — supabaseClient wipes every other
@@ -68,7 +69,8 @@ export default function SoloGame() {
   const navigate = useNavigate();
   const user = getCurrentUser();
 
-  const [view, setView] = useState('intro'); // intro | play | end | board
+  const [view, setView] = useState('intro'); // intro | play | box | end | board
+  const [boxResult, setBoxResult] = useState(null);
   const [run, setRun] = useState(newRun);
   const [hasSave, setHasSave] = useState(false);
   const [notice, setNotice] = useState('');
@@ -170,7 +172,7 @@ export default function SoloGame() {
     const s = loadSave();
     if (!s?.run) return startNew();
     seen.current = new Set(s.seen || []);
-    let r = s.run;
+    let r = { ...newRun(), ...s.run };
     if (r.gameOver || r.finished) { setRun(r); endRun(r); return; }
     let msg = '';
     if (s.pending) {
@@ -184,6 +186,7 @@ export default function SoloGame() {
     setRun(r); setNotice(msg);
     persist(r, { pending: false });
     if (r.gameOver) { endRun(r); return; }
+    if (r.boxPending) { setBoxResult(null); setView('box'); return; }
     setView('play');
     loadQuestion(r.level);
   };
@@ -210,7 +213,7 @@ export default function SoloGame() {
   };
 
   const onLifeline = (id) => {
-    if (answered || !question || run.lifelinesUsed[id]) return;
+    if (answered || !question || !canUseLifeline(run, id)) return;
     const next = applyLifeline(run, id);
     setRun(next);
     persist(next, { pending: true });
@@ -229,8 +232,19 @@ export default function SoloGame() {
   const onContinue = () => {
     if (!outcome) return;
     if (outcome.type === 'gameOver' || outcome.type === 'finished') { endRun(run); return; }
+    if (run.boxPending) { setBoxResult(null); setView('box'); return; }
     loadQuestion(run.level);
   };
+
+  const onBox = (open) => {
+    const res = openBox(run, open);
+    setRun(res.run);
+    persist(res.run, { pending: false });
+    if (!open) { setView('play'); loadQuestion(res.run.level); return; }
+    setBoxResult(res.result);
+  };
+
+  const afterBox = () => { setView('play'); loadQuestion(runRef.current.level); };
 
   // A "guess the song" clip that can't play is swapped silently — no penalty.
   const onSongFailed = useCallback(() => {
@@ -265,7 +279,8 @@ export default function SoloGame() {
           <li>خطأ في سؤال 200 ← ترجع 3 مراحل. سؤال 400 ← ترجع 10 مراحل.</li>
           <li>خطأ في سؤال 600 ← تبدأ الجولة من الصفر.</li>
           <li>كل وسيلة مساعدة تُستخدم مرة واحدة في الجولة، وتخصم من النقاط وتنقص مكافأة النهاية.</li>
-          <li>عند إنهاء المراحل كلها تُضاف مكافأة بلا مساعدات ومكافأة بلا خسارات. أعلى نتيجة ممكنة: {MAX_SCORE.toLocaleString('en')}.</li>
+          <li>عند إنهاء المراحل كلها تُضاف مكافأة بلا مساعدات ومكافأة بلا خسارات. أعلى نتيجة بلا صناديق: {MAX_SCORE.toLocaleString('en')}.</li>
+          <li>🎁 بعد كل {BOX_EVERY} مراحل صندوق مفاجأة: تفتحه أو تتخطاه دون أن ترى ما بداخله — قد تربح وقد تخسر!</li>
         </ul>
       </div>
       {!user && (
@@ -316,6 +331,44 @@ export default function SoloGame() {
     </div>
   );
 
+  if (view === 'box') {
+    const lvl = run.level;
+    const R = boxResult;
+    const msg = !R ? null : {
+      removeOne: ['🗑️', 'مساعدة "احذف إجابة" إضافية!', '#3DDC84'],
+      twoAnswers: ['✌️', 'مساعدة "جاوب جوابين" إضافية!', '#3DDC84'],
+      points: ['⭐', `+${R.amount} نقطة إضافية!`, '#3DDC84'],
+      shield: ['🛡️', 'درع! يلغي أول سؤال تخسره.', '#3DDC84'],
+      losePoints: ['💸', R.amount ? `خسرت ${R.amount} نقطة…` : 'حظ سيئ، لكن لا نقاط لتخسرها!', '#FF4040'],
+      rollback: ['⏪', `رجعت ${R.back} ${R.back === 1 ? 'مرحلة' : 'مراحل'} إلى المرحلة ${R.newLevel + 1}`, '#FF4040'],
+    }[R.type];
+    return shell(
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 50, textAlign: 'center' }}>
+        <motion.div initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} style={{ fontSize: 90 }}>
+          {R ? msg[0] : '🎁'}
+        </motion.div>
+        {!R ? (
+          <>
+            <h2 style={{ fontSize: 26, fontWeight: 900, color: '#FFD700' }}>صندوق المفاجأة</h2>
+            <p style={{ fontSize: 14, lineHeight: 1.9 }}>
+              أنهيت {lvl} مراحل. تفتح الصندوق؟<br />
+              قد يحتوي على مساعدة أو نقاط أو درع… وقد يكون حظك سيئاً فتخسر نقاطاً أو ترجع مرحلة.<br />
+              <b>لن تعرف ما بداخله قبل أن تقرّر، والقرار نهائي.</b>
+            </p>
+            <button style={redBtn} onClick={() => onBox(true)}>🎁 افتح الصندوق</button>
+            <button style={ghostBtn} onClick={() => onBox(false)}>تخطَّ — لا أريد المخاطرة</button>
+          </>
+        ) : (
+          <>
+            <h2 style={{ fontSize: 24, fontWeight: 900, color: msg[2] }}>{msg[1]}</h2>
+            <p style={{ fontSize: 13, opacity: 0.75 }}>نقاطك الآن: {baseScore(run).toLocaleString('en')}</p>
+            <button style={redBtn} onClick={afterBox}>تابع ←</button>
+          </>
+        )}
+      </div>
+    );
+  }
+
   if (view === 'end') {
     const score = finalScore(run);
     return shell(
@@ -329,7 +382,8 @@ export default function SoloGame() {
           </p>
         )}
         <div style={card}>
-          <Row label="نقاط المراحل" value={baseScore(run)} />
+          <Row label="نقاط المراحل" value={levelSum(run)} />
+          {run.bonusPoints !== 0 && <Row label="صناديق المفاجأة" value={run.bonusPoints} />}
           {run.finished && <>
             <Row label={`مكافأة بلا مساعدات (استخدمت ${run.helpsUsed})`} value={helpBonus(run)} />
             <Row label={`مكافأة بلا خسارات (خسرت ${run.losses})`} value={lossBonus(run)} />
@@ -375,7 +429,7 @@ export default function SoloGame() {
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginTop: 6 }}>
           <span style={{ color: tier.color, fontWeight: 800 }}>{tier.name} · {points} نقطة</span>
-          <span style={{ opacity: 0.7 }}>مساعدات: {run.helpsUsed} · خسارات: {run.losses}</span>
+          <span style={{ opacity: 0.7 }}>{run.shield ? '🛡️ · ' : ''}مساعدات: {run.helpsUsed} · خسارات: {run.losses}</span>
         </div>
       </div>
 
@@ -437,11 +491,12 @@ export default function SoloGame() {
             <div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
                 {LIFELINES.map(l => {
-                  const used = run.lifelinesUsed[l.id];
+                  const used = !canUseLifeline(run, l.id);
+                  const extra = run.bonusLifelines?.[l.id] || 0;
                   return (
                     <button key={l.id} onClick={() => onLifeline(l.id)} disabled={used} title={l.desc}
                       style={{ ...ghostBtn, fontSize: 13, opacity: used ? 0.3 : 1, textDecoration: used ? 'line-through' : 'none' }}>
-                      {l.label}
+                      {l.label}{extra > 0 ? ` (+${extra})` : ''}
                     </button>
                   );
                 })}
@@ -457,7 +512,7 @@ export default function SoloGame() {
           <AnimatePresence>
             {answered && outcome && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                style={{ ...card, textAlign: 'center', borderColor: outcome.type === 'correct' || outcome.type === 'finished' ? '#3DDC84' : '#FF4040' }}>
+                style={{ ...card, textAlign: 'center', borderColor: ['correct', 'finished', 'shielded'].includes(outcome.type) ? '#3DDC84' : '#FF4040' }}>
                 <p style={{ fontSize: 22, fontWeight: 900, marginBottom: 4 }}>
                   {outcome.type === 'correct' || outcome.type === 'finished' ? `🎉 إجابة صحيحة! +${outcome.earned}` : '❌ إجابة خاطئة'}
                 </p>
@@ -466,6 +521,9 @@ export default function SoloGame() {
                     رجعت {outcome.fellBack} {outcome.fellBack === 1 ? 'مرحلة' : 'مراحل'} إلى المرحلة {outcome.newLevel + 1}
                     {outcome.penalty ? ` · وخسرت ${outcome.penalty} نقطة بسبب الدبل` : ''}
                   </p>
+                )}
+                {outcome.type === 'shielded' && (
+                  <p style={{ fontSize: 14, color: '#3DDC84', fontWeight: 700 }}>🛡️ الدرع حماك! لم تخسر شيئاً وتبقى في مرحلتك.</p>
                 )}
                 {outcome.type === 'gameOver' && (
                   <p style={{ fontSize: 14, color: '#FF6666', fontWeight: 700 }}>سؤال 600 نقطة — الجولة تبدأ من الصفر.</p>

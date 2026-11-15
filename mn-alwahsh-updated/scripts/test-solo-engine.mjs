@@ -51,4 +51,36 @@ assert.equal(E.resolveQuestion(d, { correct: true, doubled: true }).outcome.earn
 // bonuses shrink with helps and losses, never negative
 let b = { ...E.newRun(), finished: true, levelPoints: [], helpsUsed: 99, losses: 99 };
 assert.equal(E.finalScore(b), 0);
+// ── Mystery box ──
+r = E.newRun();
+for (let i = 0; i < 9; i++) r = E.resolveQuestion(r, { correct: true }).run;
+assert.equal(r.boxPending, null);
+r = E.resolveQuestion(r, { correct: true }).run;        // finished level 10
+assert.equal(r.level, 10); assert.equal(r.boxPending, 10);
+// skip
+let sk = E.openBox(r, false);
+assert.equal(sk.run.boxPending, null); assert.deepEqual(sk.run.boxesSeen, [10]);
+// deterministic outcomes via rng (table order: removeOne 0-20, twoAnswers 20-35, points 35-55, shield 55-70, lose 70-88, rollback 88-100)
+const at = (x) => () => x;
+let o = E.openBox(r, true, at(0.05)); assert.equal(o.run.bonusLifelines.removeOne, 1);
+o = E.openBox(r, true, at(0.25)); assert.equal(o.run.bonusLifelines.twoAnswers, 1);
+o = E.openBox(r, true, at(0.4)); assert.equal(o.run.bonusPoints, 400); assert.equal(E.baseScore(o.run), 2000 + 400);
+o = E.openBox(r, true, at(0.6)); assert.ok(o.run.shield);
+o = E.openBox(r, true, at(0.8)); assert.equal(o.run.bonusPoints, -200);
+const seq = [0.95, 0.4]; let k = 0;
+o = E.openBox(r, true, () => seq[k++]); assert.equal(o.result.type, 'rollback'); assert.equal(o.run.level, 9); assert.equal(o.run.losses, 0);
+// loss never drives score below zero
+let z = E.newRun(); z.boxPending = 10; z = E.openBox(z, true, at(0.8)).run; assert.equal(E.baseScore(z), 0); assert.equal(z.bonusPoints, 0);
+// once per milestone: replaying level 10 after a rollback does not re-offer
+let again = sk.run;
+again = E.resolveQuestion({ ...again, level: 9, levelPoints: again.levelPoints.slice(0, 9) }, { correct: true }).run;
+assert.equal(again.boxPending, null);
+// bonus lifeline reusable after the free use is spent
+let L = E.applyLifeline({ ...E.newRun(), bonusLifelines: { removeOne: 1, twoAnswers: 0 } }, 'removeOne');
+assert.ok(!E.canUseLifeline(L, 'removeOne') === false); // bonus still available
+L = E.applyLifeline(L, 'removeOne'); assert.ok(!E.canUseLifeline(L, 'removeOne')); assert.equal(L.helpsUsed, 2);
+// shield cancels a loss (any tier), no rollback, no loss counted
+let sh = { ...E.newRun(), level: 65, shield: true };
+const sres = E.resolveQuestion(sh, { correct: false });
+assert.equal(sres.outcome.type, 'shielded'); assert.equal(sres.run.level, 65); assert.equal(sres.run.losses, 0); assert.ok(!sres.run.shield);
 console.log('solo engine: all tests passed');
