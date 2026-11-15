@@ -7,6 +7,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { fetchCategories, fetchQuestion } from '../utils/supabaseClient';
 import { fetchAndCacheImage, getCachedImageUrl } from '../utils/questionGenerator';
 import { displayName, getIcon } from '../utils/categoryIcons';
+import { isRunningInAndroidApp, isRunningInIOSApp } from '../utils/platform';
 import { isSoloExcluded } from '../utils/soloExcluded';
 import { isHiddenCategory } from '../utils/hiddenCategories';
 import { isPremiumCategory, isTestAccount } from '../utils/premiumConfig';
@@ -15,6 +16,7 @@ import { getCurrentUser } from '../utils/authClient';
 import { sounds } from '../utils/soundEffects';
 import { fetchLeaderboard, submitRun } from '../utils/soloLeaderboard';
 import SongPlayer from '../components/game/SongPlayer';
+import UnlockPrompt from '../components/game/UnlockPrompt';
 import LevelTrack from '../components/solo/LevelTrack';
 import CountUp from '../components/solo/CountUp';
 import SoloBackdrop from '../components/solo/SoloBackdrop';
@@ -69,6 +71,34 @@ const ghostBtn = {
   background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(196,22,28,0.5)',
   borderRadius: 12, padding: '10px 16px',
 };
+// The app is landscape-first (manifest + Android lock), so landscape is the
+// primary layout; portrait falls back to a single column.
+const LAYOUT_CSS = `
+.solo-shell{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:14px 14px 40px}
+.solo-two{display:flex;flex-direction:column;gap:14px}
+.solo-col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.solo-play{display:flex;flex-direction:column;gap:12px}
+.solo-head,.solo-main,.solo-tools{display:flex;flex-direction:column;gap:12px;min-width:0}
+.solo-options{display:grid;gap:9px}
+@media (orientation: landscape){
+  .solo-shell{max-width:1120px;padding:10px max(16px,env(safe-area-inset-right)) 14px max(16px,env(safe-area-inset-left))}
+  .solo-two{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  .solo-play{display:grid;grid-template-columns:1fr minmax(310px,38%);grid-template-areas:"main head" "main tools";grid-template-rows:auto 1fr;gap:10px 14px;align-items:start}
+  .solo-head{grid-area:head}.solo-main{grid-area:main}.solo-tools{grid-area:tools}
+  .solo-options{grid-template-columns:1fr 1fr}
+}
+@media (orientation: landscape) and (max-height:520px){
+  .solo-shell{padding-top:6px;padding-bottom:8px}
+  .solo-play{gap:8px 12px}
+  .solo-q{font-size:17px!important;line-height:1.6!important}
+  .solo-opt{padding:8px 10px!important;font-size:15px!important;gap:8px!important}
+  .solo-opt>span:first-child{width:26px!important;height:26px!important}
+  .solo-title{font-size:34px!important}
+  .solo-head-card{padding:8px 12px 6px!important}
+  .solo-parch{padding:12px!important}
+}
+`;
+
 const tap = { whileTap: { scale: 0.97 }, transition: springs.snappy };
 
 export default function SoloGame() {
@@ -79,10 +109,12 @@ export default function SoloGame() {
   const [boxResult, setBoxResult] = useState(null);
   const [opening, setOpening] = useState(false);
   const [allCats, setAllCats] = useState(null); // every visible category, locked ones included
-  const [lockMsg, setLockMsg] = useState('');
+  const [unlockFor, setUnlockFor] = useState(null); // premium category whose purchase prompt is open
+  const trialRef = useRef([]);                    // premium categories borrowed for this run (trial SKU)
   const [picked, setPicked] = useState([]);
   const [search, setSearch] = useState('');
   const [flash, setFlash] = useState(0);
+  const [showExit, setShowExit] = useState(false);
   const reduce = useReducedMotion();
   const [run, setRun] = useState(newRun);
   const [hasSave, setHasSave] = useState(false);
@@ -129,19 +161,46 @@ export default function SoloGame() {
   }, []);
 
   // ── question fetching ───────────────────────────────────────────────
-  // Playable = free categories + premium ones this account has unlocked.
-  // Locked premium categories are still listed in the picker (with a lock).
+  // Playable = free categories + premium ones this account owns ('__ALL__' means
+  // the whole bundle) + any borrowed for this run. Locked premium categories
+  // are still listed in the picker, with a lock and the purchase prompt.
+  const computePlayable = (visible, unlockedList) => {
+    const owned = new Set(unlockedList);
+    const everything = owned.has('__ALL__') || isTestAccount(getCurrentUser());
+    return visible.filter(c => !isPremiumCategory(c) || everything || owned.has(c) || trialRef.current.includes(c));
+  };
+
   const ensurePool = useCallback(async () => {
     if (pool) return pool;
     const cats = await fetchCategories();
-    const unlocked = new Set(await fetchUnlockedCategories().catch(() => []));
-    const test = isTestAccount(user);
     const visible = cats.filter(c => !isHiddenCategory(c) && !isSoloExcluded(c));
-    const playable = visible.filter(c => !isPremiumCategory(c) || test || unlocked.has(c));
     setAllCats(visible);
+    const unlockedList = await fetchUnlockedCategories().catch(() => []);
+    const playable = computePlayable(visible, unlockedList);
     setPool(playable);
     return playable;
-  }, [pool, user]);
+  }, [pool]);
+
+  // Re-read what the account owns (after a purchase / sign-in / restore).
+  const refreshAccess = async () => {
+    if (!allCats) return [];
+    const unlockedList = await fetchUnlockedCategories().catch(() => []);
+    const playable = computePlayable(allCats, unlockedList);
+    setPool(playable);
+    return playable;
+  };
+
+  const onAccessChanged = async (ev) => {
+    if (ev.type === 'trial') trialRef.current = [...new Set([...trialRef.current, ev.category])];
+    const playable = await refreshAccess();
+    const nowOpen = playable.includes(ev.category);
+    if (ev.type === 'single' || ev.type === 'trial' || nowOpen) {
+      setPicked(prev => (prev.includes(ev.category) || prev.length >= PICK_COUNT ? prev : [...prev, ev.category]));
+      setUnlockFor(null);
+    } else if (ev.type === 'all') {
+      setUnlockFor(null);
+    }
+  };
 
   const loadQuestion = useCallback(async (level, carry) => {
     setLoading(true); setLoadError(false);
@@ -153,7 +212,7 @@ export default function SoloGame() {
     try {
       const base = await ensurePool();
       const cur = runRef.current;
-      const chosen = (cur.categories || []).filter(c => base.includes(c)); // drops anything excluded since an older save
+      const chosen = (cur.categories || []).filter(c => base.includes(c) || (cur.trial || []).includes(c)); // drops anything excluded since an older save
       const cats = cur.mode === 'pick' && chosen.length ? chosen : base;
       for (let i = 0; i < 25; i++) {
         const live = cats.filter(c => !deadCombos.current.has(`${c}|${points}`));
@@ -188,9 +247,10 @@ export default function SoloGame() {
   }, [user]);
 
   const startNew = (mode = 'all', categories = []) => {
+    const trial = categories.filter(c => trialRef.current.includes(c)); // borrowed premium categories live only in this run
     seen.current = new Set();
     deadCombos.current = new Set();
-    const r = newRun({ mode, categories });
+    const r = newRun({ mode, categories, trial });
     runRef.current = r;            // loadQuestion reads the mode from here
     setRun(r); setNotice(''); setView('play');
     persist(r, { pending: false });
@@ -308,6 +368,25 @@ export default function SoloGame() {
     loadQuestion(runRef.current.level, { helps: helpsOnQ.current, doubled });
   }, [answered, doubled, loadQuestion]);
 
+  // "Save and exit". Between questions (answered, loading, box) progress is
+  // already saved, so just leave. While a question is on screen, leaving
+  // would dodge the one-attempt rule, so ask first and count it as a miss.
+  const questionOpen = view === 'play' && !!question && !loading && !answered;
+  const requestExit = () => { if (questionOpen) setShowExit(true); else navigate('/'); };
+  const confirmExit = () => {
+    const res = resolveQuestion(runRef.current, { correct: false, helps: helpsOnQ.current, doubled });
+    persist(res.run, { pending: false });  // saved with the loss already applied
+    setShowExit(false);
+    navigate('/');
+  };
+
+  useEffect(() => {
+    if (!showExit) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setShowExit(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showExit]);
+
   const openBoard = async () => {
     setView('board'); setBoard(null);
     setBoard(await fetchLeaderboard());
@@ -318,40 +397,26 @@ export default function SoloGame() {
   const shell = (children) => (
     <div className="min-h-screen" dir="rtl" style={{ background: '#0A0305', color: '#FFE9E9', ...font, position: 'relative' }}>
       <SoloBackdrop points={backdropPoints} flash={flash} />
-      <div style={{ position: 'relative', zIndex: 1, maxWidth: 560, margin: '0 auto', padding: '14px 14px 40px' }}>{children}</div>
+      <style>{LAYOUT_CSS}</style>
+      <div className="solo-shell">{children}</div>
     </div>
   );
 
   if (view === 'intro') return shell(
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 16 }}>
+    <div className="solo-page" style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 16 }}>
       <button onClick={() => navigate('/')} style={{ ...ghostBtn, alignSelf: 'flex-start', padding: '6px 12px', fontSize: 13 }}>→ رجوع</button>
-      <div style={{ textAlign: 'center', padding: '10px 0 2px' }}>
+      <div className="solo-two">
+      <div className="solo-col">
+      <div className="solo-hero" style={{ textAlign: 'center', padding: '10px 0 2px' }}>
         <motion.h1
           initial={reduce ? false : { opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={springs.gentle}
-          style={{ fontSize: 46, fontWeight: 900, lineHeight: 1.15, color: '#FF3B3B', textShadow: '0 0 24px rgba(229,30,40,0.55)' }}>
+          className="solo-title" style={{ fontSize: 46, fontWeight: 900, lineHeight: 1.15, color: '#FF3B3B', textShadow: '0 0 24px rgba(229,30,40,0.55)' }}>
           ٩٠ مرحلة
         </motion.h1>
         <p style={{ fontSize: 16, fontWeight: 700, opacity: 0.85, marginTop: 4 }}>محاولة واحدة لكل سؤال</p>
       </div>
       <div style={{ ...card, padding: '18px 16px 12px' }}>
         <LevelTrack level={saveInfo && !saveInfo.over ? saveInfo.level : 0} idle />
-      </div>
-      <div style={{ ...card, display: 'grid', gap: 10 }}>
-        <p style={{ fontWeight: 800, fontSize: 14, opacity: 0.8 }}>إذا أخطأت</p>
-        {[[200, 'ترجع 3 مراحل'], [400, 'ترجع 10 مراحل'], [600, 'تبدأ من الصفر']].map(([pts, text]) => (
-          <div key={pts} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 15, fontWeight: 700 }}>
-            <span style={{ minWidth: 92, padding: '3px 10px', borderRadius: 8, textAlign: 'center', fontWeight: 900, background: `${TIER[pts].color}22`, color: TIER[pts].color, border: `1px solid ${TIER[pts].color}66` }}>
-              سؤال {pts}
-            </span>
-            <span>{text}</span>
-          </div>
-        ))}
-        <p style={{ fontSize: 13, color: '#F2A93B', lineHeight: 1.7 }}>وإذا لم يكن خلفك مراحل كافية لترجع إليها (في أول 3 مراحل)، فأي خطأ يُنهي الجولة.</p>
-        <div style={{ borderTop: '1px solid rgba(196,22,28,0.3)', paddingTop: 10, fontSize: 13.5, lineHeight: 1.9, opacity: 0.9 }}>
-          <p>🛟 خمس وسائل مساعدة، كل واحدة مرة واحدة: حذف إجابة، جوابان، تبديل السؤال، اتصل بصديق (يصيب 70%)، ودبل. تخصم من نقاط السؤال وتنقص المكافأة النهائية.</p>
-          <p>🎁 بعد كل {BOX_EVERY} مراحل صندوق مفاجأة: تفتحه أو تتخطاه دون أن ترى ما بداخله.</p>
-          <p>⭐ بعد المرحلة {TOTAL_LEVELS}: مكافأة بلا مساعدات ومكافأة بلا خسارات. أعلى نتيجة بلا صناديق {MAX_SCORE.toLocaleString('en')} (وفي نمط «كل الفئات» نقاط المراحل ×{ALL_CATEGORIES_MULT}).</p>
-        </div>
       </div>
       {!user && (
         <p style={{ fontSize: 13, textAlign: 'center', color: '#F2A93B' }}>
@@ -373,6 +438,27 @@ export default function SoloGame() {
         setView('mode');
       }}>{hasSave ? 'ابدأ جولة جديدة' : 'ابدأ التحدّي'}</motion.button>
       <motion.button {...tap} style={ghostBtn} onClick={openBoard}>🏆 المتصدّرون</motion.button>
+      </div>
+      <div className="solo-col">
+      <div className="solo-rules" style={{ ...card, display: 'grid', gap: 10 }}>
+        <p style={{ fontWeight: 800, fontSize: 14, opacity: 0.8 }}>إذا أخطأت</p>
+        {[[200, 'ترجع 3 مراحل'], [400, 'ترجع 10 مراحل'], [600, 'تبدأ من الصفر']].map(([pts, text]) => (
+          <div key={pts} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 15, fontWeight: 700 }}>
+            <span style={{ minWidth: 92, padding: '3px 10px', borderRadius: 8, textAlign: 'center', fontWeight: 900, background: `${TIER[pts].color}22`, color: TIER[pts].color, border: `1px solid ${TIER[pts].color}66` }}>
+              سؤال {pts}
+            </span>
+            <span>{text}</span>
+          </div>
+        ))}
+        <p style={{ fontSize: 13, color: '#F2A93B', lineHeight: 1.7 }}>وإذا لم يكن خلفك مراحل كافية لترجع إليها (في أول 3 مراحل)، فأي خطأ يُنهي الجولة.</p>
+        <div style={{ borderTop: '1px solid rgba(196,22,28,0.3)', paddingTop: 10, fontSize: 13.5, lineHeight: 1.9, opacity: 0.9 }}>
+          <p>🛟 خمس وسائل مساعدة: حذف إجابة، جوابان، تبديل السؤال، اتصل بصديق (يصيب 70%)، ودبل. <b>كل وسيلة تُستخدم مرة واحدة فقط في الجولة كلها (٩٠ مرحلة)</b>، وتخصم 25% من نقاط السؤال وتنقص المكافأة النهائية.</p>
+          <p>🎁 بعد كل {BOX_EVERY} مراحل صندوق مفاجأة: تفتحه أو تتخطاه دون أن ترى ما بداخله.</p>
+          <p>⭐ بعد المرحلة {TOTAL_LEVELS}: مكافأة بلا مساعدات ومكافأة بلا خسارات. أعلى نتيجة بلا صناديق {MAX_SCORE.toLocaleString('en')} (وفي نمط «كل الفئات» نقاط المراحل ×{ALL_CATEGORIES_MULT}).</p>
+        </div>
+      </div>
+      </div>
+      </div>
     </div>
   );
 
@@ -381,6 +467,7 @@ export default function SoloGame() {
       <button onClick={() => setView('intro')} style={{ ...ghostBtn, alignSelf: 'flex-start', padding: '6px 12px', fontSize: 13 }}>→ رجوع</button>
       <h2 style={{ textAlign: 'center', fontSize: 26, fontWeight: 900 }}>من أين تأتي الأسئلة؟</h2>
 
+      <div className="solo-two" style={{ alignItems: 'stretch' }}>
       <motion.button {...tap} onClick={() => chooseMode('all')}
         style={{ ...card, textAlign: 'right', cursor: 'pointer', color: 'inherit', ...font, padding: 18, border: '2px solid #FFD700', boxShadow: '0 0 28px rgba(255,215,0,0.22)', position: 'relative' }}>
         <span style={{ position: 'absolute', top: -13, insetInlineStart: 14, background: '#FFD700', color: '#0A0305', fontWeight: 900, fontSize: 14, padding: '3px 12px', borderRadius: 999 }}>
@@ -399,6 +486,7 @@ export default function SoloGame() {
           تختار فئاتك المفضلة والأسئلة تأتي منها فقط. النقاط عادية بلا مضاعفة.
         </p>
       </motion.button>
+      </div>
     </div>
   );
 
@@ -408,8 +496,7 @@ export default function SoloGame() {
       .filter(c => displayName(c).includes(search.trim()))
       .sort((x, y) => Number(playable.has(y)) - Number(playable.has(x))); // open ones first
     const toggle = (c) => {
-      if (!playable.has(c)) { setLockMsg('هذه فئة مدفوعة. يمكنك فتحها من الشاشة الرئيسية ثم تعود لاختيارها.'); return; }
-      setLockMsg('');
+      if (!playable.has(c)) { setUnlockFor(c); return; } // premium and not owned: same purchase options as the main picker
       setPicked(prev => prev.includes(c) ? prev.filter(x => x !== c) : prev.length < PICK_COUNT ? [...prev, c] : prev);
     };
     const ready = picked.length === PICK_COUNT;
@@ -420,7 +507,6 @@ export default function SoloGame() {
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="ابحث عن فئة"
           style={{ ...font, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(196,22,28,0.5)', borderRadius: 12, padding: '11px 14px', color: '#FFE9E9', fontSize: 15, outline: 'none' }} />
         {allCats === null && <p style={{ textAlign: 'center', opacity: 0.8, padding: 20 }}>جاري تحميل الفئات…</p>}
-        {lockMsg && <p style={{ textAlign: 'center', fontSize: 13, color: '#F2A93B' }}>{lockMsg}</p>}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
           {list.map(c => {
             const on = picked.includes(c);
@@ -447,6 +533,11 @@ export default function SoloGame() {
             </motion.button>
           </div>
         </div>
+        <AnimatePresence>
+          {unlockFor && (
+            <UnlockPrompt key="unlock" category={unlockFor} onClose={() => setUnlockFor(null)} onChanged={onAccessChanged} />
+          )}
+        </AnimatePresence>
       </div>
     );
   }
@@ -501,7 +592,9 @@ export default function SoloGame() {
       rollback: ['⏪', `رجعت ${R.back} ${R.back === 1 ? 'مرحلة' : 'مراحل'} إلى المرحلة ${R.newLevel + 1}`, bad],
     }[R.type];
     return shell(
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 44, textAlign: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 16, textAlign: 'center' }}>
+        <button onClick={() => navigate('/')} style={{ ...ghostBtn, alignSelf: 'flex-start', padding: '5px 10px', fontSize: 12 }}>حفظ وخروج</button>
+        <div className="solo-two" style={{ alignItems: 'center' }}>
         <div style={{ position: 'relative', height: 130, display: 'grid', placeItems: 'center' }}>
           {R && !reduce && (
             <motion.span key="ring" initial={{ scale: 0.3, opacity: 0.9 }} animate={{ scale: 2.6, opacity: 0 }} transition={{ duration: 0.8, ease }}
@@ -522,6 +615,7 @@ export default function SoloGame() {
             )}
           </AnimatePresence>
         </div>
+        <div className="solo-col">
         {!R ? (
           <>
             <h2 style={{ fontSize: 26, fontWeight: 900, color: '#FFD700' }}>صندوق المفاجأة</h2>
@@ -541,6 +635,8 @@ export default function SoloGame() {
             <motion.button {...tap} style={redBtn} onClick={afterBox}>تابع</motion.button>
           </>
         )}
+        </div>
+        </div>
       </div>
     );
   }
@@ -554,6 +650,8 @@ export default function SoloGame() {
     ];
     return shell(
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 26 }}>
+        <div className="solo-two">
+        <div className="solo-col">
         <motion.h2 initial={reduce ? false : { opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={springs.pop}
           style={{ textAlign: 'center', fontSize: 32, fontWeight: 900, color: run.finished ? '#46C98B' : '#FF3B3B', textShadow: `0 0 22px ${run.finished ? 'rgba(70,201,139,0.5)' : 'rgba(229,30,40,0.5)'}` }}>
           {run.finished ? 'أنهيت التحدّي!' : 'انتهت الجولة'}
@@ -578,6 +676,8 @@ export default function SoloGame() {
             {!run.finished && ' · المكافآت تُحتسب عند إنهاء المراحل كلها'}
           </p>
         </div>
+        </div>
+        <div className="solo-col">
         <p style={{ fontSize: 13, textAlign: 'center', minHeight: 20 }}>
           {!user ? '⚠️ لم تُسجَّل النتيجة في المتصدّرين لأنك لم تسجّل دخولك.'
             : submitInfo === null ? 'جاري حفظ نتيجتك…'
@@ -588,6 +688,8 @@ export default function SoloGame() {
         <motion.button {...tap} style={redBtn} onClick={() => setView('mode')}>جولة جديدة</motion.button>
         <motion.button {...tap} style={ghostBtn} onClick={openBoard}>🏆 المتصدّرون</motion.button>
         <motion.button {...tap} style={ghostBtn} onClick={() => { setHasSave(false); setView('intro'); navigate('/'); }}>الشاشة الرئيسية</motion.button>
+        </div>
+        </div>
       </div>
     );
   }
@@ -599,13 +701,14 @@ export default function SoloGame() {
   const isGood = outcome && ['correct', 'finished', 'shielded'].includes(outcome.type);
 
   return shell(
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div className="solo-play">
+      <div className="solo-head">
       {/* header: score + track */}
-      <div style={{ ...card, padding: '12px 14px 10px' }}>
+      <div className="solo-head-card" style={{ ...card, padding: '12px 14px 10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <button onClick={() => navigate('/')} style={{ ...ghostBtn, padding: '5px 10px', fontSize: 12 }}>حفظ وخروج</button>
-          <span style={{ fontWeight: 900, fontSize: 15 }}>المرحلة {run.level + 1}<span style={{ opacity: 0.5, fontWeight: 600 }}> / {TOTAL_LEVELS}</span></span>
-          <span style={{ fontWeight: 900, fontSize: 17, color: '#FFD700' }}>⭐ <CountUp value={baseScore(run)} /></span>
+          <button onClick={requestExit} style={{ ...ghostBtn, padding: '5px 10px', fontSize: 12, whiteSpace: 'nowrap' }}>حفظ وخروج</button>
+          <span style={{ fontWeight: 900, fontSize: 15, whiteSpace: 'nowrap' }}>المرحلة {run.level + 1}<span style={{ opacity: 0.5, fontWeight: 600 }}> / {TOTAL_LEVELS}</span></span>
+          <span style={{ fontWeight: 900, fontSize: 17, color: '#FFD700', whiteSpace: 'nowrap' }}>⭐ <CountUp value={baseScore(run)} /></span>
         </div>
         <LevelTrack level={run.level} boxesSeen={run.boxesSeen} />
         <p style={{ fontSize: 11.5, opacity: 0.6, marginTop: 6, textAlign: 'center' }}>
@@ -620,6 +723,9 @@ export default function SoloGame() {
         </div>
       )}
 
+      </div>
+
+      <div className="solo-main">
       {loading && (
         <div style={{ ...card, textAlign: 'center', padding: 36 }}>
           <motion.div animate={reduce ? {} : { scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }} transition={{ duration: 1.2, repeat: Infinity }} style={{ fontSize: 34 }}>👁</motion.div>
@@ -646,7 +752,7 @@ export default function SoloGame() {
               </div>
             )}
             {/* parchment: the only light surface on the page, so the question is what you read first */}
-            <div style={{
+            <div className="solo-parch" style={{
               background: 'linear-gradient(180deg, #F3EAD7, #E4D7BA)', color: '#1d1410', borderRadius: 14, padding: 16,
               border: `2px solid ${tier.color}`, boxShadow: `0 0 0 3px #0A0305, 0 10px 30px rgba(0,0,0,0.5), 0 0 24px ${tier.glow}`,
             }}>
@@ -654,10 +760,10 @@ export default function SoloGame() {
               {question.itunes_id && (
                 <SongPlayer key={question.id ?? question.itunes_id} itunesId={question.itunes_id} solo onFailed={onSongFailed} />
               )}
-              <p style={{ fontWeight: 800, fontSize: 20, lineHeight: 1.75, textAlign: 'right' }}>{question.question}</p>
+              <p className="solo-q" style={{ fontWeight: 800, fontSize: 20, lineHeight: 1.75, textAlign: 'right' }}>{question.question}</p>
             </div>
 
-            <motion.div style={{ display: 'grid', gap: 9 }}
+            <motion.div className="solo-options"
               initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: reduce ? 0 : STAGGER, delayChildren: 0.1 } } }}>
               {Object.entries(question.options).map(([key, value]) => {
                 if (!value) return null;
@@ -674,7 +780,7 @@ export default function SoloGame() {
                 if (isRemoved || isFirstWrong) op = 0.22;
                 const celebrate = answered && isRight && selected === question.correct;
                 return (
-                  <motion.button key={key}
+                  <motion.button key={key} className="solo-opt"
                     variants={{ hidden: { opacity: 0, x: 18 }, show: { opacity: op, x: 0, transition: springs.gentle } }}
                     animate={isWrongPick ? { x: reduce ? 0 : [0, -10, 10, -7, 7, 0], opacity: op } : celebrate ? { x: 0, scale: reduce ? 1 : [1, 1.04, 1], opacity: op } : (answered || isRemoved || isFirstWrong) ? { x: 0, opacity: op } : undefined}
                     transition={isWrongPick ? { duration: 0.45 } : celebrate ? { duration: 0.5, ease } : undefined}
@@ -696,7 +802,9 @@ export default function SoloGame() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
 
+      <div className="solo-tools">
       {question && !loading && !answered && (
         <div>
           <AnimatePresence>
@@ -707,6 +815,9 @@ export default function SoloGame() {
               </motion.p>
             )}
           </AnimatePresence>
+          <p style={{ textAlign: 'center', fontSize: 12, fontWeight: 800, color: '#FFD700', marginBottom: 6 }}>
+            وسائل المساعدة · المتبقية {LIFELINES.filter(l => canUseLifeline(run, l.id)).length} من {LIFELINES.length}
+          </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
             {LIFELINES.map(l => {
               const used = !canUseLifeline(run, l.id);
@@ -716,18 +827,19 @@ export default function SoloGame() {
                 <motion.button key={l.id} {...(used ? {} : tap)} onClick={() => onLifeline(l.id)} disabled={used} title={l.desc}
                   style={{
                     ...ghostBtn, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 66, padding: '8px 8px 6px',
-                    opacity: used ? 0.28 : 1, textDecoration: used ? 'line-through' : 'none',
+                    opacity: used ? 0.4 : 1,
                   }}>
-                  <span style={{ fontSize: 20, lineHeight: 1 }}>{icon}</span>
+                  <span style={{ fontSize: 20, lineHeight: 1, filter: used ? 'grayscale(1)' : 'none' }}>{icon}</span>
                   <span style={{ fontSize: 11, fontWeight: 700 }}>{rest.join(' ')}{extra > 0 ? ` +${extra}` : ''}</span>
+                  {used && <span style={{ fontSize: 10, fontWeight: 800, color: '#FF8A8A' }}>استُخدمت</span>}
                 </motion.button>
               );
             })}
           </div>
-          <p style={{ textAlign: 'center', fontSize: 11, opacity: 0.6, marginTop: 8 }}>
+          <p style={{ textAlign: 'center', fontSize: 11, opacity: 0.7, marginTop: 8, lineHeight: 1.6 }}>
             {twoMode && !firstWrong ? '✌️ لديك محاولتان لهذا السؤال. ' : ''}
             {doubled ? `🎯 دبل مفعّل: ×${DOUBLE_MULT} إن أصبت. ` : ''}
-            كل مساعدة تخصم {HELP_COST_RATE * 100}% من نقاط السؤال (عدا الدبل).
+            كل وسيلة مرة واحدة فقط في الجولة كلها (٩٠ مرحلة). وتخصم {HELP_COST_RATE * 100}% من نقاط السؤال الذي تستخدمها فيه (عدا الدبل).
           </p>
         </div>
       )}
@@ -767,6 +879,28 @@ export default function SoloGame() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
+
+      <AnimatePresence>
+        {showExit && (
+          <motion.div key="exit" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.15 } }}
+            style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'grid', placeItems: 'center', padding: 20, background: 'rgba(0,0,0,0.78)', backdropFilter: 'blur(4px)' }}
+            onClick={() => setShowExit(false)}>
+            <motion.div role="dialog" aria-modal="true" aria-labelledby="exit-title"
+              initial={reduce ? false : { scale: 0.92, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.15 } }} transition={springs.gentle}
+              onClick={e => e.stopPropagation()}
+              style={{ ...card, maxWidth: 360, display: 'flex', flexDirection: 'column', gap: 12, textAlign: 'center' }}>
+              <p id="exit-title" style={{ fontSize: 18, fontWeight: 900 }}>الخروج أثناء السؤال؟</p>
+              <p style={{ fontSize: 14, lineHeight: 1.8, opacity: 0.9 }}>
+                لكل سؤال محاولة واحدة، فإذا خرجت الآن يُحتسب هذا السؤال خطأً.
+                أجب أولاً ثم اضغط «حفظ وخروج» لتحتفظ بتقدّمك بلا أي خسارة.
+              </p>
+              <motion.button {...tap} style={redBtn} onClick={() => setShowExit(false)} autoFocus>أكمل السؤال</motion.button>
+              <motion.button {...tap} style={ghostBtn} onClick={confirmExit}>اخرج واحتسبه خطأً</motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -782,7 +916,12 @@ function ShareButtons({ run }) {
     ? `🎉 أنهيت تحدّي «من الوحش» كاملاً (${TOTAL_LEVELS} مرحلة) وجمعت ${score.toLocaleString('en')} نقطة! هل تقدر تتفوق عليّ؟ 🎯`
     : `🎯 وصلت إلى المرحلة ${levels + (run.gameOver ? 0 : 1)} من ${TOTAL_LEVELS} في تحدّي «من الوحش» وجمعت ${score.toLocaleString('en')} نقطة! هل تقدر تتفوق عليّ؟`;
   const full = `${text}\n${url}`;
-  const open = (href) => window.open(href, '_blank', 'noopener,noreferrer');
+  // Inside the Android/iOS apps (WebViews) window.open can be ignored; navigating
+  // the view lets the app's own navigation handler open the link externally.
+  const open = (href) => {
+    if (isRunningInAndroidApp() || isRunningInIOSApp()) window.location.href = href;
+    else window.open(href, '_blank', 'noopener,noreferrer');
+  };
   const btn = { ...ghostBtn, padding: '10px 14px', fontSize: 14 };
   const canNative = typeof navigator !== 'undefined' && !!navigator.share;
   const copy = async () => {

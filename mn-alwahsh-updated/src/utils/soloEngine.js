@@ -77,10 +77,11 @@ export function tierPoints(levelIndex) {
   return 600;
 }
 
-export function newRun({ mode = 'all', categories = [] } = {}) {
+export function newRun({ mode = 'all', categories = [], trial = [] } = {}) {
   return {
     mode,                // 'all' | 'pick'
     categories,          // the 10 chosen names when mode === 'pick'
+    trial,               // premium categories borrowed for this run only (one-game trial)
     level: 0,            // 0-based index of the level being played
     levelPoints: [],     // points banked for each finished level (index = level)
     helpsUsed: 0,        // total helps used in this run (never decreases)
