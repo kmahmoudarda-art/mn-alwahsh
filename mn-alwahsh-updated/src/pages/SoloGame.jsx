@@ -19,6 +19,7 @@ import UnlockPrompt from '../components/game/UnlockPrompt';
 import LevelTrack from '../components/solo/LevelTrack';
 import CountUp from '../components/solo/CountUp';
 import ShareResult from '../components/solo/ShareResult';
+import { setScreenSecure } from '../utils/nativeBridge';
 import SoloBackdrop from '../components/solo/SoloBackdrop';
 import { springs, TIER, STAGGER, ease } from '../components/solo/soloMotion';
 import {
@@ -130,6 +131,9 @@ export default function SoloGame() {
   const navigate = useNavigate();
   const user = getCurrentUser();
   const reduce = useReducedMotion();
+
+  // Android app only (no-op elsewhere): no screenshots or screen recording while the solo game is open.
+  useEffect(() => { setScreenSecure(true); return () => setScreenSecure(false); }, []);
 
   const [view, setView] = useState('intro'); // intro | mode | pick | play | box | end | board
   const [boxResult, setBoxResult] = useState(null);
