@@ -434,6 +434,15 @@ export default function GameNameScreen({ onEnter }) {
             )}
           </div>
 
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+            <button onClick={() => navigate('/solo')}
+              className="flex items-center gap-2 px-5 py-2 rounded-xl font-cairo font-bold text-sm transition-all"
+              style={{ background: 'rgba(80,0,0,0.75)', border: '1px solid rgba(255,60,60,0.6)', color: '#FFE4E4', backdropFilter: 'blur(8px)' }}
+            >
+              🎯 تحدّي فردي (Solo) · ٩٠ مرحلة
+            </button>
+          </div>
+
           <p className="gns-subtitle font-tajawal font-bold" style={{
             color: '#FF6666', textShadow: '0 0 10px rgba(204,0,0,0.6)',
             fontSize: 'clamp(12px, 1.8vw, 16px)', marginBottom: 12, textAlign: 'center',
