@@ -148,6 +148,7 @@ export default function SoloGame() {
   const [flash, setFlash] = useState(0);
   const [run, setRun] = useState(newRun);
   const [hasSave, setHasSave] = useState(false);
+  const [confirmNew, setConfirmNew] = useState(false); // in-page confirmation: the apps' WebView ignores window.confirm
   const [saveInfo, setSaveInfo] = useState(null); // { level, score, mode } of the saved run
 
   const [pool, setPool] = useState(null);     // categories this account can play
@@ -563,7 +564,7 @@ export default function SoloGame() {
         </motion.button>
       )}
       <motion.button {...tap} style={hasSave ? ghostBtn : redBtn} onClick={() => {
-        if (hasSave && !window.confirm('سيُحذف تقدّمك الحالي. متأكد؟')) return;
+        if (hasSave) { setConfirmNew(true); return; }
         setView('mode');
       }}>{hasSave ? 'ابدأ جولة جديدة' : 'ابدأ التحدّي'}</motion.button>
       <motion.button {...tap} style={ghostBtn} onClick={openBoard}>🏆 المتصدّرون</motion.button>
@@ -590,6 +591,23 @@ export default function SoloGame() {
       </div>
       </div>
       </div>
+      <AnimatePresence>
+        {confirmNew && (
+          <motion.div key="confirm-new" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.15 } }}
+            onClick={() => setConfirmNew(false)}
+            style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(0,0,0,0.8)', display: 'grid', placeItems: 'center', padding: 16 }}>
+            <motion.div role="dialog" aria-modal="true" aria-labelledby="confirm-new-title"
+              initial={reduce ? false : { scale: 0.94, y: 8 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.96, opacity: 0, transition: { duration: 0.15 } }} transition={springs.gentle}
+              onClick={(e) => e.stopPropagation()}
+              style={{ ...card, maxWidth: 340, display: 'flex', flexDirection: 'column', gap: 12, textAlign: 'center' }}>
+              <p id="confirm-new-title" style={{ fontSize: 18, fontWeight: 900 }}>بدء جولة جديدة؟</p>
+              <p style={{ fontSize: 14, lineHeight: 1.8, opacity: 0.9 }}>سيُحذف تقدّمك المحفوظ في الجولة الحالية.</p>
+              <motion.button {...tap} style={redBtn} onClick={() => { setConfirmNew(false); setView('mode'); }}>نعم، ابدأ جولة جديدة</motion.button>
+              <motion.button {...tap} style={ghostBtn} onClick={() => setConfirmNew(false)} autoFocus>إلغاء، أكمل جولتي</motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 
