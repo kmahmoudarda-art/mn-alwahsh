@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { fetchQuestion } from '../utils/supabaseClient';
+import { fetchQuestion, insertGameSession, updateGameSession } from '../utils/supabaseClient';
 import { loadCategoriesFast } from '../utils/categoryCache';
 import { fetchAndCacheImage, getCachedImageUrl } from '../utils/questionGenerator';
 import { displayName, getIcon } from '../utils/categoryIcons';
@@ -195,6 +195,7 @@ export default function SoloGame() {
   const [slowLoad, setSlowLoad] = useState(false);
   const songSwapped = useRef(false);
   const songFails = useRef(0);          // unplayable clips in a row; after 2 we stop serving songs until an answer
+  const sessionIdRef = useRef(null);    // this run's row in game_sessions (the "games played" counter)
   const submittedRef = useRef(false);   // this finished run is already on the leaderboard
   const loadTok = useRef(0);            // newest loadQuestion wins; stale ones stop quietly
   const boxTimer = useRef(null);
@@ -223,7 +224,7 @@ export default function SoloGame() {
     } else if (L.loading) {
       qs = { carry: { helps: helpsOnQ.current, doubled: L.doubled } };
     }
-    writeSave({ run: L.run, seen: [...seen.current].slice(-400), qs, submitted: submittedRef.current });
+    writeSave({ run: L.run, seen: [...seen.current].slice(-400), qs, submitted: submittedRef.current, sid: sessionIdRef.current });
   }, []);
 
   useEffect(() => { saveNow(); }, [run, question, removed, twoMode, firstWrong, doubled, friendKey, answered, loading, songStarted, view, saveNow]);
@@ -370,6 +371,8 @@ export default function SoloGame() {
     setView('end');
     setSubmitInfo(null);
     if (submittedRef.current) { setSubmitInfo({ saved: true, newBest: false, signedIn: true }); return; }
+    // the run is over: close its row in the same games table the multiplayer games use
+    updateGameSession(sessionIdRef.current, { status: 'finished', winner: null, team1_score: finalScore(r), team2_score: null });
     submittedRef.current = true;          // set first, so tapping twice can't submit twice
     const info = await submitRun({
       score: finalScore(r), levels: levelsCompleted(r), finished: r.finished, user,
@@ -386,6 +389,15 @@ export default function SoloGame() {
     nextRef.current = null;
     submittedRef.current = false;
     const r = newRun({ mode, categories, trial });
+    // Count it as a game played: one row in game_sessions, like a multiplayer game
+    // (the home screen's counter counts that table). Marked with game_name 'solo'.
+    sessionIdRef.current = null;
+    insertGameSession({
+      game_name: 'solo',
+      team1_name: user ? displayNameFor(user) : 'ضيف',
+      team2_name: null,
+      categories: mode === 'pick' ? categories : ['كل الفئات'],
+    }).then((id) => { sessionIdRef.current = id; saveNow(); });
     runRef.current = r;            // loadQuestion reads the mode from here
     liveRun.current = true;
     setRun(r); setBoxResult(null); setView('play');
@@ -409,6 +421,7 @@ export default function SoloGame() {
     seen.current = new Set(s.seen || []);
     songFails.current = 0;
     submittedRef.current = !!s.submitted;
+    sessionIdRef.current = s.sid || null;
     const r = { ...newRun({ mode: 'pick' }), ...s.run }; // saves from before modes behave like 'pick', ×1
     runRef.current = r;
     liveRun.current = true;
