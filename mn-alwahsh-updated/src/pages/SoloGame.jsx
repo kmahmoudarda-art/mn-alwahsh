@@ -4,7 +4,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { fetchCategories, fetchQuestion } from '../utils/supabaseClient';
+import { fetchQuestion } from '../utils/supabaseClient';
+import { loadCategoriesFast } from '../utils/categoryCache';
 import { fetchAndCacheImage, getCachedImageUrl } from '../utils/questionGenerator';
 import { displayName, getIcon } from '../utils/categoryIcons';
 import { isSoloExcluded } from '../utils/soloExcluded';
@@ -53,6 +54,18 @@ function loadHistory(u) {
 }
 function saveHistory(u, set) {
   try { localStorage.setItem(historyKey(u), JSON.stringify([...set].slice(-HISTORY_CAP))); } catch { /* storage full or blocked */ }
+}
+
+// Category+tier pairs that have no questions never get retried (kept for a day on this device).
+const DEAD_KEY = 'mn_alwahsh_v3_solo_dead';
+function loadDead() {
+  try {
+    const d = JSON.parse(localStorage.getItem(DEAD_KEY) || 'null');
+    return d && Date.now() - d.t < 24 * 3600 * 1000 ? new Set(d.list) : new Set();
+  } catch { return new Set(); }
+}
+function saveDead(set) {
+  try { localStorage.setItem(DEAD_KEY, JSON.stringify({ t: Date.now(), list: [...set] })); } catch { /* storage full */ }
 }
 
 function loadSave() {
@@ -177,7 +190,9 @@ export default function SoloGame() {
 
   const seen = useRef(new Set());       // questions shown in THIS run
   const history = useRef(null);         // questions shown in every run on this device (see loadHistory)
-  const deadCombos = useRef(new Set());
+  const deadCombos = useRef(loadDead());
+  const nextRef = useRef(null);         // the next question, fetched while the player answers this one: { points, promise }
+  const [slowLoad, setSlowLoad] = useState(false);
   const songSwapped = useRef(false);
   const songFails = useRef(0);          // unplayable clips in a row; after 2 we stop serving songs until an answer
   const submittedRef = useRef(false);   // this finished run is already on the leaderboard
@@ -247,11 +262,10 @@ export default function SoloGame() {
 
   const ensurePool = useCallback(async () => {
     if (pool) return pool;
-    const cats = await fetchCategories();
+    const [cats, unlockedList] = await Promise.all([loadCategoriesFast(), fetchUnlockedCategories().catch(() => [])]);
     if (!cats.length) throw new Error('no-categories');
     const visible = cats.filter(c => !isHiddenCategory(c) && !isSoloExcluded(c));
     setAllCats(visible);
-    const unlockedList = await fetchUnlockedCategories().catch(() => []);
     const playable = computePlayable(visible, unlockedList);
     setPool(playable);
     return playable;
@@ -278,6 +292,40 @@ export default function SoloGame() {
     }
   };
 
+  // Finds a fresh, valid question for this tier (does not show it).
+  const findQuestion = useCallback(async (points, deadline) => {
+    const base = await ensurePool();
+    const cur = runRef.current;
+    const chosen = (cur.categories || []).filter(c => base.includes(c) || (cur.trial || []).includes(c)); // drops anything excluded since an older save
+    const cats = cur.mode === 'pick' && chosen.length ? chosen : base;
+    if (!history.current) history.current = loadHistory(user);
+    const hist = history.current;
+    // First pass skips everything this player has ever seen in solo; only if that
+    // finds nothing do we allow repeats from older runs (never within this run).
+    for (const strict of [true, false]) {
+      for (let i = 0; i < 25; i++) {
+        if (Date.now() > deadline) return null;
+        const avail = cats.filter(c => !deadCombos.current.has(`${c}|${points}`));
+        if (!avail.length) break;
+        const cat = pick(avail);
+        const q = await fetchQuestion(cat, points);
+        if (!q) { deadCombos.current.add(`${cat}|${points}`); saveDead(deadCombos.current); continue; }
+        const k = qKey(q);
+        if (!validQuestion(q) || seen.current.has(k) || (strict && hist.has(k))) continue;
+        if (q.itunes_id && songFails.current >= 2) continue; // clips keep failing: serve other questions
+        if (q.image_url) await Promise.race([fetchAndCacheImage(q.image_url), new Promise(r => setTimeout(r, 2500))]);
+        return { q, cat };
+      }
+    }
+    return null;
+  }, [ensurePool, user]);
+
+  // Start fetching the question that will most likely come next, while this one is being answered.
+  const startPrefetch = useCallback((nextLevel) => {
+    const points = tierPoints(Math.min(nextLevel, TOTAL_LEVELS - 1));
+    nextRef.current = { points, promise: findQuestion(points, Date.now() + 25000).catch(() => null) };
+  }, [findQuestion]);
+
   const loadQuestion = useCallback(async (level, carry) => {
     const tok = ++loadTok.current;
     setLoading(true); setLoadError(false);
@@ -289,40 +337,33 @@ export default function SoloGame() {
     setTimeLeft(QUESTION_SECONDS); setSongStarted(false); setTimedOut(false);
     const points = tierPoints(level);
     try {
-      const base = await ensurePool();
-      if (tok !== loadTok.current) return;
-      const cur = runRef.current;
-      const chosen = (cur.categories || []).filter(c => base.includes(c) || (cur.trial || []).includes(c)); // drops anything excluded since an older save
-      const cats = cur.mode === 'pick' && chosen.length ? chosen : base;
-      if (!history.current) history.current = loadHistory(user);
-      const hist = history.current;
-      // First pass skips everything this player has ever seen in solo; only if that
-      // finds nothing do we allow repeats from older runs (never within this run).
-      for (const strict of [true, false]) {
-        for (let i = 0; i < 25; i++) {
-          const avail = cats.filter(c => !deadCombos.current.has(`${c}|${points}`));
-          if (!avail.length) break;
-          const cat = pick(avail);
-          const q = await fetchQuestion(cat, points);
-          if (tok !== loadTok.current) return;
-          if (!q) { deadCombos.current.add(`${cat}|${points}`); continue; }
-          const k = qKey(q);
-          if (!validQuestion(q) || seen.current.has(k) || (strict && hist.has(k))) continue;
-          if (q.itunes_id && songFails.current >= 2) continue; // clips keep failing: serve other questions
-          if (q.image_url) await Promise.race([fetchAndCacheImage(q.image_url), new Promise(r => setTimeout(r, 2500))]);
-          if (tok !== loadTok.current) return;
-          seen.current.add(k); hist.add(k); saveHistory(user, hist);
-          setQuestion({ ...q, category: cat });
-          setLoading(false);
-          return;
-        }
+      let found = null;
+      const pre = nextRef.current;
+      if (pre && pre.points === points) {          // already fetched in the background: no waiting
+        nextRef.current = null;
+        found = await pre.promise;
+        if (tok !== loadTok.current) return;
+        if (found && seen.current.has(qKey(found.q))) found = null;
       }
-      setLoadError(true);
+      if (!found) found = await findQuestion(points, Date.now() + 25000);
+      if (tok !== loadTok.current) return;
+      if (!found) { setLoadError(true); setLoading(false); return; }
+      if (!history.current) history.current = loadHistory(user);
+      const k = qKey(found.q);
+      seen.current.add(k); history.current.add(k); saveHistory(user, history.current);
+      setQuestion({ ...found.q, category: found.cat });
+      setLoading(false);
+      startPrefetch(level + 1);
     } catch {
-      if (tok === loadTok.current) setLoadError(true);
+      if (tok === loadTok.current) { setLoadError(true); setLoading(false); }
     }
-    if (tok === loadTok.current) setLoading(false);
-  }, [ensurePool, user]);
+  }, [findQuestion, startPrefetch, user]);
+
+  useEffect(() => {
+    if (!loading) { setSlowLoad(false); return undefined; }
+    const id = setTimeout(() => setSlowLoad(true), 6000);
+    return () => clearTimeout(id);
+  }, [loading]);
 
   // ── run lifecycle ───────────────────────────────────────────────────
   const endRun = useCallback(async (r) => {
@@ -341,8 +382,8 @@ export default function SoloGame() {
   const startNew = (mode = 'all', categories = []) => {
     const trial = categories.filter(c => trialRef.current.includes(c)); // borrowed premium categories live only in this run
     seen.current = new Set();
-    deadCombos.current = new Set();
     songFails.current = 0; setSongSkips(3);
+    nextRef.current = null;
     submittedRef.current = false;
     const r = newRun({ mode, categories, trial });
     runRef.current = r;            // loadQuestion reads the mode from here
@@ -366,7 +407,6 @@ export default function SoloGame() {
     const s = loadSave();
     if (!s?.run) return startNew();
     seen.current = new Set(s.seen || []);
-    deadCombos.current = new Set();
     songFails.current = 0;
     submittedRef.current = !!s.submitted;
     const r = { ...newRun({ mode: 'pick' }), ...s.run }; // saves from before modes behave like 'pick', ×1
@@ -387,6 +427,7 @@ export default function SoloGame() {
       timerRef.current = { used: Math.min(QUESTION_SECONDS, Number(qs.timeUsed) || 0), startedAt: null };
       setTimeLeft(Math.max(0, QUESTION_SECONDS - timerRef.current.used)); setSongStarted(!!qs.songStarted); setTimedOut(false);
       if (qs.question.image_url) fetchAndCacheImage(qs.question.image_url).catch(() => {});
+      startPrefetch(r.level + 1);
       return;
     }
     loadQuestion(r.level, qs?.carry);
@@ -907,7 +948,7 @@ export default function SoloGame() {
       {loading && (
         <div style={{ ...card, textAlign: 'center', padding: 36 }}>
           <motion.div animate={reduce ? {} : { scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }} transition={{ duration: 1.2, repeat: Infinity }} style={{ fontSize: 34 }}>👁</motion.div>
-          <p style={{ fontSize: 13, opacity: 0.7, marginTop: 6 }}>جاري تحضير السؤال…</p>
+          <p style={{ fontSize: 13, opacity: 0.7, marginTop: 6 }}>{slowLoad ? 'الاتصال بطيء، ما زلنا نحضّر السؤال…' : 'جاري تحضير السؤال…'}</p>
         </div>
       )}
 
