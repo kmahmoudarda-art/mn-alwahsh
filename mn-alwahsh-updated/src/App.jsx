@@ -11,6 +11,7 @@ import { logAppOpen } from '@/utils/supabaseClient';
 import Game from './pages/Game';
 import Login from './pages/Login';
 import SoloGame from './pages/SoloGame';
+import SoloShare from './pages/SoloShare';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 
 const AuthenticatedApp = () => {
@@ -44,6 +45,7 @@ const AuthenticatedApp = () => {
       <Route path="/game" element={<Game />} />
       <Route path="/winner" element={<Game />} />
       <Route path="/solo" element={<SoloGame />} />
+      <Route path="/solo-share" element={<SoloShare />} />
       <Route path="/login" element={<Login />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="*" element={<PageNotFound />} />

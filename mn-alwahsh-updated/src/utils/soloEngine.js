@@ -38,6 +38,13 @@ export const HELP_BONUS_STEP = 400;
 export const MAX_LOSS_BONUS = 5000;   // −1000 per question lost in the run
 export const LOSS_BONUS_STEP = 1000;
 
+// Timer: every question has 30 seconds. Running out counts as a wrong answer;
+// each whole second left when you answer correctly adds 1 point (not multiplied).
+export const QUESTION_SECONDS = 30;
+export function timeBonus(secondsLeft) {
+  return Math.max(0, Math.min(QUESTION_SECONDS, Math.floor(secondsLeft || 0)));
+}
+
 // Mystery box
 export const BOX_EVERY = 10;
 export const BOX_BONUS_MULT = 2;  // ⭐ gain  = tier points × 2
@@ -137,7 +144,7 @@ export function finalScore(run) {
   return base + helpBonus(run) + lossBonus(run);
 }
 
-export const MAX_SCORE = 30 * 200 + 30 * 400 + 30 * 600 + MAX_HELP_BONUS + MAX_LOSS_BONUS;
+export const MAX_SCORE = 30 * 200 + 30 * 400 + 30 * 600 + MAX_HELP_BONUS + MAX_LOSS_BONUS + TOTAL_LEVELS * QUESTION_SECONDS;
 
 // Use a lifeline. Returns the updated run, or the same run if it was already
 // used. `helpsOnThisQuestion` is the cost (in points) charged to the current
@@ -184,7 +191,7 @@ function advance(run, earned) {
   };
 }
 
-export function resolveQuestion(run, { correct, helps = 0, doubled = false }) {
+export function resolveQuestion(run, { correct, helps = 0, doubled = false, timeLeft = 0 }) {
   const points = tierPoints(run.level);
   const trap = isTrap(run);
 
@@ -192,10 +199,12 @@ export function resolveQuestion(run, { correct, helps = 0, doubled = false }) {
     let earned = Math.max(0, points - helps * helpCost(points));
     if (doubled) earned *= DOUBLE_MULT;
     earned = Math.round(earned * modeMultiplier(run));
+    const speed = timeBonus(timeLeft);
+    earned += speed;
     const next = advance(run, earned);
     return {
       run: next,
-      outcome: { type: next.finished ? 'finished' : 'correct', earned, points, trap },
+      outcome: { type: next.finished ? 'finished' : 'correct', earned, points, trap, timeBonus: speed },
     };
   }
 

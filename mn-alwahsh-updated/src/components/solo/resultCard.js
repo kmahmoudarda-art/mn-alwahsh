@@ -12,10 +12,28 @@ export function levelReached(run) {
   return run.finished ? TOTAL_LEVELS : run.level + 1;
 }
 
-export function shareText(run) {
-  return run.finished
+export function shareTextFor({ level, finished }) {
+  return finished
     ? `🎯 أنهيت كل المراحل الـ${TOTAL_LEVELS} في تحدّي «من الوحش»`
-    : `🎯 وصلت إلى المرحلة ${levelReached(run)} من ${TOTAL_LEVELS} في تحدّي «من الوحش»`;
+    : `🎯 وصلت إلى المرحلة ${level} من ${TOTAL_LEVELS} في تحدّي «من الوحش»`;
+}
+
+export function shareText(run) {
+  return shareTextFor({ level: levelReached(run), finished: !!run.finished });
+}
+
+// What the picture needs, taken from a run.
+export function cardDataFor(run) {
+  return {
+    level: levelReached(run),
+    score: run.finished ? finalScore(run) : baseScore(run),
+    finished: !!run.finished,
+    allCategories: modeMultiplier(run) > 1,
+  };
+}
+
+export function renderResultCard(run) {
+  return renderCard(cardDataFor(run));
 }
 
 function roundRect(g, x, y, w, h, r) {
@@ -28,15 +46,13 @@ function roundRect(g, x, y, w, h, r) {
   g.closePath();
 }
 
-export async function renderResultCard(run) {
+export async function renderCard({ level, score, finished, allCategories }) {
   try {
     await Promise.all([document.fonts.load('900 64px Cairo'), document.fonts.load('700 40px Cairo')]);
   } catch { /* fall back to the system font */ }
 
-  const level = levelReached(run);
   const tierPts = level <= 30 ? 200 : level <= 60 ? 400 : 600;
   const color = TIER[tierPts].color;
-  const score = run.finished ? finalScore(run) : baseScore(run);
   const family = "Cairo, 'Segoe UI', Tahoma, sans-serif";
 
   const c = document.createElement('canvas');
@@ -65,7 +81,7 @@ export async function renderResultCard(run) {
 
   // level
   g.fillStyle = 'rgba(255,233,233,0.85)'; g.font = `700 60px ${family}`;
-  g.fillText(run.finished ? 'أنهيت' : 'وصلت إلى المرحلة', W / 2, 372);
+  g.fillText(finished ? 'أنهيت' : 'وصلت إلى المرحلة', W / 2, 372);
   g.shadowColor = color; g.shadowBlur = 40;
   g.fillStyle = color; g.font = `900 250px ${family}`;
   g.fillText(String(level), W / 2, 600);
@@ -96,10 +112,10 @@ export async function renderResultCard(run) {
 
   // mode + result chip
   g.font = `700 44px ${family}`;
-  if (run.finished) {
+  if (finished) {
     g.fillStyle = '#46C98B';
     g.fillText('أنهيت التحدّي كاملاً 🏆', W / 2, 980);
-  } else if (modeMultiplier(run) > 1) {
+  } else if (allCategories) {
     g.fillStyle = '#FFD700';
     g.fillText(`كل الفئات (مضاعف النقاط ${ALL_CATEGORIES_MULT})`, W / 2, 980);
   }
