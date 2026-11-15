@@ -7,7 +7,6 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { fetchCategories, fetchQuestion } from '../utils/supabaseClient';
 import { fetchAndCacheImage, getCachedImageUrl } from '../utils/questionGenerator';
 import { displayName, getIcon } from '../utils/categoryIcons';
-import { isRunningInAndroidApp, isRunningInIOSApp } from '../utils/platform';
 import { isSoloExcluded } from '../utils/soloExcluded';
 import { isHiddenCategory } from '../utils/hiddenCategories';
 import { isPremiumCategory, isTestAccount } from '../utils/premiumConfig';
@@ -19,6 +18,7 @@ import SongPlayer from '../components/game/SongPlayer';
 import UnlockPrompt from '../components/game/UnlockPrompt';
 import LevelTrack from '../components/solo/LevelTrack';
 import CountUp from '../components/solo/CountUp';
+import ShareResult from '../components/solo/ShareResult';
 import SoloBackdrop from '../components/solo/SoloBackdrop';
 import { springs, TIER, STAGGER, ease } from '../components/solo/soloMotion';
 import {
@@ -752,7 +752,7 @@ export default function SoloGame() {
             : submitInfo.saved ? (submitInfo.newBest ? '🏆 رقم قياسي جديد! حُفظت نتيجتك.' : '✔ حُفظت نتيجتك.')
             : '⚠️ تعذّر حفظ النتيجة، تحقّق من الاتصال.'}
         </p>
-        <ShareButtons run={run} />
+        <ShareResult run={run} />
         <motion.button {...tap} style={redBtn} onClick={() => setView('mode')}>جولة جديدة</motion.button>
         <motion.button {...tap} style={ghostBtn} onClick={openBoard}>🏆 المتصدّرون</motion.button>
         <motion.button {...tap} style={ghostBtn} onClick={() => { setHasSave(false); setView('intro'); navigate('/'); }}>الشاشة الرئيسية</motion.button>
@@ -966,40 +966,6 @@ export default function SoloGame() {
       </AnimatePresence>
       </div>
 
-    </div>
-  );
-}
-
-// Share the current level and score — WhatsApp, Facebook, the phone's own
-// share sheet (when available) or copy the text.
-function ShareButtons({ run }) {
-  const [copied, setCopied] = useState(false);
-  const levels = levelsCompleted(run);
-  const score = finalScore(run);
-  const url = `${window.location.origin}/solo`;
-  const text = run.finished
-    ? `🎉 أنهيت تحدّي «من الوحش» كاملاً (${TOTAL_LEVELS} مرحلة) وجمعت ${score.toLocaleString('en')} نقطة! هل تقدر تتفوق عليّ؟ 🎯`
-    : `🎯 وصلت إلى المرحلة ${levels + (run.gameOver ? 0 : 1)} من ${TOTAL_LEVELS} في تحدّي «من الوحش» وجمعت ${score.toLocaleString('en')} نقطة! هل تقدر تتفوق عليّ؟`;
-  const full = `${text}\n${url}`;
-  // Inside the Android/iOS apps (WebViews) window.open can be ignored; navigating
-  // the view lets the app's own navigation handler open the link externally.
-  const open = (href) => {
-    if (isRunningInAndroidApp() || isRunningInIOSApp()) window.location.href = href;
-    else window.open(href, '_blank', 'noopener,noreferrer');
-  };
-  const btn = { ...ghostBtn, padding: '10px 14px', fontSize: 14 };
-  const canNative = typeof navigator !== 'undefined' && !!navigator.share;
-  const copy = async () => {
-    try { await navigator.clipboard.writeText(full); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {}
-  };
-  return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
-      <span style={{ width: '100%', textAlign: 'center', fontSize: 13, opacity: 0.8 }}>📣 شارك نتيجتك</span>
-      <button style={{ ...btn, borderColor: '#25D366' }} onClick={() => open(`https://wa.me/?text=${encodeURIComponent(full)}`)}>واتساب</button>
-      <button style={{ ...btn, borderColor: '#1877F2' }}
-        onClick={() => open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`)}>فيسبوك</button>
-      {canNative && <button style={btn} onClick={() => navigator.share({ text, url }).catch(() => {})}>مشاركة…</button>}
-      <button style={btn} onClick={copy}>{copied ? '✔ نُسخ' : 'نسخ'}</button>
     </div>
   );
 }
