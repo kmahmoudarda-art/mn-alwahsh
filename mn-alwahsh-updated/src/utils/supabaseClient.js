@@ -467,7 +467,9 @@ let _ipInfoCache = null;
 async function getIpInfo() {
   if (_ipInfoCache) return _ipInfoCache;
   try {
-    const res = await fetch('https://ipapi.co/json/');
+    // Never let a slow/blocked IP lookup delay (or lose) the game-session row —
+    // the games-played counter depends on that insert.
+    const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
     if (!res.ok) return null;
     const data = await res.json();
     _ipInfoCache = {
@@ -481,7 +483,7 @@ async function getIpInfo() {
 }
 
 export async function insertGameSession({ game_name, team1_name, team2_name, categories }) {
-  const ipInfo = await getIpInfo();
+  const ipInfo = await getIpInfo().catch(() => null);
   // id is text NOT NULL with no database default — must be supplied here,
   // or every insert fails on a NOT NULL violation (this was happening
   // silently before; see the comment in game_sessions_missing_columns.sql).
