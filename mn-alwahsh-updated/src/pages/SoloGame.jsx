@@ -423,6 +423,11 @@ export default function SoloGame() {
     songFails.current = 0;
     submittedRef.current = !!s.submitted;
     sessionIdRef.current = s.sid || null;
+    if (!s.sid && !s.run.gameOver && !s.run.finished) {
+      // The original insert never landed (offline / failed): count this run now.
+      insertGameSession({ game_name: 'solo', team1_name: user ? displayNameFor(user) : 'ضيف', team2_name: null, categories: s.run.mode === 'pick' ? (s.run.categories || []) : ['كل الفئات'] })
+        .then((id) => { sessionIdRef.current = id; saveNow(); });
+    }
     const r = { ...newRun({ mode: 'pick' }), ...s.run }; // saves from before modes behave like 'pick', ×1
     runRef.current = r;
     liveRun.current = true;
